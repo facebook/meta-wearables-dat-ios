@@ -33,6 +33,7 @@ class WearablesViewModel: ObservableObject {
   private var registrationTask: Task<Void, Never>?
   private var deviceStreamTask: Task<Void, Never>?
   private let wearables: WearablesInterface
+  private var compatibilityListenerTokens: [DeviceIdentifier: AnyListenerToken] = [:]
 
   init(wearables: WearablesInterface) {
     self.wearables = wearables
@@ -70,7 +71,33 @@ class WearablesViewModel: ObservableObject {
         #if DEBUG
         self.hasMockDevice = !MockDeviceKit.shared.pairedDevices.isEmpty
         #endif
+        // Monitor compatibility for each device
+        monitorDeviceCompatibility(devices: devices)
       }
+    }
+  }
+
+  private func monitorDeviceCompatibility(devices: [DeviceIdentifier]) {
+    // Remove listeners for devices that are no longer present
+    let deviceSet = Set(devices)
+    compatibilityListenerTokens = compatibilityListenerTokens.filter { deviceSet.contains($0.key) }
+
+    // Add listeners for new devices
+    for deviceId in devices {
+      guard compatibilityListenerTokens[deviceId] == nil else { continue }
+      guard let device = wearables.deviceForIdentifier(deviceId) else { continue }
+
+      // Capture device name before the closure to avoid Sendable issues
+      let deviceName = device.nameOrId()
+      let token = device.addCompatibilityListener { [weak self] compatibility in
+        guard let self else { return }
+        if compatibility == .deviceUpdateRequired {
+          Task { @MainActor in
+            self.showError("Device '\(deviceName)' requires an update to work with this app")
+          }
+        }
+      }
+      compatibilityListenerTokens[deviceId] = token
     }
   }
 
