@@ -27,11 +27,11 @@ struct StreamSessionView: View {
 
   var body: some View {
     ZStack {
-      if viewModel.isStreaming {
-        // Full-screen video view with streaming controls
+      if viewModel.isStudySessionActive {
+        // Study session in progress
         StreamView(viewModel: viewModel, wearablesVM: wearablesViewModel)
       } else {
-        // Pre-streaming setup view with permissions and start button
+        // Pre-study setup view with start button
         NonStreamView(viewModel: viewModel, wearablesVM: wearablesViewModel)
       }
     }

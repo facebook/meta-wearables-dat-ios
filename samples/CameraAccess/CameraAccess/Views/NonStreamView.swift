@@ -19,7 +19,6 @@ import SwiftUI
 struct NonStreamView: View {
   @ObservedObject var viewModel: StreamSessionViewModel
   @ObservedObject var wearablesVM: WearablesViewModel
-  @State private var sheetHeight: CGFloat = 300
 
   var body: some View {
     ZStack {
@@ -29,12 +28,18 @@ struct NonStreamView: View {
         HStack {
           Spacer()
           Menu {
+            Button {
+              // TODO: Implement study history view
+            } label: {
+              Label("View your study history", systemImage: "clock.arrow.circlepath")
+            }
+            
             Button("Disconnect", role: .destructive) {
               wearablesVM.disconnectGlasses()
             }
             .disabled(wearablesVM.registrationState != .registered)
           } label: {
-            Image(systemName: "gearshape")
+            Image(systemName: "ellipsis.circle")
               .resizable()
               .aspectRatio(contentMode: .fit)
               .foregroundColor(.white)
@@ -52,11 +57,11 @@ struct NonStreamView: View {
             .aspectRatio(contentMode: .fit)
             .frame(width: 120)
 
-          Text("Stream Your Glasses Camera")
+          Text("Ready to Study")
             .font(.system(size: 20, weight: .semibold))
             .foregroundColor(.white)
 
-          Text("Tap the Start streaming button to stream video from your glasses or use the camera button to take a photo from your glasses.")
+          Text("Tap the button below to start your study session. Your glasses will automatically capture photos periodically to track your progress.")
             .font(.system(size: 15))
             .multilineTextAlignment(.center)
             .foregroundColor(.white)
@@ -80,25 +85,16 @@ struct NonStreamView: View {
         .opacity(viewModel.hasActiveDevice ? 0 : 1)
 
         CustomButton(
-          title: "Start streaming",
+          title: "Start study session",
           style: .primary,
           isDisabled: !viewModel.hasActiveDevice
         ) {
           Task {
-            await viewModel.handleStartStreaming()
+            await viewModel.handleStartStudySession()
           }
         }
       }
       .padding(.all, 24)
-    }
-    .sheet(isPresented: $wearablesVM.showGettingStartedSheet) {
-      if #available(iOS 16.0, *) {
-        GettingStartedSheetView(height: $sheetHeight)
-          .presentationDetents([.height(sheetHeight)])
-          .presentationDragIndicator(.visible)
-      } else {
-        GettingStartedSheetView(height: $sheetHeight)
-      }
     }
   }
 }

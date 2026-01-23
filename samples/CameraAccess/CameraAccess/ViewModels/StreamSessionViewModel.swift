@@ -24,6 +24,13 @@ enum StreamingStatus {
   case stopped
 }
 
+enum StudyCyclePhase {
+  case idle
+  case streaming
+  case capturingPhoto
+  case waitingForNextCycle
+}
+
 @MainActor
 class StreamSessionViewModel: ObservableObject {
   @Published var currentVideoFrame: UIImage?
@@ -36,6 +43,31 @@ class StreamSessionViewModel: ObservableObject {
   var isStreaming: Bool {
     streamingStatus != .stopped
   }
+  
+  // Study session properties
+  @Published var isStudySessionActive: Bool = false
+  @Published var studyCyclePhase: StudyCyclePhase = .idle
+  @Published var photoCaptureCount: Int = 0
+  @Published var countdownToNextCapture: Int = 0
+  
+  // Study session manager for API calls
+  let sessionManager = StudySessionManager.shared
+  
+  var studyCycleStatusText: String {
+    switch studyCyclePhase {
+    case .idle:
+      return "Ready to start"
+    case .streaming:
+      return "Stream active • Monitoring..."
+    case .capturingPhoto:
+      return "📸 Photo captured!"
+    case .waitingForNextCycle:
+      return "Stream active • Next capture in \(countdownToNextCapture)s"
+    }
+  }
+  
+  private var studyCycleTask: Task<Void, Never>?
+  private let captureInterval: Int = 5 // seconds between captures
 
   // Timer properties
   @Published var activeTimeLimit: StreamTimeLimit = .noLimit
@@ -116,9 +148,21 @@ class StreamSessionViewModel: ObservableObject {
     photoDataListenerToken = streamSession.photoDataPublisher.listen { [weak self] photoData in
       Task { @MainActor [weak self] in
         guard let self else { return }
-        if let uiImage = UIImage(data: photoData.data) {
-          self.capturedPhoto = uiImage
-          self.showPhotoPreview = true
+        // During study session, upload to backend for analysis
+        if self.isStudySessionActive {
+          self.photoCaptureCount += 1
+          print("📸 Study session photo captured! Count: \(self.photoCaptureCount)")
+          
+          // Fire-and-forget upload to backend
+          Task {
+            await self.sessionManager.uploadAndAnalyze(imageData: photoData.data)
+          }
+        } else {
+          // Normal photo capture - show preview
+          if let uiImage = UIImage(data: photoData.data) {
+            self.capturedPhoto = uiImage
+            self.showPhotoPreview = true
+          }
         }
       }
     }
@@ -140,6 +184,93 @@ class StreamSessionViewModel: ObservableObject {
       showError("Permission denied")
     } catch {
       showError("Permission error: \(error.description)")
+    }
+  }
+  
+  // MARK: - Study Session Methods
+  
+  func handleStartStudySession() async {
+    let permission = Permission.camera
+    do {
+      let status = try await wearables.checkPermissionStatus(permission)
+      if status == .granted {
+        await startStudySession()
+        return
+      }
+      let requestStatus = try await wearables.requestPermission(permission)
+      if requestStatus == .granted {
+        await startStudySession()
+        return
+      }
+      showError("Permission denied")
+    } catch {
+      showError("Permission error: \(error.description)")
+    }
+  }
+  
+  func startStudySession() async {
+    isStudySessionActive = true
+    photoCaptureCount = 0
+    studyCyclePhase = .streaming
+    
+    // Start backend session first
+    let sessionStarted = await sessionManager.startSession()
+    if !sessionStarted {
+      print("⚠️ Failed to start backend session, continuing anyway...")
+    }
+    
+    // Start streaming once and keep it running
+    await streamSession.start()
+    
+    // Wait for streaming to initialize
+    try? await Task.sleep(nanoseconds: UInt64(1.5 * Double(NSEC_PER_SEC)))
+    
+    // Start the photo capture cycle (stream stays running)
+    studyCycleTask = Task { @MainActor [weak self] in
+      guard let self else { return }
+      
+      while !Task.isCancelled && self.isStudySessionActive {
+        // Capture photo
+        self.studyCyclePhase = .capturingPhoto
+        self.streamSession.capturePhoto(format: .jpeg)
+        print("📸 Capturing photo...")
+        
+        // Show "Photo captured!" for 1 second
+        try? await Task.sleep(nanoseconds: NSEC_PER_SEC)
+        
+        guard !Task.isCancelled && self.isStudySessionActive else { break }
+        
+        // Wait for next capture (stream keeps running in background)
+        self.studyCyclePhase = .waitingForNextCycle
+        for countdown in stride(from: self.captureInterval, to: 0, by: -1) {
+          guard !Task.isCancelled && self.isStudySessionActive else { break }
+          self.countdownToNextCapture = countdown
+          try? await Task.sleep(nanoseconds: NSEC_PER_SEC)
+        }
+        
+        // Back to streaming phase for next capture
+        self.studyCyclePhase = .streaming
+      }
+      
+      // Cleanup when study session ends
+      self.studyCyclePhase = .idle
+      self.isStudySessionActive = false
+    }
+  }
+  
+  func stopStudySession() async {
+    isStudySessionActive = false
+    studyCycleTask?.cancel()
+    studyCycleTask = nil
+    studyCyclePhase = .idle
+    
+    // Make sure streaming is stopped
+    await streamSession.stop()
+    
+    // End backend session
+    let totalAnalyses = await sessionManager.endSession()
+    if let total = totalAnalyses {
+      print("✅ Study session ended. Total analyses: \(total)")
     }
   }
 

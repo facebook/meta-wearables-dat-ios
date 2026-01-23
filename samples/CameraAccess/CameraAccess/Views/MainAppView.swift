@@ -21,6 +21,7 @@ struct MainAppView: View {
   let wearables: WearablesInterface
   @ObservedObject private var viewModel: WearablesViewModel
   @State private var showingRegistration: Bool = false
+  @State private var hasCompletedGettingStarted: Bool = false
 
   init(wearables: WearablesInterface, viewModel: WearablesViewModel) {
     self.wearables = wearables
@@ -29,7 +30,15 @@ struct MainAppView: View {
 
   var body: some View {
     if viewModel.registrationState == .registered || viewModel.hasMockDevice {
-      StreamSessionView(wearables: wearables, wearablesVM: viewModel)
+      if hasCompletedGettingStarted {
+        // Show streaming view (permission already granted)
+        StreamSessionView(wearables: wearables, wearablesVM: viewModel)
+      } else {
+        // Show getting started page to request camera permission
+        GettingStartedView(wearables: wearables, wearablesVM: viewModel) {
+          hasCompletedGettingStarted = true
+        }
+      }
     } else if showingRegistration {
       // Show registration/onboarding flow
       HomeScreenView(viewModel: viewModel) {

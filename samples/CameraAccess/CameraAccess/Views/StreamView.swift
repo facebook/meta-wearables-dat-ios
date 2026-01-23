@@ -20,95 +20,163 @@ import SwiftUI
 struct StreamView: View {
   @ObservedObject var viewModel: StreamSessionViewModel
   @ObservedObject var wearablesVM: WearablesViewModel
+  @ObservedObject var sessionManager = StudySessionManager.shared
 
   var body: some View {
     ZStack {
-      // Black background for letterboxing/pillarboxing
+      // Black background
       Color.black
         .edgesIgnoringSafeArea(.all)
 
-      // Video backdrop
-      if let videoFrame = viewModel.currentVideoFrame, viewModel.hasReceivedFirstFrame {
-        GeometryReader { geometry in
-          Image(uiImage: videoFrame)
-            .resizable()
-            .aspectRatio(contentMode: .fill)
-            .frame(width: geometry.size.width, height: geometry.size.height)
-            .clipped()
-        }
-        .edgesIgnoringSafeArea(.all)
-      } else {
-        ProgressView()
-          .scaleEffect(1.5)
-          .foregroundColor(.white)
-      }
-
-      // Bottom controls layer
-
       VStack {
         Spacer()
-        ControlsView(viewModel: viewModel)
+        
+        // Study in progress message
+        VStack(spacing: 16) {
+          Image(.cameraAccessIcon)
+            .resizable()
+            .renderingMode(.template)
+            .foregroundColor(.white)
+            .aspectRatio(contentMode: .fit)
+            .frame(width: 80)
+          
+          Text("Studying in progress")
+            .font(.system(size: 28, weight: .bold))
+            .foregroundColor(.white)
+            .multilineTextAlignment(.center)
+          
+          // Study cycle status
+          Text(viewModel.studyCycleStatusText)
+            .font(.system(size: 15))
+            .foregroundColor(.white.opacity(0.7))
+            .multilineTextAlignment(.center)
+          
+          // Photo capture and upload stats
+          HStack(spacing: 16) {
+            VStack(spacing: 4) {
+              Text("\(viewModel.photoCaptureCount)")
+                .font(.system(size: 24, weight: .bold))
+                .foregroundColor(.white)
+              Text("Captured")
+                .font(.system(size: 12))
+                .foregroundColor(.white.opacity(0.5))
+            }
+            
+            VStack(spacing: 4) {
+              Text("\(sessionManager.uploadSuccessCount)")
+                .font(.system(size: 24, weight: .bold))
+                .foregroundColor(.green)
+              Text("Uploaded")
+                .font(.system(size: 12))
+                .foregroundColor(.white.opacity(0.5))
+            }
+            
+            if sessionManager.uploadFailureCount > 0 {
+              VStack(spacing: 4) {
+                Text("\(sessionManager.uploadFailureCount)")
+                  .font(.system(size: 24, weight: .bold))
+                  .foregroundColor(.red)
+                Text("Failed")
+                  .font(.system(size: 12))
+                  .foregroundColor(.white.opacity(0.5))
+              }
+            }
+          }
+          .padding(.top, 8)
+          
+          // Latest analysis result
+          if let analysis = sessionManager.lastAnalysis {
+            VStack(spacing: 8) {
+              Divider()
+                .background(Color.white.opacity(0.3))
+                .padding(.vertical, 8)
+              
+              if let topic = analysis.topic {
+                HStack {
+                  Text("Topic:")
+                    .font(.system(size: 14))
+                    .foregroundColor(.white.opacity(0.7))
+                  Text(topic)
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundColor(.white)
+                }
+              }
+              
+              if let subtopic = analysis.subtopic {
+                Text(subtopic)
+                  .font(.system(size: 12))
+                  .foregroundColor(.white.opacity(0.6))
+                  .multilineTextAlignment(.center)
+              }
+              
+              if let isStudying = analysis.is_studying {
+                HStack(spacing: 6) {
+                  Circle()
+                    .fill(isStudying ? Color.green : Color.orange)
+                    .frame(width: 8, height: 8)
+                  Text(isStudying ? "Studying detected" : "Not studying")
+                    .font(.system(size: 12))
+                    .foregroundColor(.white.opacity(0.7))
+                }
+              }
+            }
+            .padding(.horizontal, 16)
+          }
+          
+          // Connection and upload status
+          VStack(spacing: 4) {
+            // Server connection status
+            HStack(spacing: 6) {
+              Circle()
+                .fill(sessionManager.isConnected ? Color.green : Color.red)
+                .frame(width: 8, height: 8)
+              Text(sessionManager.isConnected ? "Connected to server" : "Not connected to server")
+                .font(.system(size: 12))
+                .foregroundColor(.white.opacity(0.6))
+            }
+            
+            // Last upload status
+            if let lastSuccess = sessionManager.lastUploadSuccess {
+              HStack(spacing: 6) {
+                Image(systemName: lastSuccess ? "checkmark.circle.fill" : "xmark.circle.fill")
+                  .foregroundColor(lastSuccess ? .green : .red)
+                  .font(.system(size: 14))
+                Text(lastSuccess ? "Last upload successful" : "Last upload failed")
+                  .font(.system(size: 12))
+                  .foregroundColor(.white.opacity(0.6))
+              }
+            }
+            
+            // Error message if any
+            if let error = sessionManager.lastError {
+              Text(error)
+                .font(.system(size: 10))
+                .foregroundColor(.red.opacity(0.8))
+                .multilineTextAlignment(.center)
+                .lineLimit(2)
+            }
+          }
+          .padding(.top, 4)
+        }
+        
+        Spacer()
+
+        // End studying button at the bottom
+        CustomButton(
+          title: "End studying",
+          style: .destructive,
+          isDisabled: false
+        ) {
+          Task {
+            await viewModel.stopStudySession()
+          }
+        }
       }
       .padding(.all, 24)
-      // Timer display area with fixed height
-      VStack {
-        Spacer()
-        if viewModel.activeTimeLimit.isTimeLimited && viewModel.remainingTime > 0 {
-          Text("Streaming ending in \(viewModel.remainingTime.formattedCountdown)")
-            .font(.system(size: 15))
-            .foregroundColor(.white)
-        }
-      }
     }
     .onDisappear {
       Task {
-        if viewModel.streamingStatus != .stopped {
-          await viewModel.stopSession()
-        }
-      }
-    }
-    // Show captured photos from DAT SDK in a preview sheet
-    .sheet(isPresented: $viewModel.showPhotoPreview) {
-      if let photo = viewModel.capturedPhoto {
-        PhotoPreviewView(
-          photo: photo,
-          onDismiss: {
-            viewModel.dismissPhotoPreview()
-          }
-        )
-      }
-    }
-  }
-}
-
-// Extracted controls for clarity
-struct ControlsView: View {
-  @ObservedObject var viewModel: StreamSessionViewModel
-  var body: some View {
-    // Controls row
-    HStack(spacing: 8) {
-      CustomButton(
-        title: "Stop streaming",
-        style: .destructive,
-        isDisabled: false
-      ) {
-        Task {
-          await viewModel.stopSession()
-        }
-      }
-
-      // Timer button
-      CircleButton(
-        icon: "timer",
-        text: viewModel.activeTimeLimit != .noLimit ? viewModel.activeTimeLimit.displayText : nil
-      ) {
-        let nextTimeLimit = viewModel.activeTimeLimit.next
-        viewModel.setTimeLimit(nextTimeLimit)
-      }
-
-      // Photo button
-      CircleButton(icon: "camera.fill", text: nil) {
-        viewModel.capturePhoto()
+        await viewModel.stopStudySession()
       }
     }
   }
