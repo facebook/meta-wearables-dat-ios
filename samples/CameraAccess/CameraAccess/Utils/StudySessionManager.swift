@@ -91,7 +91,19 @@ class StudySessionManager: ObservableObject {
   @Published var uploadFailureCount: Int = 0
   @Published var lastError: String?
   
+  // Image naming
+  private var imageCounter: Int = 0
+  
   private init() {}
+  
+  // Generate unique filename with capture number and timestamp
+  private func generateUniqueFilename() -> String {
+    imageCounter += 1
+    let dateFormatter = DateFormatter()
+    dateFormatter.dateFormat = "yyyy-MM-dd_HH-mm-ss"
+    let timestamp = dateFormatter.string(from: Date())
+    return "imagecapture_\(imageCounter)_\(timestamp).jpg"
+  }
   
   // MARK: - Start Session
   
@@ -131,6 +143,7 @@ class StudySessionManager: ObservableObject {
       isConnected = true
       uploadSuccessCount = 0
       uploadFailureCount = 0
+      imageCounter = 0  // Reset image counter for new session
       lastAnalysis = nil
       lastError = nil
       
@@ -184,9 +197,13 @@ class StudySessionManager: ObservableObject {
     // Build multipart body
     var body = Data()
     
+    // Generate unique filename with capture number and timestamp
+    let filename = generateUniqueFilename()
+    print("📤 Uploading: \(filename)")
+    
     // Add image field (field name MUST be "image")
     body.append("--\(boundary)\r\n".data(using: .utf8)!)
-    body.append("Content-Disposition: form-data; name=\"image\"; filename=\"image.jpg\"\r\n".data(using: .utf8)!)
+    body.append("Content-Disposition: form-data; name=\"image\"; filename=\"\(filename)\"\r\n".data(using: .utf8)!)
     body.append("Content-Type: image/jpeg\r\n\r\n".data(using: .utf8)!)
     body.append(imageData)
     body.append("\r\n".data(using: .utf8)!)

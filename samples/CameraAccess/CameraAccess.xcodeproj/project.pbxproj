@@ -37,6 +37,7 @@
 		F94C1ACF2F23CDBB007B7771 /* WelcomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F94C1ACE2F23CDBB007B7771 /* WelcomeView.swift */; };
 		F94C1AD12F23DE1D007B7771 /* GettingStartedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F94C1AD02F23DE1D007B7771 /* GettingStartedView.swift */; };
 		F94C1AD32F23FD6C007B7771 /* StudySessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F94C1AD22F23FD6C007B7771 /* StudySessionManager.swift */; };
+		F94C1AD52F240585007B7771 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F94C1AD42F240585007B7771 /* ContentView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -94,6 +95,7 @@
 		F94C1ACE2F23CDBB007B7771 /* WelcomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeView.swift; sourceTree = "<group>"; };
 		F94C1AD02F23DE1D007B7771 /* GettingStartedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GettingStartedView.swift; sourceTree = "<group>"; };
 		F94C1AD22F23FD6C007B7771 /* StudySessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudySessionManager.swift; sourceTree = "<group>"; };
+		F94C1AD42F240585007B7771 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -166,6 +168,7 @@
 				E6A188472EB918740097D0E1 /* StreamView.swift */,
 				E6FD3BCD2EB4D53A00E7FE5D /* NonStreamView.swift */,
 				F94C1ACE2F23CDBB007B7771 /* WelcomeView.swift */,
+				F94C1AD42F240585007B7771 /* ContentView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -345,6 +348,7 @@
 				E6DA451E2E79A63100E3F688 /* CardView.swift in Sources */,
 				E6DA451F2E79A63100E3F688 /* MockDeviceKitView.swift in Sources */,
 				F94C1AD12F23DE1D007B7771 /* GettingStartedView.swift in Sources */,
+				F94C1AD52F240585007B7771 /* ContentView.swift in Sources */,
 				8FD96B872E6F0A9800F56AB1 /* StreamSessionViewModel.swift in Sources */,
 				8FD96B882E6F0A9800F56AB1 /* StreamSessionView.swift in Sources */,
 				8FFD60602E84A2F70035E446 /* MainAppView.swift in Sources */,

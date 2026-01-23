@@ -174,10 +174,5 @@ struct StreamView: View {
       }
       .padding(.all, 24)
     }
-    .onDisappear {
-      Task {
-        await viewModel.stopStudySession()
-      }
-    }
   }
 }

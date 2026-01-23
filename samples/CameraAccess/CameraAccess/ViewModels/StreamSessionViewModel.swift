@@ -258,7 +258,16 @@ class StreamSessionViewModel: ObservableObject {
     }
   }
   
+  private var isStoppingSession: Bool = false
+  
   func stopStudySession() async {
+    // Prevent double-calling (from button + onDisappear)
+    guard !isStoppingSession else {
+      print("⚠️ Session already stopping, skipping duplicate call")
+      return
+    }
+    isStoppingSession = true
+    
     isStudySessionActive = false
     studyCycleTask?.cancel()
     studyCycleTask = nil
@@ -272,6 +281,8 @@ class StreamSessionViewModel: ObservableObject {
     if let total = totalAnalyses {
       print("✅ Study session ended. Total analyses: \(total)")
     }
+    
+    isStoppingSession = false
   }
 
   func startSession() async {
