@@ -18,12 +18,27 @@ import SwiftUI
 
 struct HomeScreenView: View {
   @ObservedObject var viewModel: WearablesViewModel
+  let onBack: () -> Void
 
   var body: some View {
     ZStack {
       Color.white.edgesIgnoringSafeArea(.all)
 
       VStack(spacing: 12) {
+        HStack {
+          Button(action: onBack) {
+            HStack(spacing: 4) {
+              Image(systemName: "chevron.left")
+                .font(.system(size: 16, weight: .semibold))
+              Text("Back")
+                .font(.system(size: 16))
+            }
+            .foregroundColor(.black)
+          }
+          Spacer()
+        }
+        .padding(.top, 8)
+
         Spacer()
 
         Image(.cameraAccessIcon)

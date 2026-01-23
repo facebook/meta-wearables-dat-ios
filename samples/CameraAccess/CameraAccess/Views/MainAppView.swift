@@ -20,6 +20,7 @@ import SwiftUI
 struct MainAppView: View {
   let wearables: WearablesInterface
   @ObservedObject private var viewModel: WearablesViewModel
+  @State private var showingRegistration: Bool = false
 
   init(wearables: WearablesInterface, viewModel: WearablesViewModel) {
     self.wearables = wearables
@@ -29,9 +30,16 @@ struct MainAppView: View {
   var body: some View {
     if viewModel.registrationState == .registered || viewModel.hasMockDevice {
       StreamSessionView(wearables: wearables, wearablesVM: viewModel)
+    } else if showingRegistration {
+      // Show registration/onboarding flow
+      HomeScreenView(viewModel: viewModel) {
+        showingRegistration = false
+      }
     } else {
-      // User not registered - show registration/onboarding flow
-      HomeScreenView(viewModel: viewModel)
+      // Show welcome screen
+      WelcomeView {
+        showingRegistration = true
+      }
     }
   }
 }
