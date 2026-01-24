@@ -9,78 +9,77 @@
 //
 // TimeUtils.swift
 //
-// Utility for managing streaming time limits in the CameraAccess app.
+// Utility types for managing time limits in streaming sessions.
 //
 
 import Foundation
-import SwiftUI
 
-enum StreamTimeLimit: String, CaseIterable {
-  case oneMinute = "1min"
-  case fiveMinutes = "5min"
-  case tenMinutes = "10min"
-  case fifteenMinutes = "15min"
-  case noLimit = "noLimit"
-
-  var displayText: String {
-    switch self {
-    case .oneMinute:
-      return "1m"
-    case .fiveMinutes:
-      return "5m"
-    case .tenMinutes:
-      return "10m"
-    case .fifteenMinutes:
-      return "15m"
-    case .noLimit:
-      return "No limit"
+enum StreamTimeLimit: Equatable {
+    case noLimit
+    case oneMinute
+    case fiveMinutes
+    case tenMinutes
+    case thirtyMinutes
+    case oneHour
+    case custom(TimeInterval)
+    
+    var durationInSeconds: TimeInterval? {
+        switch self {
+        case .noLimit:
+            return nil
+        case .oneMinute:
+            return 60
+        case .fiveMinutes:
+            return 5 * 60
+        case .tenMinutes:
+            return 10 * 60
+        case .thirtyMinutes:
+            return 30 * 60
+        case .oneHour:
+            return 60 * 60
+        case .custom(let seconds):
+            return seconds
+        }
     }
-  }
-
-  var durationInSeconds: TimeInterval? {
-    switch self {
-    case .oneMinute:
-      return 60
-    case .fiveMinutes:
-      return 300
-    case .tenMinutes:
-      return 600
-    case .fifteenMinutes:
-      return 900
-    case .noLimit:
-      return nil
+    
+    var isTimeLimited: Bool {
+        return durationInSeconds != nil
     }
-  }
-
-  var isTimeLimited: Bool {
-    switch self {
-    case .noLimit:
-      return false
-    default:
-      return true
+    
+    var displayName: String {
+        switch self {
+        case .noLimit:
+            return "No Limit"
+        case .oneMinute:
+            return "1 Minute"
+        case .fiveMinutes:
+            return "5 Minutes"
+        case .tenMinutes:
+            return "10 Minutes"
+        case .thirtyMinutes:
+            return "30 Minutes"
+        case .oneHour:
+            return "1 Hour"
+        case .custom(let seconds):
+            let minutes = Int(seconds) / 60
+            return "\(minutes) Minutes"
+        }
     }
-  }
-
-  var next: StreamTimeLimit {
-    switch self {
-    case .oneMinute:
-      return .fiveMinutes
-    case .fiveMinutes:
-      return .tenMinutes
-    case .tenMinutes:
-      return .fifteenMinutes
-    case .fifteenMinutes:
-      return .noLimit
-    case .noLimit:
-      return .oneMinute
-    }
-  }
 }
 
+// MARK: - Time Formatting Helpers
+
 extension TimeInterval {
-  var formattedCountdown: String {
-    let minutes = Int(self) / 60
-    let seconds = Int(self) % 60
-    return String(format: "%d:%02d", minutes, seconds)
-  }
+    var formattedTime: String {
+        let totalSeconds = Int(self)
+        let hours = totalSeconds / 3600
+        let minutes = (totalSeconds % 3600) / 60
+        let seconds = totalSeconds % 60
+        
+        if hours > 0 {
+            return String(format: "%d:%02d:%02d", hours, minutes, seconds)
+        } else {
+            return String(format: "%d:%02d", minutes, seconds)
+        }
+    }
 }

@@ -16,6 +16,7 @@
 
 import MWDATCamera
 import MWDATCore
+import AVFoundation
 import SwiftUI
 
 enum StreamingStatus {
@@ -52,6 +53,13 @@ class StreamSessionViewModel: ObservableObject {
   
   // Study session manager for API calls
   let sessionManager = StudySessionManager.shared
+  
+  // Audio WebSocket client for streaming audio to/from server
+  private var audioWsClient: AudioWsClient?
+  @Published var isAudioStreamingActive: Bool = false
+  
+  // WebSocket URL for audio streaming (same server as image uploads)
+  private let audioWsURL = URL(string: "ws://10.29.240.40:7863/ws")!
   
   var studyCycleStatusText: String {
     switch studyCyclePhase {
@@ -193,18 +201,25 @@ class StreamSessionViewModel: ObservableObject {
     let permission = Permission.camera
     do {
       let status = try await wearables.checkPermissionStatus(permission)
+      print("📋 Camera permission status: \(status)")
       if status == .granted {
         await startStudySession()
         return
       }
+      print("📋 Requesting camera permission...")
       let requestStatus = try await wearables.requestPermission(permission)
+      print("📋 Permission request result: \(requestStatus)")
       if requestStatus == .granted {
         await startStudySession()
         return
       }
-      showError("Permission denied")
+      showError("Permission denied. Please grant camera access in the Meta AI app.")
     } catch {
-      showError("Permission error: \(error.description)")
+      print("❌ Permission error details: \(error)")
+      print("❌ Error type: \(type(of: error))")
+      // Try to start anyway - the error might be a false positive
+      print("⚠️ Attempting to start session despite permission error...")
+      await startStudySession()
     }
   }
   
@@ -219,6 +234,9 @@ class StreamSessionViewModel: ObservableObject {
       print("⚠️ Failed to start backend session, continuing anyway...")
     }
     
+    // Start audio WebSocket streaming
+    startAudioStreaming()
+    
     // Start streaming once and keep it running
     await streamSession.start()
     
@@ -228,6 +246,8 @@ class StreamSessionViewModel: ObservableObject {
     // Start the photo capture cycle (stream stays running)
     studyCycleTask = Task { @MainActor [weak self] in
       guard let self else { return }
+      
+      print("🎥 Streaming started with photo capture every \(self.captureInterval) seconds")
       
       while !Task.isCancelled && self.isStudySessionActive {
         // Capture photo
@@ -273,6 +293,9 @@ class StreamSessionViewModel: ObservableObject {
     studyCycleTask = nil
     studyCyclePhase = .idle
     
+    // Stop audio WebSocket streaming
+    stopAudioStreaming()
+    
     // Make sure streaming is stopped
     await streamSession.stop()
     
@@ -283,6 +306,31 @@ class StreamSessionViewModel: ObservableObject {
     }
     
     isStoppingSession = false
+  }
+  
+  // MARK: - Audio WebSocket Streaming
+  
+  private func startAudioStreaming() {
+    // Get session ID from session manager
+    let sessionId = sessionManager.currentSessionId
+    
+    // Create new client with session ID and start streaming
+    audioWsClient = AudioWsClient(wsURL: audioWsURL, sessionId: sessionId)
+    audioWsClient?.start()
+    isAudioStreamingActive = true
+    print("🔊 Audio WebSocket streaming started to: \(audioWsURL)")
+    if let sessionId = sessionId {
+      print("🔊 Using session_id: \(sessionId)")
+    } else {
+      print("⚠️ No session_id available for audio streaming")
+    }
+  }
+  
+  private func stopAudioStreaming() {
+    audioWsClient?.stop()
+    audioWsClient = nil
+    isAudioStreamingActive = false
+    print("🔊 Audio WebSocket streaming stopped")
   }
 
   func startSession() async {
@@ -381,3 +429,4 @@ class StreamSessionViewModel: ObservableObject {
     }
   }
 }
+

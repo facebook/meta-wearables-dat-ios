@@ -21,6 +21,7 @@ struct StreamView: View {
   @ObservedObject var viewModel: StreamSessionViewModel
   @ObservedObject var wearablesVM: WearablesViewModel
   @ObservedObject var sessionManager = StudySessionManager.shared
+  var onSessionEnd: () -> Void
 
   var body: some View {
     ZStack {
@@ -169,6 +170,7 @@ struct StreamView: View {
         ) {
           Task {
             await viewModel.stopStudySession()
+            onSessionEnd()
           }
         }
       }

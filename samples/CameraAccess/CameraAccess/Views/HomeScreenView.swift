@@ -67,19 +67,36 @@ struct HomeScreenView: View {
         Spacer()
 
         VStack(spacing: 20) {
-          Text("You'll be redirected to the Meta AI app to confirm your connection.")
-            .font(.system(size: 14))
-            .foregroundColor(.gray)
-            .multilineTextAlignment(.center)
-            .fixedSize(horizontal: false, vertical: true)
-            .padding(.horizontal, 12)
+          if viewModel.registrationState == .registered {
+            // Already registered - show success and auto-proceed
+            Text("Your glasses are already connected!")
+              .font(.system(size: 14))
+              .foregroundColor(.green)
+              .multilineTextAlignment(.center)
+              .padding(.horizontal, 12)
+            
+            CustomButton(
+              title: "Continue",
+              style: .primary,
+              isDisabled: false
+            ) {
+              onBack()
+            }
+          } else {
+            Text("You'll be redirected to the Meta AI app to confirm your connection.")
+              .font(.system(size: 14))
+              .foregroundColor(.gray)
+              .multilineTextAlignment(.center)
+              .fixedSize(horizontal: false, vertical: true)
+              .padding(.horizontal, 12)
 
-          CustomButton(
-            title: viewModel.registrationState == .registering ? "Connecting..." : "Connect my glasses",
-            style: .primary,
-            isDisabled: viewModel.registrationState == .registering
-          ) {
-            viewModel.connectGlasses()
+            CustomButton(
+              title: viewModel.registrationState == .registering ? "Connecting..." : "Connect my glasses",
+              style: .primary,
+              isDisabled: viewModel.registrationState == .registering
+            ) {
+              viewModel.connectGlasses()
+            }
           }
         }
       }

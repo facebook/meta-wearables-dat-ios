@@ -17,37 +17,102 @@
 import MWDATCore
 import SwiftUI
 
+enum AppFlowPage {
+  case splash
+  case onboarding
+  case welcome
+  case registration
+  case gettingStarted
+  case session
+}
+
 struct MainAppView: View {
   let wearables: WearablesInterface
   @ObservedObject private var viewModel: WearablesViewModel
-  @State private var showingRegistration: Bool = false
-  @State private var hasCompletedGettingStarted: Bool = false
+  @State private var currentPage: AppFlowPage = .splash
 
   init(wearables: WearablesInterface, viewModel: WearablesViewModel) {
     self.wearables = wearables
     self.viewModel = viewModel
   }
+  
+  // Check if user is already registered
+  private var isRegistered: Bool {
+    viewModel.registrationState == .registered || viewModel.hasMockDevice
+  }
 
   var body: some View {
-    if viewModel.registrationState == .registered || viewModel.hasMockDevice {
-      if hasCompletedGettingStarted {
-        // Show streaming view (permission already granted)
-        StreamSessionView(wearables: wearables, wearablesVM: viewModel)
-      } else {
-        // Show getting started page to request camera permission
+    ZStack {
+      // Background
+      Color.black.ignoresSafeArea()
+      
+      // Content based on current page
+      switch currentPage {
+      case .splash:
+        SplashView2 {
+          withAnimation {
+            // Always go to onboarding first
+            currentPage = .onboarding
+          }
+        }
+        
+      case .onboarding:
+        OnboardingView {
+          withAnimation {
+            // After onboarding, check if already registered
+            if isRegistered {
+              // Skip straight to getting started if already registered
+              currentPage = .gettingStarted
+            } else {
+              currentPage = .welcome
+            }
+          }
+        }
+        
+      case .welcome:
+        WelcomeView {
+          withAnimation {
+            // If already registered, skip registration
+            if isRegistered {
+              currentPage = .gettingStarted
+            } else {
+              currentPage = .registration
+            }
+          }
+        }
+        
+      case .registration:
+        HomeScreenView(viewModel: viewModel) {
+          withAnimation {
+            currentPage = .gettingStarted
+          }
+        }
+        
+      case .gettingStarted:
         GettingStartedView(wearables: wearables, wearablesVM: viewModel) {
-          hasCompletedGettingStarted = true
+          withAnimation {
+            currentPage = .session
+          }
+        }
+        
+      case .session:
+        StreamSessionView(wearables: wearables, wearablesVM: viewModel)
+      }
+    }
+    .preferredColorScheme(.dark)
+    // Auto-navigate when registration state changes
+    .onChange(of: viewModel.registrationState) { oldState, newState in
+      // If user becomes registered while on registration page, move forward
+      if newState == .registered && currentPage == .registration {
+        withAnimation {
+          currentPage = .gettingStarted
         }
       }
-    } else if showingRegistration {
-      // Show registration/onboarding flow
-      HomeScreenView(viewModel: viewModel) {
-        showingRegistration = false
-      }
-    } else {
-      // Show welcome screen
-      WelcomeView {
-        showingRegistration = true
+      // If user becomes registered while on welcome page, skip registration
+      if newState == .registered && currentPage == .welcome {
+        withAnimation {
+          currentPage = .gettingStarted
+        }
       }
     }
   }

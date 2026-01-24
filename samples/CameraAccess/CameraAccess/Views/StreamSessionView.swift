@@ -14,10 +14,17 @@
 import MWDATCore
 import SwiftUI
 
+enum SessionPage {
+  case ready      // NonStreamView - waiting to start
+  case active     // StreamView - session in progress
+  case dashboard  // DashboardView - post-session report
+}
+
 struct StreamSessionView: View {
   let wearables: WearablesInterface
   @ObservedObject private var wearablesViewModel: WearablesViewModel
   @StateObject private var viewModel: StreamSessionViewModel
+  @State private var currentPage: SessionPage = .ready
 
   init(wearables: WearablesInterface, wearablesVM: WearablesViewModel) {
     self.wearables = wearables
@@ -27,12 +34,33 @@ struct StreamSessionView: View {
 
   var body: some View {
     ZStack {
-      if viewModel.isStudySessionActive {
-        // Study session in progress
-        StreamView(viewModel: viewModel, wearablesVM: wearablesViewModel)
-      } else {
+      switch currentPage {
+      case .ready:
         // Pre-study setup view with start button
         NonStreamView(viewModel: viewModel, wearablesVM: wearablesViewModel)
+          .onReceive(viewModel.$isStudySessionActive) { isActive in
+            if isActive {
+              withAnimation {
+                currentPage = .active
+              }
+            }
+          }
+        
+      case .active:
+        // Study session in progress
+        StreamView(viewModel: viewModel, wearablesVM: wearablesViewModel, onSessionEnd: {
+          withAnimation {
+            currentPage = .dashboard
+          }
+        })
+        
+      case .dashboard:
+        // Post-session dashboard
+        DashboardView(onBack: {
+          withAnimation {
+            currentPage = .ready
+          }
+        })
       }
     }
     .alert("Error", isPresented: $viewModel.showError) {

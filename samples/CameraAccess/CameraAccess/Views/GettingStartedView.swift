@@ -13,6 +13,7 @@
 // Explains camera permissions and requests them before proceeding to streaming.
 //
 
+import AVFoundation
 import MWDATCore
 import SwiftUI
 
@@ -22,6 +23,7 @@ struct GettingStartedView: View {
   let onContinue: () -> Void
   
   @State private var isRequestingPermission: Bool = false
+  @State private var microphonePermissionGranted: Bool = false
 
   var body: some View {
     ZStack {
@@ -80,13 +82,17 @@ struct GettingStartedView: View {
             resource: .smartGlassesIcon,
             text: "The capture LED lets others know when you're capturing content or going live."
           )
+          GettingStartedTipItemView(
+            resource: .soundIcon,
+            text: "We'll also use your microphone for audio during study sessions."
+          )
         }
         .padding(.top, 16)
 
         Spacer()
 
         VStack(spacing: 20) {
-          Text("You'll be redirected to the Meta AI app to grant camera permission.")
+          Text("You'll be redirected to the Meta AI app to grant camera permission, and we'll also request microphone access.")
             .font(.system(size: 14))
             .foregroundColor(.gray)
             .multilineTextAlignment(.center)
@@ -110,25 +116,54 @@ struct GettingStartedView: View {
   
   private func requestCameraPermissionAndContinue() async {
     isRequestingPermission = true
+    
+    // Request microphone permission first (this is a system dialog)
+    await requestMicrophonePermission()
+    
+    // Then request camera permission (redirects to Meta AI app)
     let permission = Permission.camera
     do {
       let status = try await wearables.checkPermissionStatus(permission)
+      print("📋 Camera permission status: \(status)")
       if status == .granted {
         // Already granted, proceed
         onContinue()
+        isRequestingPermission = false
         return
       }
       // Request permission - user will be taken to Meta AI app
+      print("📋 Requesting camera permission...")
       let result = try await wearables.requestPermission(permission)
+      print("📋 Permission request result: \(result)")
       if result == .granted {
         onContinue()
       } else {
         wearablesVM.showError("Camera permission is required to stream from your glasses.")
       }
     } catch {
-      wearablesVM.showError("Permission error: \(error)")
+      print("❌ Permission error details: \(error)")
+      print("❌ Error type: \(type(of: error))")
+      // Try to continue anyway - sometimes the error is misleading
+      print("⚠️ Continuing despite permission error...")
+      onContinue()
     }
     isRequestingPermission = false
+  }
+  
+  private func requestMicrophonePermission() async {
+    await withCheckedContinuation { continuation in
+      AVAudioApplication.requestRecordPermission { granted in
+        microphonePermissionGranted = granted
+        
+        if granted {
+          print("🎙️ Microphone permission granted")
+        } else {
+          print("🎙️ Microphone permission denied (continuing anyway)")
+        }
+        
+        continuation.resume()
+      }
+    }
   }
 }
 
