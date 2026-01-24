@@ -1,5 +1,6 @@
 import Foundation
 import AVFoundation
+import Speech
 
 final class AudioWsClient: NSObject {
     private let url: URL
@@ -41,6 +42,17 @@ final class AudioWsClient: NSObject {
         channels: 1,
         interleaved: true
     )!
+
+    // Speech recognition (wake/stop phrases)
+    private let speechRecognizer = SFSpeechRecognizer(locale: Locale(identifier: "en-US"))
+    private var recognitionRequest: SFSpeechAudioBufferRecognitionRequest?
+    private var recognitionTask: SFSpeechRecognitionTask?
+    private var isRealtimeAIOn = false
+    private var lastNormalizedTranscript = ""
+    private var recentWords: [String] = []
+    private let wakePhrase = "hey luma"
+    private let stopPhrase = "thank you"
+    private let maxRecentWords = 50
 
     init(wsURL: URL, sessionId: String? = nil) {
         self.url = wsURL
@@ -141,6 +153,7 @@ final class AudioWsClient: NSObject {
         log("▶️ Starting AudioWsClient...")
         shouldReconnect = true
         reconnectAttempts = 0
+        requestSpeechAuthorizationAndStart()
         connectWebSocket()
         startAudioCapture()
         startAudioPlayback()
@@ -161,6 +174,9 @@ final class AudioWsClient: NSObject {
         
         engine.stop()
         player.stop()
+
+        stopSpeechRecognition(clearState: true)
+        isRealtimeAIOn = false
         
         // Remove route change observer
         NotificationCenter.default.removeObserver(self, name: AVAudioSession.routeChangeNotification, object: nil)
@@ -390,7 +406,9 @@ final class AudioWsClient: NSObject {
                 switch message {
                 case .data(let data):
                     self.log("📥 Received binary data: \(data.count) bytes")
-                    self.playPcm16Audio(data)
+                    if self.isRealtimeAIOn {
+                        self.playPcm16Audio(data)
+                    }
                 case .string(let text):
                     self.log("📥 Received text: \(text.prefix(200))\(text.count > 200 ? "..." : "")")
                 @unknown default:
@@ -450,13 +468,19 @@ final class AudioWsClient: NSObject {
             // Log format change detection (only logs if format changes)
             self.logCaptureBufferFormat(buffer)
 
+            if let request = self.recognitionRequest {
+                request.append(buffer)
+            }
+
             // Send raw audio buffer data
             if let data = self.bufferToData(buffer) {
-                // Log only every 500 buffers (~10-15 seconds depending on sample rate)
-                if self.captureBufferCount == 1 || self.captureBufferCount % 500 == 0 {
-                    self.logDataBeingSent(data, buffer: buffer)
+                if self.isRealtimeAIOn {
+                    // Log only every 500 buffers (~10-15 seconds depending on sample rate)
+                    if self.captureBufferCount == 1 || self.captureBufferCount % 500 == 0 {
+                        self.logDataBeingSent(data, buffer: buffer)
+                    }
+                    self.sendBinary(data)
                 }
-                self.sendBinary(data)
             }
         }
 
@@ -624,6 +648,112 @@ final class AudioWsClient: NSObject {
         }
 
         player.scheduleBuffer(buffer, completionHandler: nil)
+    }
+
+    // MARK: - Speech Recognition (Wake/Stop Phrases)
+
+    private func requestSpeechAuthorizationAndStart() {
+        SFSpeechRecognizer.requestAuthorization { [weak self] status in
+            guard let self = self else { return }
+            guard status == .authorized else {
+                self.log("⚠️ Speech recognition not authorized: \(status.rawValue)")
+                return
+            }
+            self.startSpeechRecognition()
+        }
+    }
+
+    private func startSpeechRecognition() {
+        recognitionTask?.cancel()
+        recognitionTask = nil
+
+        recognitionRequest = SFSpeechAudioBufferRecognitionRequest()
+        recognitionRequest?.shouldReportPartialResults = true
+        recognitionRequest?.requiresOnDeviceRecognition = false
+
+        guard let recognitionRequest else {
+            log("⚠️ Failed to create speech recognition request")
+            return
+        }
+
+        recognitionTask = speechRecognizer?.recognitionTask(with: recognitionRequest) { [weak self] result, error in
+            guard let self else { return }
+            if let result = result {
+                self.handleTranscription(result.bestTranscription.formattedString)
+            }
+            if let error = error {
+                self.logError("Speech recognition error", error: error)
+            }
+        }
+    }
+
+    private func stopSpeechRecognition(clearState: Bool) {
+        recognitionRequest?.endAudio()
+        recognitionTask?.cancel()
+        recognitionRequest = nil
+        recognitionTask = nil
+        if clearState {
+            clearTranscriptState()
+        }
+    }
+
+    private func handleTranscription(_ text: String) {
+        let normalized = normalizeText(text)
+        guard !normalized.isEmpty else { return }
+
+        updateRecentWords(with: normalized)
+        let window = recentWords.joined(separator: " ")
+        log("📝 Transcription: raw='\(text)' norm='\(normalized)' window='\(window)'")
+
+        if window.contains(stopPhrase) {
+            setRealtimeAI(on: false, reason: "stop phrase detected")
+            clearTranscriptState()
+        } else if window.contains(wakePhrase) {
+            setRealtimeAI(on: true, reason: "wake phrase detected")
+        }
+    }
+
+    private func updateRecentWords(with normalized: String) {
+        if lastNormalizedTranscript.isEmpty {
+            recentWords = normalized.split(separator: " ").map(String.init)
+        } else if normalized.hasPrefix(lastNormalizedTranscript) {
+            let delta = normalized.dropFirst(lastNormalizedTranscript.count)
+            let deltaWords = delta.split(whereSeparator: { $0 == " " }).map(String.init)
+            if !deltaWords.isEmpty {
+                recentWords.append(contentsOf: deltaWords)
+            }
+        } else {
+            recentWords = normalized.split(separator: " ").map(String.init)
+        }
+
+        if recentWords.count > maxRecentWords {
+            recentWords = Array(recentWords.suffix(maxRecentWords))
+        }
+        lastNormalizedTranscript = normalized
+    }
+
+    private func normalizeText(_ text: String) -> String {
+        let lowercased = text.lowercased()
+        let cleaned = lowercased.unicodeScalars.map { scalar -> Character in
+            if CharacterSet.alphanumerics.contains(scalar) {
+                return Character(scalar)
+            }
+            return " "
+        }
+        return String(cleaned)
+            .split(separator: " ")
+            .joined(separator: " ")
+    }
+
+    private func clearTranscriptState() {
+        lastNormalizedTranscript = ""
+        recentWords.removeAll(keepingCapacity: true)
+    }
+
+    private func setRealtimeAI(on: Bool, reason: String) {
+        guard isRealtimeAIOn != on else { return }
+        isRealtimeAIOn = on
+        log("🧠 Realtime AI \(on ? "ON" : "OFF") (\(reason))")
     }
 }
 
