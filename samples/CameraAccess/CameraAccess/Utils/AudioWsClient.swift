@@ -684,7 +684,10 @@ final class AudioWsClient: NSObject {
             if let result = result {
                 self.handleTranscription(result.bestTranscription.formattedString)
             }
-            if let error = error {
+            if let error = error as NSError? {
+                if error.domain == "kLSRErrorDomain" && error.code == 301 {
+                    return
+                }
                 self.logError("Speech recognition error", error: error)
             }
         }
