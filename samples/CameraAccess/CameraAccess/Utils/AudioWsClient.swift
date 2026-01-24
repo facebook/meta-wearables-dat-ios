@@ -42,6 +42,10 @@ final class AudioWsClient: NSObject {
         channels: 1,
         interleaved: true
     )!
+    
+    // Bookmark notification playback (through same AVAudioEngine for same output device)
+    private let notificationPlayer = AVAudioPlayerNode()
+    private var notificationBuffer: AVAudioPCMBuffer?
 
     // Speech recognition (wake/stop phrases)
     private let speechRecognizer = SFSpeechRecognizer(locale: Locale(identifier: "en-US"))
@@ -74,6 +78,10 @@ final class AudioWsClient: NSObject {
         engine.attach(player)
         engine.connect(player, to: engine.mainMixerNode, format: outputFormat)
         
+        // Attach notification player to the SAME engine for guaranteed same output device
+        engine.attach(notificationPlayer)
+        loadBookmarkNotificationBuffer()
+
         log("📱 AudioWsClient initialized with URL: \(wsURL.absoluteString)")
     }
     
@@ -175,6 +183,7 @@ final class AudioWsClient: NSObject {
         
         engine.stop()
         player.stop()
+        notificationPlayer.stop()
 
         stopSpeechRecognition(clearState: true)
         isRealtimeAIOn = false
@@ -591,6 +600,7 @@ final class AudioWsClient: NSObject {
         
         playbackBufferCount = 0
         player.play()
+        notificationPlayer.play()
     }
     
     private func logOutputAudioRoute() {
@@ -729,6 +739,7 @@ final class AudioWsClient: NSObject {
             }
         } else if highlightPhrases.contains(where: { window.contains($0) }) {
             log("📌 Highlight detected")
+            playBookmarkNotification()
             sendHighlightSignal()
             clearTranscriptState()
             DispatchQueue.main.async { [weak self] in
@@ -793,7 +804,7 @@ final class AudioWsClient: NSObject {
         default:
             break
         }
-        components.path = "/bookmark"
+        components.path = "/api/bookmark"
         components.query = nil
         return components.url
     }
@@ -834,6 +845,68 @@ final class AudioWsClient: NSObject {
                 self?.log("✅ Highlight signal sent")
             }
         }.resume()
+    }
+
+    // MARK: - Bookmark Notification Sound (via AVAudioEngine for same output device)
+
+    private func loadBookmarkNotificationBuffer() {
+        // Try without subdirectory first (flat bundle structure)
+        var fileURL = Bundle.main.url(forResource: "BookmarkNotification", withExtension: "wav")
+        
+        // If not found, try with subdirectory
+        if fileURL == nil {
+            fileURL = Bundle.main.url(
+                forResource: "BookmarkNotification",
+                withExtension: "wav",
+                subdirectory: "Audio"
+            )
+        }
+        
+        guard let url = fileURL else {
+            log("⚠️ BookmarkNotification.wav not found in bundle")
+            return
+        }
+        
+        do {
+            let audioFile = try AVAudioFile(forReading: url)
+            let fileFormat = audioFile.processingFormat
+            let frameCount = AVAudioFrameCount(audioFile.length)
+            
+            log("🔔 Loading BookmarkNotification.wav:")
+            log("🔔   Sample Rate: \(fileFormat.sampleRate) Hz")
+            log("🔔   Channels: \(fileFormat.channelCount)")
+            log("🔔   Format: \(describeAudioFormat(fileFormat.commonFormat))")
+            log("🔔   Frame Count: \(frameCount)")
+            log("🔔   Duration: \(String(format: "%.2f", Double(frameCount) / fileFormat.sampleRate))s")
+            
+            guard let buffer = AVAudioPCMBuffer(pcmFormat: fileFormat, frameCapacity: frameCount) else {
+                log("⚠️ Failed to create buffer for BookmarkNotification.wav")
+                return
+            }
+            
+            try audioFile.read(into: buffer)
+            notificationBuffer = buffer
+            
+            // Connect notification player to mixer with the file's format
+            engine.connect(notificationPlayer, to: engine.mainMixerNode, format: fileFormat)
+            
+            log("✅ BookmarkNotification.wav loaded and connected to audio engine")
+            
+        } catch {
+            logError("Failed to load BookmarkNotification.wav", error: error)
+        }
+    }
+
+    private func playBookmarkNotification() {
+        guard let buffer = notificationBuffer else {
+            log("⚠️ Notification buffer not loaded")
+            return
+        }
+        
+        log("🔔 Playing bookmark notification on same output as server audio")
+        
+        // Schedule the buffer on the notification player (which is attached to the same engine)
+        notificationPlayer.scheduleBuffer(buffer, at: nil, options: [], completionHandler: nil)
     }
 }
 
