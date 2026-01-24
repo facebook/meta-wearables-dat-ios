@@ -52,6 +52,7 @@ final class AudioWsClient: NSObject {
     private var recentWords: [String] = []
     private let wakePhrases = ["hey luma", "hey lu na","hey luna"]
     private let stopPhrase = "thank you"
+    private let highlightPhrases = ["highlight", "high light", "high five"]
     private let maxRecentWords = 50
 
     init(wsURL: URL, sessionId: String? = nil) {
@@ -726,6 +727,14 @@ final class AudioWsClient: NSObject {
                 self?.stopSpeechRecognition(clearState: true)
                 self?.startSpeechRecognition()
             }
+        } else if highlightPhrases.contains(where: { window.contains($0) }) {
+            log("📌 Highlight detected")
+            sendHighlightSignal()
+            clearTranscriptState()
+            DispatchQueue.main.async { [weak self] in
+                self?.stopSpeechRecognition(clearState: true)
+                self?.startSpeechRecognition()
+            }
         }
     }
 
@@ -770,6 +779,61 @@ final class AudioWsClient: NSObject {
         guard isRealtimeAIOn != on else { return }
         isRealtimeAIOn = on
         log("🧠 Realtime AI set to \(on ? "ON" : "OFF") (\(reason))")
+    }
+
+    private func highlightURL() -> URL? {
+        guard var components = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
+            return nil
+        }
+        switch components.scheme?.lowercased() {
+        case "ws":
+            components.scheme = "http"
+        case "wss":
+            components.scheme = "https"
+        default:
+            break
+        }
+        components.path = "/bookmark"
+        components.query = nil
+        return components.url
+    }
+
+    private func sendHighlightSignal() {
+        guard let highlightURL = highlightURL() else {
+            log("⚠️ Highlight URL invalid")
+            return
+        }
+        var request = URLRequest(url: highlightURL)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.timeoutInterval = 30
+
+        var payload: [String: Any] = [
+            "type": "bookmark"
+        ]
+        if let sessionId = sessionId {
+            payload["session_id"] = sessionId
+        }
+
+        do {
+            request.httpBody = try JSONSerialization.data(withJSONObject: payload, options: [])
+        } catch {
+            logError("Failed to encode highlight payload", error: error)
+            return
+        }
+
+        URLSession.shared.dataTask(with: request) { [weak self] _, response, error in
+            if let error = error {
+                self?.logError("Highlight request failed", error: error)
+                return
+            }
+            if let httpResponse = response as? HTTPURLResponse,
+               !(200...299).contains(httpResponse.statusCode) {
+                self?.logError("Highlight request failed with status \(httpResponse.statusCode)", error: nil)
+            } else {
+                self?.log("✅ Highlight signal sent")
+            }
+        }.resume()
     }
 }
 
