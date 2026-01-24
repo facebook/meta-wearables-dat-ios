@@ -42,6 +42,10 @@ final class AudioWsClient: NSObject {
         channels: 1,
         interleaved: true
     )!
+    
+    // Bookmark notification playback (through same AVAudioEngine for same output device)
+    private let notificationPlayer = AVAudioPlayerNode()
+    private var notificationBuffer: AVAudioPCMBuffer?
 
     // Speech recognition (wake/stop phrases)
     private let speechRecognizer = SFSpeechRecognizer(locale: Locale(identifier: "en-US"))
@@ -52,6 +56,7 @@ final class AudioWsClient: NSObject {
     private var recentWords: [String] = []
     private let wakePhrases = ["hey luma", "hey lu na","hey luna"]
     private let stopPhrase = "thank you"
+    private let highlightPhrases = ["highlight", "high light", "high five"]
     private let maxRecentWords = 50
 
     init(wsURL: URL, sessionId: String? = nil) {
@@ -73,6 +78,10 @@ final class AudioWsClient: NSObject {
         engine.attach(player)
         engine.connect(player, to: engine.mainMixerNode, format: outputFormat)
         
+        // Attach notification player to the SAME engine for guaranteed same output device
+        engine.attach(notificationPlayer)
+        loadBookmarkNotificationBuffer()
+
         log("📱 AudioWsClient initialized with URL: \(wsURL.absoluteString)")
     }
     
@@ -174,6 +183,7 @@ final class AudioWsClient: NSObject {
         
         engine.stop()
         player.stop()
+        notificationPlayer.stop()
 
         stopSpeechRecognition(clearState: true)
         isRealtimeAIOn = false
@@ -590,6 +600,7 @@ final class AudioWsClient: NSObject {
         
         playbackBufferCount = 0
         player.play()
+        notificationPlayer.play()
     }
     
     private func logOutputAudioRoute() {
@@ -726,6 +737,15 @@ final class AudioWsClient: NSObject {
                 self?.stopSpeechRecognition(clearState: true)
                 self?.startSpeechRecognition()
             }
+        } else if highlightPhrases.contains(where: { window.contains($0) }) {
+            log("📌 Highlight detected")
+            playBookmarkNotification()
+            sendHighlightSignal()
+            clearTranscriptState()
+            DispatchQueue.main.async { [weak self] in
+                self?.stopSpeechRecognition(clearState: true)
+                self?.startSpeechRecognition()
+            }
         }
     }
 
@@ -770,6 +790,123 @@ final class AudioWsClient: NSObject {
         guard isRealtimeAIOn != on else { return }
         isRealtimeAIOn = on
         log("🧠 Realtime AI set to \(on ? "ON" : "OFF") (\(reason))")
+    }
+
+    private func highlightURL() -> URL? {
+        guard var components = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
+            return nil
+        }
+        switch components.scheme?.lowercased() {
+        case "ws":
+            components.scheme = "http"
+        case "wss":
+            components.scheme = "https"
+        default:
+            break
+        }
+        components.path = "/api/bookmark"
+        components.query = nil
+        return components.url
+    }
+
+    private func sendHighlightSignal() {
+        guard let highlightURL = highlightURL() else {
+            log("⚠️ Highlight URL invalid")
+            return
+        }
+        var request = URLRequest(url: highlightURL)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.timeoutInterval = 30
+
+        var payload: [String: Any] = [
+            "type": "bookmark"
+        ]
+        if let sessionId = sessionId {
+            payload["session_id"] = sessionId
+        }
+
+        do {
+            request.httpBody = try JSONSerialization.data(withJSONObject: payload, options: [])
+        } catch {
+            logError("Failed to encode highlight payload", error: error)
+            return
+        }
+
+        URLSession.shared.dataTask(with: request) { [weak self] _, response, error in
+            if let error = error {
+                self?.logError("Highlight request failed", error: error)
+                return
+            }
+            if let httpResponse = response as? HTTPURLResponse,
+               !(200...299).contains(httpResponse.statusCode) {
+                self?.logError("Highlight request failed with status \(httpResponse.statusCode)", error: nil)
+            } else {
+                self?.log("✅ Highlight signal sent")
+            }
+        }.resume()
+    }
+
+    // MARK: - Bookmark Notification Sound (via AVAudioEngine for same output device)
+
+    private func loadBookmarkNotificationBuffer() {
+        // Try without subdirectory first (flat bundle structure)
+        var fileURL = Bundle.main.url(forResource: "BookmarkNotification", withExtension: "wav")
+        
+        // If not found, try with subdirectory
+        if fileURL == nil {
+            fileURL = Bundle.main.url(
+                forResource: "BookmarkNotification",
+                withExtension: "wav",
+                subdirectory: "Audio"
+            )
+        }
+        
+        guard let url = fileURL else {
+            log("⚠️ BookmarkNotification.wav not found in bundle")
+            return
+        }
+        
+        do {
+            let audioFile = try AVAudioFile(forReading: url)
+            let fileFormat = audioFile.processingFormat
+            let frameCount = AVAudioFrameCount(audioFile.length)
+            
+            log("🔔 Loading BookmarkNotification.wav:")
+            log("🔔   Sample Rate: \(fileFormat.sampleRate) Hz")
+            log("🔔   Channels: \(fileFormat.channelCount)")
+            log("🔔   Format: \(describeAudioFormat(fileFormat.commonFormat))")
+            log("🔔   Frame Count: \(frameCount)")
+            log("🔔   Duration: \(String(format: "%.2f", Double(frameCount) / fileFormat.sampleRate))s")
+            
+            guard let buffer = AVAudioPCMBuffer(pcmFormat: fileFormat, frameCapacity: frameCount) else {
+                log("⚠️ Failed to create buffer for BookmarkNotification.wav")
+                return
+            }
+            
+            try audioFile.read(into: buffer)
+            notificationBuffer = buffer
+            
+            // Connect notification player to mixer with the file's format
+            engine.connect(notificationPlayer, to: engine.mainMixerNode, format: fileFormat)
+            
+            log("✅ BookmarkNotification.wav loaded and connected to audio engine")
+            
+        } catch {
+            logError("Failed to load BookmarkNotification.wav", error: error)
+        }
+    }
+
+    private func playBookmarkNotification() {
+        guard let buffer = notificationBuffer else {
+            log("⚠️ Notification buffer not loaded")
+            return
+        }
+        
+        log("🔔 Playing bookmark notification on same output as server audio")
+        
+        // Schedule the buffer on the notification player (which is attached to the same engine)
+        notificationPlayer.scheduleBuffer(buffer, at: nil, options: [], completionHandler: nil)
     }
 }
 
