@@ -52,6 +52,7 @@ final class AudioWsClient: NSObject {
     private var recognitionRequest: SFSpeechAudioBufferRecognitionRequest?
     private var recognitionTask: SFSpeechRecognitionTask?
     private var isRealtimeAIOn = false
+    var onRealtimeAIToggled: ((Bool) -> Void)?
     private var lastNormalizedTranscript = ""
     private var recentWords: [String] = []
     private let wakePhrases = ["hey luma", "hey lu na","hey luna"]
@@ -790,6 +791,7 @@ final class AudioWsClient: NSObject {
         guard isRealtimeAIOn != on else { return }
         isRealtimeAIOn = on
         log("🧠 Realtime AI set to \(on ? "ON" : "OFF") (\(reason))")
+        onRealtimeAIToggled?(on)
     }
 
     private func highlightURL() -> URL? {

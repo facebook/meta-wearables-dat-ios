@@ -244,38 +244,7 @@ class StreamSessionViewModel: ObservableObject {
     try? await Task.sleep(nanoseconds: UInt64(1.5 * Double(NSEC_PER_SEC)))
     
     // Start the photo capture cycle (stream stays running)
-    studyCycleTask = Task { @MainActor [weak self] in
-      guard let self else { return }
-      
-      print("🎥 Streaming started with photo capture every \(self.captureInterval) seconds")
-      
-      while !Task.isCancelled && self.isStudySessionActive {
-        // Capture photo
-        self.studyCyclePhase = .capturingPhoto
-        self.streamSession.capturePhoto(format: .jpeg)
-        print("📸 Capturing photo...")
-        
-        // Show "Photo captured!" for 1 second
-        try? await Task.sleep(nanoseconds: NSEC_PER_SEC)
-        
-        guard !Task.isCancelled && self.isStudySessionActive else { break }
-        
-        // Wait for next capture (stream keeps running in background)
-        self.studyCyclePhase = .waitingForNextCycle
-        for countdown in stride(from: self.captureInterval, to: 0, by: -1) {
-          guard !Task.isCancelled && self.isStudySessionActive else { break }
-          self.countdownToNextCapture = countdown
-          try? await Task.sleep(nanoseconds: NSEC_PER_SEC)
-        }
-        
-        // Back to streaming phase for next capture
-        self.studyCyclePhase = .streaming
-      }
-      
-      // Cleanup when study session ends
-      self.studyCyclePhase = .idle
-      self.isStudySessionActive = false
-    }
+    startStudyCycleTask()
   }
   
   private var isStoppingSession: Bool = false
@@ -316,6 +285,11 @@ class StreamSessionViewModel: ObservableObject {
     
     // Create new client with session ID and start streaming
     audioWsClient = AudioWsClient(wsURL: audioWsURL, sessionId: sessionId)
+    audioWsClient?.onRealtimeAIToggled = { [weak self] isOn in
+      Task { @MainActor in
+        self?.handleRealtimeAIToggle(isOn: isOn)
+      }
+    }
     audioWsClient?.start()
     isAudioStreamingActive = true
     print("🔊 Audio WebSocket streaming started to: \(audioWsURL)")
@@ -331,6 +305,66 @@ class StreamSessionViewModel: ObservableObject {
     audioWsClient = nil
     isAudioStreamingActive = false
     print("🔊 Audio WebSocket streaming stopped")
+  }
+
+  private func handleRealtimeAIToggle(isOn: Bool) {
+    print("🤖 Realtime AI toggled: \(isOn ? "ON" : "OFF")")
+    if isOn {
+      pauseStudyCycleTask()
+    } else {
+      resumeStudyCycleTaskIfNeeded()
+    }
+  }
+
+  private func pauseStudyCycleTask() {
+    print("⏸️ Pausing study cycle task (photo capture loop)")
+    studyCycleTask?.cancel()
+    studyCycleTask = nil
+    if isStudySessionActive {
+      studyCyclePhase = .streaming
+    }
+  }
+
+  private func resumeStudyCycleTaskIfNeeded() {
+    guard isStudySessionActive, studyCycleTask == nil else { return }
+    print("▶️ Resuming study cycle task (photo capture loop)")
+    startStudyCycleTask()
+  }
+
+  private func startStudyCycleTask() {
+    studyCycleTask?.cancel()
+    studyCycleTask = Task { @MainActor [weak self] in
+      guard let self else { return }
+      
+      print("🎥 Streaming started with photo capture every \(self.captureInterval) seconds")
+      
+      while !Task.isCancelled && self.isStudySessionActive {
+        // Capture photo
+        self.studyCyclePhase = .capturingPhoto
+        self.streamSession.capturePhoto(format: .jpeg)
+        print("📸 Capturing photo...")
+        
+        // Show "Photo captured!" for 1 second
+        try? await Task.sleep(nanoseconds: NSEC_PER_SEC)
+        
+        guard !Task.isCancelled && self.isStudySessionActive else { break }
+        
+        // Wait for next capture (stream keeps running in background)
+        self.studyCyclePhase = .waitingForNextCycle
+        for countdown in stride(from: self.captureInterval, to: 0, by: -1) {
+          guard !Task.isCancelled && self.isStudySessionActive else { break }
+          self.countdownToNextCapture = countdown
+          try? await Task.sleep(nanoseconds: NSEC_PER_SEC)
+        }
+        
+        // Back to streaming phase for next capture
+        self.studyCyclePhase = .streaming
+      }
+      
+      // Cleanup when study session ends
+      self.studyCyclePhase = .idle
+      self.isStudySessionActive = false
+    }
   }
 
   func startSession() async {
