@@ -15,19 +15,19 @@ struct OnboardingPage3: View {
     @State private var buttonOpacity: Double = 0
     
     var body: some View {
-        VStack(spacing: 24) {
+        VStack(spacing: 20) {
             Spacer()
             
             // Glasses icon with glow
             ZStack {
                 Circle()
                     .fill(Color(hex: "00c6a2"))
-                    .frame(width: 200, height: 200)
-                    .blur(radius: 60)
+                    .frame(width: 160, height: 160)
+                    .blur(radius: 50)
                     .opacity(glowPulse ? 0.4 : 0.15)
                 
                 ZStack {
-                    RoundedRectangle(cornerRadius: 32)
+                    RoundedRectangle(cornerRadius: 28)
                         .fill(
                             LinearGradient(
                                 colors: [Color(hex: "18181b"), Color(hex: "27272a")],
@@ -35,23 +35,23 @@ struct OnboardingPage3: View {
                                 endPoint: .bottomTrailing
                             )
                         )
-                        .frame(width: 170, height: 170)
+                        .frame(width: 140, height: 140)
                         .overlay(
-                            RoundedRectangle(cornerRadius: 32)
+                            RoundedRectangle(cornerRadius: 28)
                                 .stroke(Color(hex: "3f3f46"), lineWidth: 1)
                         )
-                        .shadow(color: .black.opacity(0.5), radius: 40)
+                        .shadow(color: .black.opacity(0.5), radius: 30)
                     
                     Image(systemName: "eyeglasses")
-                        .font(.system(size: 80, weight: .thin))
+                        .font(.system(size: 65, weight: .thin))
                         .foregroundColor(Color(hex: "00c6a2"))
                     
                     Circle()
                         .fill(Color(hex: "00c6a2"))
-                        .frame(width: 14, height: 14)
-                        .shadow(color: Color(hex: "00c6a2"), radius: indicatorPulse ? 16 : 8)
+                        .frame(width: 12, height: 12)
+                        .shadow(color: Color(hex: "00c6a2"), radius: indicatorPulse ? 14 : 6)
                         .scaleEffect(indicatorPulse ? 1.2 : 1.0)
-                        .offset(x: 70, y: -70)
+                        .offset(x: 58, y: -58)
                         .opacity(indicatorOpacity)
                         .scaleEffect(indicatorScale)
                 }
@@ -59,17 +59,17 @@ struct OnboardingPage3: View {
                 .scaleEffect(glassesScale)
                 .offset(y: glassesFloat)
             }
-            .frame(height: 210)
+            .frame(height: 180)
             
-            // Text content - ensure text fits
-            VStack(spacing: 16) {
+            // Text content
+            VStack(spacing: 14) {
                 HStack(spacing: 0) {
                     Text("Meet ")
-                        .font(.system(size: 36, weight: .bold))
+                        .font(.system(size: 30, weight: .bold))
                         .foregroundColor(.white)
                     
                     Text("SmartSight")
-                        .font(.system(size: 36, weight: .bold))
+                        .font(.system(size: 30, weight: .bold))
                         .foregroundStyle(
                             LinearGradient(
                                 colors: [Color(hex: "00c6a2"), Color(hex: "8ef1de")],
@@ -81,7 +81,7 @@ struct OnboardingPage3: View {
                 .opacity(titleOpacity)
                 
                 Text("Your hands-free learning companion")
-                    .font(.system(size: 22))
+                    .font(.system(size: 18))
                     .foregroundColor(Color(hex: "d4d4d8"))
                     .multilineTextAlignment(.center)
                     .opacity(descriptionOpacity)
@@ -104,27 +104,27 @@ struct OnboardingPage3: View {
                     Text(" while it remembers for you.")
                         .foregroundColor(Color(hex: "a1a1aa"))
                 )
-                .font(.system(size: 18))
+                .font(.system(size: 16))
                 .multilineTextAlignment(.center)
-                .lineSpacing(5)
+                .lineSpacing(4)
                 .fixedSize(horizontal: false, vertical: true)
                 .opacity(descriptionOpacity)
             }
-            .padding(.horizontal, 24)
+            .padding(.horizontal, 8)
             
             Spacer()
             
-            // Button - bigger
+            // Button
             Button(action: onNext) {
-                HStack(spacing: 12) {
+                HStack(spacing: 10) {
                     Text("See how it works")
-                        .font(.system(size: 20, weight: .bold))
-                    Image(systemName: "arrow.right")
                         .font(.system(size: 18, weight: .bold))
+                    Image(systemName: "arrow.right")
+                        .font(.system(size: 16, weight: .bold))
                 }
                 .foregroundColor(.black)
-                .padding(.horizontal, 44)
-                .padding(.vertical, 20)
+                .padding(.horizontal, 36)
+                .padding(.vertical, 16)
                 .background(
                     Capsule()
                         .fill(
@@ -134,15 +134,15 @@ struct OnboardingPage3: View {
                                 endPoint: .trailing
                             )
                         )
-                        .shadow(color: Color(hex: "00c6a2").opacity(0.4), radius: 30)
+                        .shadow(color: Color(hex: "00c6a2").opacity(0.4), radius: 24)
                 )
             }
             .opacity(buttonOpacity)
             
             Spacer()
-                .frame(height: 40)
+                .frame(height: 32)
         }
-        .padding(.horizontal, 16)
+        .padding(.horizontal, 28)
         .onAppear {
             animateSequence()
         }

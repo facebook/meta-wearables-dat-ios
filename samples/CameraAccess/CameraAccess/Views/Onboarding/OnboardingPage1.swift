@@ -12,61 +12,61 @@ struct OnboardingPage1: View {
     @State private var showButton = false
     
     var body: some View {
-        VStack(spacing: 28) {
+        VStack(spacing: 24) {
             Spacer()
             
             // Animation area - stacked illustration
             ZStack {
-                // Book (base layer) - bigger
+                // Book (base layer)
                 if showBook {
-                    RoundedRectangle(cornerRadius: 14)
+                    RoundedRectangle(cornerRadius: 12)
                         .fill(Color(hex: "3f3f46"))
-                        .frame(width: 160, height: 115)
+                        .frame(width: 140, height: 100)
                         .overlay(
-                            VStack(spacing: 10) {
+                            VStack(spacing: 8) {
                                 ForEach(0..<3, id: \.self) { _ in
                                     RoundedRectangle(cornerRadius: 2)
                                         .fill(Color(hex: "52525b"))
-                                        .frame(height: 8)
+                                        .frame(height: 6)
                                 }
                             }
-                            .padding(24)
+                            .padding(20)
                         )
                         .overlay(
-                            RoundedRectangle(cornerRadius: 14)
+                            RoundedRectangle(cornerRadius: 12)
                                 .stroke(Color(hex: "52525b"), lineWidth: 1)
                         )
-                        .offset(y: 35)
+                        .offset(y: 30)
                         .transition(.scale.combined(with: .opacity))
                 }
                 
-                // Person silhouette - bigger
+                // Person silhouette
                 if showPerson {
                     Circle()
                         .fill(Color(hex: "3f3f46"))
-                        .frame(width: 60, height: 60)
+                        .frame(width: 50, height: 50)
                         .overlay(
                             Circle()
                                 .stroke(Color(hex: "52525b"), lineWidth: 1)
                         )
-                        .offset(x: -60, y: -25)
+                        .offset(x: -50, y: -20)
                         .transition(.scale.combined(with: .opacity))
                 }
                 
-                // Phone - bigger
+                // Phone
                 if showPhone {
                     ZStack {
-                        RoundedRectangle(cornerRadius: 16)
+                        RoundedRectangle(cornerRadius: 14)
                             .fill(Color(hex: "67d5ff"))
-                            .frame(width: 70, height: 115)
-                            .blur(radius: 35)
+                            .frame(width: 60, height: 100)
+                            .blur(radius: 30)
                             .opacity(glowPulse ? 0.5 : 0.2)
                         
-                        RoundedRectangle(cornerRadius: 16)
+                        RoundedRectangle(cornerRadius: 14)
                             .fill(Color(hex: "27272a"))
-                            .frame(width: 70, height: 115)
+                            .frame(width: 60, height: 100)
                             .overlay(
-                                RoundedRectangle(cornerRadius: 14)
+                                RoundedRectangle(cornerRadius: 12)
                                     .fill(
                                         LinearGradient(
                                             colors: [Color(hex: "67d5ff"), Color(hex: "00c6a2")],
@@ -75,33 +75,33 @@ struct OnboardingPage1: View {
                                         )
                                     )
                                     .opacity(glowPulse ? 0.6 : 0.3)
-                                    .padding(6)
+                                    .padding(5)
                             )
                             .overlay(
-                                RoundedRectangle(cornerRadius: 16)
+                                RoundedRectangle(cornerRadius: 14)
                                     .stroke(Color(hex: "3f3f46"), lineWidth: 2)
                             )
                             .overlay(
                                 Circle()
                                     .fill(Color(hex: "ffaa54"))
-                                    .frame(width: 12, height: 12)
+                                    .frame(width: 10, height: 10)
                                     .shadow(color: Color(hex: "ffaa54"), radius: 5)
-                                    .offset(x: 26, y: -48)
+                                    .offset(x: 22, y: -42)
                             )
                     }
-                    .offset(x: 60, y: -35)
+                    .offset(x: 50, y: -30)
                     .rotationEffect(.degrees(-8))
                     .offset(y: glowPulse ? -4 : 0)
                     .transition(.scale.combined(with: .opacity))
                 }
                 
-                // Focus broken label - bigger
+                // Focus broken label
                 if showFocusBroken {
                     Text("Focus broken")
-                        .font(.system(size: 16, weight: .bold))
+                        .font(.system(size: 14, weight: .bold))
                         .foregroundColor(Color(hex: "ffaa54"))
-                        .padding(.horizontal, 20)
-                        .padding(.vertical, 10)
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 8)
                         .background(
                             Capsule()
                                 .fill(Color(hex: "ffaa54").opacity(glowPulse ? 0.3 : 0.15))
@@ -112,54 +112,50 @@ struct OnboardingPage1: View {
                         )
                         .scaleEffect(glowPulse ? 1.05 : 1.0)
                         .shadow(color: Color(hex: "ffaa54").opacity(glowPulse ? 0.5 : 0), radius: 10)
-                        .offset(y: -105)
+                        .offset(y: -90)
                         .transition(.scale.combined(with: .opacity))
                 }
             }
-            .frame(height: 240)
+            .frame(height: 200)
             
-            // Text content - bigger
+            // Text content
             if showText {
-                VStack(spacing: 20) {
-                    (
-                        Text("Tracking your study sessions means pulling out your phone—")
-                            .foregroundColor(.white)
-                        +
-                        Text("breaking your focus")
-                            .foregroundColor(Color(hex: "ffaa54"))
-                            .fontWeight(.bold)
-                        +
-                        Text(" before you even start.")
-                            .foregroundColor(.white)
-                    )
-                    .font(.system(size: 26))
-                    .multilineTextAlignment(.center)
-                    .lineSpacing(5)
-                    
-                    Text("So most learning goes unrecorded.\nYour effort stays invisible.")
-                        .font(.system(size: 22))
-                        .foregroundColor(Color(hex: "a1a1aa"))
+                VStack(spacing: 12) {
+                    Text("Tracking your learning means manual work...")
+                        .font(.system(size: 22, weight: .medium))
+                        .foregroundColor(.white)
                         .multilineTextAlignment(.center)
-                        .lineSpacing(4)
+                    
+                    VStack(spacing: 4) {
+                        Text("Breaking your focus")
+                            .font(.system(size: 24, weight: .bold))
+                            .foregroundColor(Color(hex: "ffaa54"))
+                            .padding(10)
+                        
+                        Text("before you even start.")
+                            .font(.system(size: 22))
+                            .foregroundColor(.white)
+                    }
+                    .multilineTextAlignment(.center)
                 }
-                .padding(.horizontal, 24)
+                .padding(.horizontal, 8)
                 .transition(.opacity.combined(with: .offset(y: 20)))
             }
             
             Spacer()
             
-            // Continue button - bigger
+            // Continue button
             if showButton {
                 Button(action: onNext) {
-                    HStack(spacing: 10) {
+                    HStack(spacing: 8) {
                         Text("Continue")
-                            .font(.system(size: 20, weight: .semibold))
+                            .font(.system(size: 18, weight: .semibold))
                         Image(systemName: "arrow.right")
-                            .font(.system(size: 18))
+                            .font(.system(size: 16))
                     }
                     .foregroundColor(.white)
-                    .padding(.horizontal, 44)
-                    .padding(.vertical, 20)
+                    .padding(.horizontal, 36)
+                    .padding(.vertical, 16)
                     .background(
                         Capsule()
                             .fill(Color(hex: "27272a"))
@@ -173,9 +169,9 @@ struct OnboardingPage1: View {
             }
             
             Spacer()
-                .frame(height: 40)
+                .frame(height: 32)
         }
-        .padding(.horizontal, 16)
+        .padding(.horizontal, 28)
         .onAppear {
             animateSequence()
         }

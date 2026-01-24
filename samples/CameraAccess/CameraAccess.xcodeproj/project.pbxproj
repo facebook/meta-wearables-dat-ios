@@ -32,6 +32,7 @@
 		E6DA451F2E79A63100E3F688 /* MockDeviceKitView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DA451A2E79A63100E3F688 /* MockDeviceKitView.swift */; };
 		E6FD3BCE2EB4D53A00E7FE5D /* NonStreamView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6FD3BCD2EB4D53A00E7FE5D /* NonStreamView.swift */; };
 		F93995282F25328B00D690FF /* TimeUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = F93995272F25328B00D690FF /* TimeUtils.swift */; };
+		F939952A2F2535E900D690FF /* LearningLessonsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F93995292F2535E900D690FF /* LearningLessonsView.swift */; };
 		F94C1ACF2F23CDBB007B7771 /* WelcomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F94C1ACE2F23CDBB007B7771 /* WelcomeView.swift */; };
 		F94C1AD12F23DE1D007B7771 /* GettingStartedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F94C1AD02F23DE1D007B7771 /* GettingStartedView.swift */; };
 		F94C1AD32F23FD6C007B7771 /* StudySessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F94C1AD22F23FD6C007B7771 /* StudySessionManager.swift */; };
@@ -97,6 +98,7 @@
 		E6DA451A2E79A63100E3F688 /* MockDeviceKitView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockDeviceKitView.swift; sourceTree = "<group>"; };
 		E6FD3BCD2EB4D53A00E7FE5D /* NonStreamView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NonStreamView.swift; sourceTree = "<group>"; };
 		F93995272F25328B00D690FF /* TimeUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeUtils.swift; sourceTree = "<group>"; };
+		F93995292F2535E900D690FF /* LearningLessonsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LearningLessonsView.swift; sourceTree = "<group>"; };
 		F94C1ACE2F23CDBB007B7771 /* WelcomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeView.swift; sourceTree = "<group>"; };
 		F94C1AD02F23DE1D007B7771 /* GettingStartedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GettingStartedView.swift; sourceTree = "<group>"; };
 		F94C1AD22F23FD6C007B7771 /* StudySessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudySessionManager.swift; sourceTree = "<group>"; };
@@ -183,6 +185,7 @@
 				E6A188472EB918740097D0E1 /* StreamView.swift */,
 				E6FD3BCD2EB4D53A00E7FE5D /* NonStreamView.swift */,
 				F94C1ACE2F23CDBB007B7771 /* WelcomeView.swift */,
+				F93995292F2535E900D690FF /* LearningLessonsView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -403,6 +406,7 @@
 				F94C1B012F245E6D007B7771 /* OnboardingPage3.swift in Sources */,
 				F94C1B022F245E6D007B7771 /* OnboardingPage4.swift in Sources */,
 				F94C1B032F245E6D007B7771 /* OnboardingView.swift in Sources */,
+				F939952A2F2535E900D690FF /* LearningLessonsView.swift in Sources */,
 				F94C1B042F245E6D007B7771 /* OnboardingPage1.swift in Sources */,
 				F94C1ADB2F242EAB007B7771 /* AudioWsClient.swift in Sources */,
 				F94C1AEF2F243491007B7771 /* SplashView2.swift in Sources */,

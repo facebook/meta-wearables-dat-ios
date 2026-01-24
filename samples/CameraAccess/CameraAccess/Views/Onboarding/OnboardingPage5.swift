@@ -14,10 +14,10 @@ struct OnboardingPage5: View {
     @State private var buttonOffset: Double = 30
     
     var body: some View {
-        VStack(spacing: 28) {
+        VStack(spacing: 22) {
             Spacer()
             
-            // Animated icon with orbiting particles - restored original animation
+            // Animated icon with orbiting particles
             ZStack {
                 // Pulsing glow
                 Circle()
@@ -28,12 +28,12 @@ struct OnboardingPage5: View {
                             endPoint: .bottomTrailing
                         )
                     )
-                    .frame(width: 180, height: 180)
-                    .blur(radius: 50)
+                    .frame(width: 150, height: 150)
+                    .blur(radius: 45)
                     .scaleEffect(pulsing ? 1.5 : 1.0)
                     .opacity(pulsing ? 0.2 : 0.5)
                 
-                // Main circle - bigger
+                // Main circle
                 if showIcon {
                     Circle()
                         .fill(
@@ -43,37 +43,37 @@ struct OnboardingPage5: View {
                                 endPoint: .bottomTrailing
                             )
                         )
-                        .frame(width: 160, height: 160)
-                        .shadow(color: .black.opacity(0.3), radius: 20)
+                        .frame(width: 130, height: 130)
+                        .shadow(color: .black.opacity(0.3), radius: 18)
                         .overlay(
                             Image(systemName: "sparkles")
-                                .font(.system(size: 72))
+                                .font(.system(size: 58))
                                 .foregroundColor(.white)
-                                .offset(y: pulsing ? -4 : 0)
+                                .offset(y: pulsing ? -3 : 0)
                         )
                         .transition(.scale.combined(with: .opacity))
                 }
                 
-                // Orbiting particles - restored
+                // Orbiting particles
                 ForEach(0..<3, id: \.self) { index in
                     Circle()
                         .fill(Color(hex: "67d5ff"))
-                        .frame(width: 14, height: 14)
-                        .shadow(color: Color(hex: "67d5ff").opacity(0.8), radius: 10)
-                        .offset(y: -100)
+                        .frame(width: 12, height: 12)
+                        .shadow(color: Color(hex: "67d5ff").opacity(0.8), radius: 8)
+                        .offset(y: -85)
                         .rotationEffect(.degrees(orbitRotations[index]))
                 }
             }
-            .frame(height: 220)
+            .frame(height: 190)
             
-            // Title - bigger
-            VStack(spacing: 12) {
+            // Title
+            VStack(spacing: 10) {
                 Text("Let's start your first")
-                    .font(.system(size: 36, weight: .bold))
+                    .font(.system(size: 30, weight: .bold))
                     .foregroundColor(.white)
                 
                 Text("study session!")
-                    .font(.system(size: 36, weight: .bold))
+                    .font(.system(size: 30, weight: .bold))
                     .foregroundStyle(
                         LinearGradient(
                             colors: [Color(hex: "00c6a2"), Color(hex: "8ef1de"), Color(hex: "67d5ff")],
@@ -86,13 +86,13 @@ struct OnboardingPage5: View {
             .opacity(titleOpacity)
             
             Text("Your learning journey begins now")
-                .font(.system(size: 22))
+                .font(.system(size: 18))
                 .foregroundColor(Color(hex: "a1a1aa"))
                 .opacity(subtitleOpacity)
             
-            // Feature pills - bigger
-            VStack(spacing: 14) {
-                HStack(spacing: 14) {
+            // Feature pills
+            VStack(spacing: 8) {
+                HStack(spacing: 8) {
                     FeaturePill5(emoji: "👓", text: "Hands-free")
                     FeaturePill5(emoji: "🎯", text: "Smart insights")
                 }
@@ -103,19 +103,19 @@ struct OnboardingPage5: View {
             
             Spacer()
             
-            // CTA Button - bigger
+            // CTA Button
             Button(action: onNext) {
-                HStack(spacing: 14) {
+                HStack(spacing: 12) {
                     Text("Start Learning Session")
-                        .font(.system(size: 22, weight: .bold))
+                        .font(.system(size: 18, weight: .bold))
                     Image(systemName: "arrow.right")
-                        .font(.system(size: 20, weight: .bold))
+                        .font(.system(size: 16, weight: .bold))
                 }
                 .foregroundColor(.black)
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, 24)
+                .padding(.vertical, 18)
                 .background(
-                    RoundedRectangle(cornerRadius: 20)
+                    RoundedRectangle(cornerRadius: 18)
                         .fill(
                             LinearGradient(
                                 colors: [Color(hex: "00c6a2"), Color(hex: "8ef1de")],
@@ -123,17 +123,17 @@ struct OnboardingPage5: View {
                                 endPoint: .trailing
                             )
                         )
-                        .shadow(color: Color(hex: "00c6a2").opacity(0.4), radius: 25)
+                        .shadow(color: Color(hex: "00c6a2").opacity(0.4), radius: 20)
                 )
             }
-            .padding(.horizontal, 24)
+            .padding(.horizontal, 4)
             .opacity(buttonOpacity)
             .offset(y: buttonOffset)
             
             Spacer()
-                .frame(height: 40)
+                .frame(height: 32)
         }
-        .padding(.horizontal, 16)
+        .padding(.horizontal, 28)
         .onAppear {
             animateSequence()
         }
@@ -190,15 +190,15 @@ private struct FeaturePill5: View {
     let text: String
     
     var body: some View {
-        HStack(spacing: 10) {
+        HStack(spacing: 5) {
             Text(emoji)
-                .font(.system(size: 20))
+                .font(.system(size: 12))
             Text(text)
-                .font(.system(size: 18, weight: .medium))
+                .font(.system(size: 12, weight: .medium))
                 .foregroundColor(Color(hex: "d4d4d8"))
         }
-        .padding(.horizontal, 20)
-        .padding(.vertical, 12)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 7)
         .background(
             Capsule()
                 .fill(Color(hex: "18181b"))
