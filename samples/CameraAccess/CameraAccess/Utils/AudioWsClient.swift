@@ -711,8 +711,18 @@ final class AudioWsClient: NSObject {
         if window.contains(stopPhrase) {
             setRealtimeAI(on: false, reason: "stop phrase detected")
             clearTranscriptState()
+
+            DispatchQueue.main.async { [weak self] in
+                self?.stopSpeechRecognition(clearState: true)
+                self?.startSpeechRecognition()
+            }
         } else if wakePhrases.contains(where: { window.contains($0) }) {
             setRealtimeAI(on: true, reason: "wake phrase detected")
+            clearTranscriptState()
+            DispatchQueue.main.async { [weak self] in
+                self?.stopSpeechRecognition(clearState: true)
+                self?.startSpeechRecognition()
+            }
         }
     }
 
