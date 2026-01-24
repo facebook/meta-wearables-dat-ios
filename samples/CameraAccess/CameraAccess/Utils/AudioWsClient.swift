@@ -50,7 +50,7 @@ final class AudioWsClient: NSObject {
     private var isRealtimeAIOn = false
     private var lastNormalizedTranscript = ""
     private var recentWords: [String] = []
-    private let wakePhrase = "hey luma"
+    private let wakePhrases = ["hey luma", "hey lu na","hey luna"]
     private let stopPhrase = "thank you"
     private let maxRecentWords = 50
 
@@ -478,8 +478,11 @@ final class AudioWsClient: NSObject {
                     // Log only every 500 buffers (~10-15 seconds depending on sample rate)
                     if self.captureBufferCount == 1 || self.captureBufferCount % 500 == 0 {
                         self.logDataBeingSent(data, buffer: buffer)
+                        self.log("🎙️ Realtime AI ON, sending audio")
                     }
                     self.sendBinary(data)
+                } else if self.captureBufferCount == 1 || self.captureBufferCount % 500 == 0 {
+                    self.log("🚫 Realtime AI OFF, not sending audio")
                 }
             }
         }
@@ -708,7 +711,7 @@ final class AudioWsClient: NSObject {
         if window.contains(stopPhrase) {
             setRealtimeAI(on: false, reason: "stop phrase detected")
             clearTranscriptState()
-        } else if window.contains(wakePhrase) {
+        } else if wakePhrases.contains(where: { window.contains($0) }) {
             setRealtimeAI(on: true, reason: "wake phrase detected")
         }
     }
@@ -753,7 +756,7 @@ final class AudioWsClient: NSObject {
     private func setRealtimeAI(on: Bool, reason: String) {
         guard isRealtimeAIOn != on else { return }
         isRealtimeAIOn = on
-        log("🧠 Realtime AI \(on ? "ON" : "OFF") (\(reason))")
+        log("🧠 Realtime AI set to \(on ? "ON" : "OFF") (\(reason))")
     }
 }
 
