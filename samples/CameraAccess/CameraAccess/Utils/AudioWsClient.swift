@@ -696,7 +696,12 @@ final class AudioWsClient: NSObject {
                 self.handleTranscription(result.bestTranscription.formattedString)
             }
             if let error = error as NSError? {
+                // Filter out expected errors when manually stopping recognition
                 if error.domain == "kLSRErrorDomain" && error.code == 301 {
+                    return
+                }
+                // "No speech detected" - occurs when we cancel recognition after keyword trigger
+                if error.domain == "kAFAssistantErrorDomain" && error.code == 1110 {
                     return
                 }
                 self.logError("Speech recognition error", error: error)
@@ -722,6 +727,7 @@ final class AudioWsClient: NSObject {
         let window = recentWords.joined(separator: " ")
         log("📝 Transcription: raw='\(text)' norm='\(normalized)' window='\(window)'")
 
+        // "thank you" always works - it's the only way to turn off AI session
         if window.contains(stopPhrase) {
             setRealtimeAI(on: false, reason: "stop phrase detected")
             clearTranscriptState()
@@ -730,14 +736,16 @@ final class AudioWsClient: NSObject {
                 self?.stopSpeechRecognition(clearState: true)
                 self?.startSpeechRecognition()
             }
-        } else if wakePhrases.contains(where: { window.contains($0) }) {
+        } else if !isRealtimeAIOn && wakePhrases.contains(where: { window.contains($0) }) {
+            // Only trigger "hey luna" when AI is OFF
             setRealtimeAI(on: true, reason: "wake phrase detected")
             clearTranscriptState()
             DispatchQueue.main.async { [weak self] in
                 self?.stopSpeechRecognition(clearState: true)
                 self?.startSpeechRecognition()
             }
-        } else if highlightPhrases.contains(where: { window.contains($0) }) {
+        } else if !isRealtimeAIOn && highlightPhrases.contains(where: { window.contains($0) }) {
+            // Only trigger "highlight" when AI is OFF
             log("📌 Highlight detected")
             playBookmarkNotification()
             sendHighlightSignal()
