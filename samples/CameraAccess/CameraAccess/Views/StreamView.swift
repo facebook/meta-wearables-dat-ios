@@ -92,6 +92,7 @@ struct ControlsView: View {
       CircleButton(icon: "camera.fill", text: nil) {
         viewModel.capturePhoto()
       }
+      .accessibilityIdentifier("capture_photo_button")
     }
   }
 }

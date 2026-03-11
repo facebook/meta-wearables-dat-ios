@@ -34,22 +34,30 @@ struct PhotoPreviewView: View {
 
       VStack(spacing: 20) {
         photoDisplayView
+
+        CircleButton(icon: "square.and.arrow.up", text: nil) {
+          showShareSheet = true
+        }
       }
       .padding()
       .offset(dragOffset)
       .animation(.spring(response: 0.6, dampingFraction: 0.8), value: dragOffset)
-    }
-    .task {
-      try? await Task.sleep(nanoseconds: 100_000_000)
-      showShareSheet = true
-    }
-    .sheet(
-      isPresented: $showShareSheet,
-      onDismiss: {
-        // When share sheet is dismissed, dismiss the entire preview
-        dismissWithAnimation()
+
+      // Close button in top right
+      VStack {
+        HStack {
+          Spacer()
+          CircleButton(icon: "xmark", text: nil) {
+            dismissWithAnimation()
+          }
+          .accessibilityIdentifier("close_preview_button")
+          .padding(.trailing, 20)
+          .padding(.top, 50)
+        }
+        Spacer()
       }
-    ) {
+    }
+    .sheet(isPresented: $showShareSheet) {
       ShareSheet(photo: photo)
     }
   }
@@ -62,6 +70,7 @@ struct PhotoPreviewView: View {
         .frame(maxWidth: geometry.size.width, maxHeight: geometry.size.height * 0.6)
         .cornerRadius(12)
         .shadow(color: .black.opacity(0.3), radius: 10, x: 0, y: 5)
+        .frame(width: geometry.size.width, height: geometry.size.height)
         .gesture(
           DragGesture()
             .onChanged { value in

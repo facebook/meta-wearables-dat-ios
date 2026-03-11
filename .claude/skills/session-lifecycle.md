@@ -1,0 +1,103 @@
+---
+description: Device session states, pause/resume, availability monitoring
+---
+
+# Session Lifecycle (iOS)
+
+Guide for managing device session states in DAT SDK integrations.
+
+## Overview
+
+The DAT SDK runs work inside sessions. Meta glasses expose two experience types:
+- **Device sessions** — sustained access to device sensors and outputs
+- **Transactions** — short, system-owned interactions (notifications, "Hey Meta")
+
+Your app observes session state changes — the device decides when to transition.
+
+## Session states
+
+| State | Meaning | App action |
+|-------|---------|------------|
+| `STOPPED` | Session inactive, not reconnecting | Free resources, wait for user action |
+| `RUNNING` | Session active, streaming data | Perform live work |
+| `PAUSED` | Temporarily suspended | Hold work, may resume |
+
+## Observing session state
+
+```swift
+Task {
+    for await state in Wearables.shared.deviceSessionStateStream(for: deviceId) {
+        switch state {
+        case .running:
+            // Confirm UI shows session is live
+        case .paused:
+            // Keep connection, wait for running or stopped
+        case .stopped:
+            // Release resources, allow user to restart
+        }
+    }
+}
+```
+
+## StreamSession state transitions
+
+StreamSession has its own state flow:
+
+```text
+stopped → waitingForDevice → starting → streaming → paused → stopped
+```
+
+```swift
+let token = session.statePublisher.listen { state in
+    Task { @MainActor in
+        // React to state changes
+    }
+}
+```
+
+## Common transitions
+
+The device changes session state when:
+- User performs a system gesture that opens another experience
+- Another app starts a device session
+- User removes or folds the glasses (Bluetooth disconnects)
+- User removes the app from Meta AI companion app
+- Connectivity between companion app and glasses drops
+
+## Pause and resume
+
+When a session is paused:
+- The device keeps the connection alive
+- Streams stop delivering data
+- The device may resume by returning to `RUNNING`
+
+Your app should **not** attempt to restart while paused — wait for `RUNNING` or `STOPPED`.
+
+## Device availability
+
+Monitor device availability to know when sessions can start:
+
+```swift
+Task {
+    for await devices in Wearables.shared.devicesStream() {
+        // Update list of available glasses
+    }
+}
+```
+
+Key behaviors:
+- Closing hinges disconnects Bluetooth → forces `STOPPED`
+- Opening hinges restores Bluetooth but does **not** restart sessions
+- Start a new session after the device becomes available again
+
+## Implementation checklist
+
+- [ ] Handle all session states (`RUNNING`, `PAUSED`, `STOPPED`)
+- [ ] Monitor device availability before starting work
+- [ ] Release resources only after `STOPPED`
+- [ ] Don't infer transition causes — rely only on observable state
+- [ ] Don't restart during `PAUSED` — wait for system to resume or stop
+
+## Links
+
+- [Session lifecycle documentation](https://wearables.developer.meta.com/docs/lifecycle-events)

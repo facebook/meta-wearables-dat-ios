@@ -1,7 +1,7 @@
 # Meta Wearables Device Access Toolkit for iOS
 
-[![Swift Package](https://img.shields.io/badge/Swift_Package-0.4.0-brightgreen?logo=swift&logoColor=white)](https://github.com/facebook/meta-wearables-dat-ios/tags)
-[![Docs](https://img.shields.io/badge/API_Reference-0.4-blue?logo=meta)](https://wearables.developer.meta.com/docs/reference/ios_swift/dat/0.4)
+[![Swift Package](https://img.shields.io/badge/Swift_Package-0.5.0-brightgreen?logo=swift&logoColor=white)](https://github.com/facebook/meta-wearables-dat-ios/tags)
+[![Docs](https://img.shields.io/badge/API_Reference-0.5-blue?logo=meta)](https://wearables.developer.meta.com/docs/reference/ios_swift/dat/0.5)
 
 The Meta Wearables Device Access Toolkit enables developers to utilize Meta's AI glasses to build hands-free wearable experiences into their mobile applications.
 By integrating this SDK, developers can reliably connect to Meta's AI glasses and leverage capabilities like video streaming and photo capture.
@@ -75,6 +75,40 @@ Add or modify the following in your `Info.plist` file.
 
 - `YES`/`<true/>` = Opt out (analytics **disabled**)
 - `NO`/`<false/>` = Opt in (analytics **enabled**)
+
+## AI-Assisted Development
+
+This repository includes AI development skills that work with [Claude Code](https://docs.anthropic.com/en/docs/claude-code), [Cursor](https://cursor.sh/), and other AI coding assistants that support project-level context.
+
+### Quick setup
+
+Add the skills to your project with a single command:
+
+```bash
+curl -sL https://raw.githubusercontent.com/facebook/meta-wearables-dat-ios/main/install-skills.sh | bash
+```
+
+Or manually download the `.claude/` directory into your project root:
+
+```bash
+cd your-project
+curl -sL https://github.com/facebook/meta-wearables-dat-ios/archive/refs/heads/main.tar.gz \
+  | tar xz --strip-components=1 'meta-wearables-dat-ios-main/.claude'
+```
+
+If you cloned this repository, the skills are already included — no setup needed.
+
+### What's included
+
+- **Getting started** — SDK setup, SPM integration, Info.plist configuration
+- **Camera streaming** — StreamSession, video frames, resolution/frame rate, photo capture
+- **MockDevice testing** — Test without physical glasses using MockDeviceKit
+- **Session lifecycle** — Device session states, pause/resume, availability
+- **Permissions & registration** — App registration, camera permission flows
+- **Debugging** — Common issues, Developer Mode, version compatibility
+- **Sample app guide** — Building a complete DAT app
+
+Skills are loaded automatically from `.claude/settings.json` when your AI assistant opens the project.
 
 ## License
 

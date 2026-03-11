@@ -55,10 +55,9 @@ struct MockDeviceKitButton: View {
     }
     .padding(.horizontal)
     .frame(maxWidth: expandsHorizontally ? .infinity : nil, minHeight: 44)
-    .background(style.backgroundColor)
-    .foregroundStyle(style.foregroundColor)
+    .background(disabled ? style.backgroundColor.opacity(0.4) : style.backgroundColor)
+    .foregroundStyle(disabled ? style.foregroundColor.opacity(0.6) : style.foregroundColor)
     .clipShape(RoundedRectangle(cornerRadius: 16))
-    .opacity(disabled ? 0.6 : 1)
     .disabled(disabled)
   }
 }

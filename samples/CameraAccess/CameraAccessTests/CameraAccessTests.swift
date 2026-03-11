@@ -54,8 +54,9 @@ class ViewModelIntegrationTests: XCTestCase {
       return
     }
 
-    guard let videoURL = Bundle(for: type(of: self)).url(forResource: "plant", withExtension: "mp4") else {
-      XCTFail("Could not find resource in test bundle")
+    guard let videoURL = Bundle.main.url(forResource: "plant", withExtension: "mp4")
+    else {
+      XCTFail("Test resources not found")
       return
     }
 
@@ -101,13 +102,10 @@ class ViewModelIntegrationTests: XCTestCase {
       return
     }
 
-    guard let videoURL = Bundle(for: type(of: self)).url(forResource: "plant", withExtension: "mp4") else {
-      XCTFail("Could not find resource in test bundle")
-      return
-    }
-
-    guard let imageURL = Bundle(for: type(of: self)).url(forResource: "plant", withExtension: "png") else {
-      XCTFail("Could not find resource in test bundle")
+    guard let videoURL = Bundle.main.url(forResource: "plant", withExtension: "mp4"),
+      let imageURL = Bundle.main.url(forResource: "plant", withExtension: "png")
+    else {
+      XCTFail("Test resources not found")
       return
     }
 

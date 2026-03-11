@@ -5,9 +5,34 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.0] - 2026-03-11
+
+### Added
+
+- [Feature] `VideoCodec.hvc1` to `StreamSessionConfig` for compressed HEVC streaming that continues in the background. The default `VideoCodec.raw` pauses streaming when app is backgrounded.
+- [Feature] Support for app attestation.
+- [API] `thermalCritical` to `StreamSessionError` to indicate that the device's thermal state has reached a critical level that may affect streaming performance.
+- AI coding agents config files: AGENTS.md, Claude skills, Cursor rules, Copilot instructions.
+
+### Removed
+
+- [API] `@MainActor` requirement from MWDATCamera to enable safely calling this from any thread.
+- [API] `HingeState` enum.
+- [API] `DeviceState` struct.
+- [Dependency] `nanopb` library dependency which was blocking Apple review for iOS apps.
+- [CameraAccess] Removed timer functionality.
+
+### Fixed
+
+- High resolution (720x1280) video can now be requested.
+
+### Changed
+
+- [CameraAccess] Improved photo capture flow.
+
 ## [0.4.0] - 2026-02-03
 
-> **Note:** This version requires updated configuration values from Wearables Developer Center to work with release channels.
+> **Note:** This version requires updated configuration values from Wearables Developer Center for release channel functionality.
 
 ### Added
 
@@ -24,7 +49,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Fixed streaming status when switching between devices.
-- Fixed streaming status failing to get to `Streaming` due to a race condition.
+- Fixed streaming status failing to reach `Streaming` state. A race condition caused this issue.
 
 ## [0.3.0] - 2025-12-16
 

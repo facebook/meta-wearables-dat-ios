@@ -40,6 +40,28 @@ struct CameraAccessApp: App {
       NSLog("[CameraAccess] Failed to configure Wearables SDK: \(error)")
       #endif
     }
+
+    #if DEBUG
+    // Auto-configure MockDeviceKit when launched by XCUITests
+    if ProcessInfo.processInfo.arguments.contains("--ui-testing") {
+      let device = MockDeviceKit.shared.pairRaybanMeta()
+
+      let cameraKit = device.getCameraKit()
+      Task {
+        guard let videoURL = Bundle.main.url(forResource: "plant", withExtension: "mp4"),
+          let imageURL = Bundle.main.url(forResource: "plant", withExtension: "png")
+        else {
+          fatalError("Test resources not found - are you running a Release build?")
+        }
+        await cameraKit.setCameraFeed(fileURL: videoURL)
+        await cameraKit.setCapturedImage(fileURL: imageURL)
+
+        device.powerOn()
+        device.don()
+      }
+    }
+    #endif
+
     let wearables = Wearables.shared
     self.wearables = wearables
     self._wearablesViewModel = StateObject(wrappedValue: WearablesViewModel(wearables: wearables))

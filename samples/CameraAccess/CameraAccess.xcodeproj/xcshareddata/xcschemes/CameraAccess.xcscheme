@@ -41,6 +41,17 @@
                ReferencedContainer = "container:CameraAccess.xcodeproj">
             </BuildableReference>
          </TestableReference>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "E66CC00C2F3E05D900B07379"
+               BuildableName = "CameraAccessUITests.xctest"
+               BlueprintName = "CameraAccessUITests"
+               ReferencedContainer = "container:CameraAccess.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction

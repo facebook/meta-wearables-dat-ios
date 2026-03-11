@@ -1,0 +1,11 @@
+{
+  "skills": {
+    "skills/getting-started.md": "SDK setup, Swift Package Manager integration, Info.plist configuration, and first connection to Meta glasses",
+    "skills/camera-streaming.md": "StreamSession, video frames, photo capture, resolution/frame rate configuration",
+    "skills/mockdevice-testing.md": "MockDeviceKit for testing without physical glasses hardware",
+    "skills/session-lifecycle.md": "Device session states, pause/resume, availability monitoring",
+    "skills/permissions-registration.md": "App registration with Meta AI, camera permission flows",
+    "skills/debugging.md": "Common issues, Developer Mode, version compatibility, state machine diagnosis",
+    "skills/sample-app-guide.md": "Building a complete DAT app with camera streaming and photo capture"
+  }
+}

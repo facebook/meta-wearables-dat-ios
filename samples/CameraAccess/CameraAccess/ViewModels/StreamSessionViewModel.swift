@@ -188,12 +188,12 @@ class StreamSessionViewModel: ObservableObject {
       return "The operation timed out. Please try again."
     case .videoStreamingError:
       return "Video streaming failed. Please try again."
-    case .audioStreamingError:
-      return "Audio streaming failed. Please try again."
     case .permissionDenied:
       return "Camera permission denied. Please grant permission in Settings."
     case .hingesClosed:
       return "The hinges on the glasses were closed. Please open the hinges and try again."
+    case .thermalCritical:
+      return "Device is overheating. Streaming has been paused to protect the device."
     @unknown default:
       return "An unknown streaming error occurred."
     }

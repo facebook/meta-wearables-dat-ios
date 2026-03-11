@@ -25,6 +25,9 @@ extension MockDeviceCardView {
     let device: MockDevice
     @Published var hasCameraFeed: Bool = false
     @Published var hasCapturedImage: Bool = false
+    @Published var isPoweredOn: Bool = false
+    @Published var isDonned: Bool = false
+    @Published var isUnfolded: Bool = false
 
     init(device: MockDevice, hasCameraFeed: Bool = false, hasCapturedImage: Bool = false) {
       self.device = device
@@ -44,29 +47,37 @@ extension MockDeviceCardView {
 
     func powerOn() {
       device.powerOn()
+      isPoweredOn = true
     }
 
     func powerOff() {
       device.powerOff()
+      isPoweredOn = false
+      isDonned = false
+      isUnfolded = false
     }
 
     func don() {
       device.don()
+      isDonned = true
     }
 
     func doff() {
       device.doff()
+      isDonned = false
     }
 
     func unfold() {
       if let rayBanDevice = device as? MockDisplaylessGlasses {
         rayBanDevice.unfold()
+        isUnfolded = true
       }
     }
 
     func fold() {
       if let rayBanDevice = device as? MockDisplaylessGlasses {
         rayBanDevice.fold()
+        isUnfolded = false
       }
     }
 

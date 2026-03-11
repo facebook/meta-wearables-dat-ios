@@ -27,6 +27,8 @@
 		8FFD60542E849D0D0035E446 /* RegistrationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FFD60532E849D0D0035E446 /* RegistrationView.swift */; };
 		8FFD60602E84A2F70035E446 /* MainAppView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FFD605F2E84A2F70035E446 /* MainAppView.swift */; };
 		8FFD60612E84A2F70035E446 /* DebugMenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FFD605E2E84A2F70035E446 /* DebugMenuView.swift */; };
+		E66CC01B2F3E1A9300B07379 /* plant.png in Resources */ = {isa = PBXBuildFile; fileRef = E66CC0192F3E1A9300B07379 /* plant.png */; };
+		E66CC01C2F3E1A9300B07379 /* plant.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = E66CC0182F3E1A9300B07379 /* plant.mp4 */; };
 		E66D30242E7DA71900470B48 /* MockDeviceKitButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = E66D30232E7DA71900470B48 /* MockDeviceKitButton.swift */; };
 		E6A188482EB918740097D0E1 /* StreamView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6A188472EB918740097D0E1 /* StreamView.swift */; };
 		E6DA451D2E79A63100E3F688 /* MockDeviceCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DA45182E79A63100E3F688 /* MockDeviceCardView.swift */; };
@@ -36,6 +38,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		E66CC0132F3E05D900B07379 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = CCCCCCCCCCCCCCCCCCCCCC /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8A8A8A8A8A8A8A8A8A8A8A8A;
+			remoteInfo = CameraAccess;
+		};
 		E699CC992E8150670052C240 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = CCCCCCCCCCCCCCCCCCCCCC /* Project object */;
@@ -79,6 +88,9 @@
 		8FFD60532E849D0D0035E446 /* RegistrationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegistrationView.swift; sourceTree = "<group>"; };
 		8FFD605E2E84A2F70035E446 /* DebugMenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugMenuView.swift; sourceTree = "<group>"; };
 		8FFD605F2E84A2F70035E446 /* MainAppView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainAppView.swift; sourceTree = "<group>"; };
+		E66CC00D2F3E05D900B07379 /* CameraAccessUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CameraAccessUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		E66CC0182F3E1A9300B07379 /* plant.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = plant.mp4; sourceTree = "<group>"; };
+		E66CC0192F3E1A9300B07379 /* plant.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = plant.png; sourceTree = "<group>"; };
 		E66D30232E7DA71900470B48 /* MockDeviceKitButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockDeviceKitButton.swift; sourceTree = "<group>"; };
 		E699CC952E8150670052C240 /* CameraAccessTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CameraAccessTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E6A188472EB918740097D0E1 /* StreamView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreamView.swift; sourceTree = "<group>"; };
@@ -89,6 +101,7 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		E66CC00E2F3E05D900B07379 /* CameraAccessUITests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = CameraAccessUITests; sourceTree = "<group>"; };
 		E699CC962E8150670052C240 /* CameraAccessTests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = CameraAccessTests; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
@@ -103,6 +116,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		E66CC00A2F3E05D900B07379 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -110,6 +130,7 @@
 			isa = PBXGroup;
 			children = (
 				8FD96B7D2E6F0A9800F56AB1 /* CameraAccess */,
+				E66CC00E2F3E05D900B07379 /* CameraAccessUITests */,
 				8F2A14F12DDBCEB900D4E5F2 /* Frameworks */,
 				7A7A7A7A7A7A7A7A7A7A7A7A /* Products */,
 				E699CC962E8150670052C240 /* CameraAccessTests */,
@@ -121,6 +142,7 @@
 			children = (
 				3A3A3A3A3A3A3A3A3A3A3A3A /* CameraAccess.app */,
 				E699CC952E8150670052C240 /* CameraAccessTests.xctest */,
+				E66CC00D2F3E05D900B07379 /* CameraAccessUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -163,6 +185,7 @@
 		8FD96B7D2E6F0A9800F56AB1 /* CameraAccess */ = {
 			isa = PBXGroup;
 			children = (
+				E66CC01A2F3E1A9300B07379 /* TestResources */,
 				8FD96B702E6F0A9800F56AB1 /* ViewModels */,
 				8FD96B762E6F0A9800F56AB1 /* Views */,
 				8FD96B772E6F0A9800F56AB1 /* Assets.xcassets */,
@@ -192,6 +215,15 @@
 				8FFD602A2E8433E20035E446 /* MockDeviceViewModel.swift */,
 			);
 			path = MockDeviceKit;
+			sourceTree = "<group>";
+		};
+		E66CC01A2F3E1A9300B07379 /* TestResources */ = {
+			isa = PBXGroup;
+			children = (
+				E66CC0182F3E1A9300B07379 /* plant.mp4 */,
+				E66CC0192F3E1A9300B07379 /* plant.png */,
+			);
+			path = TestResources;
 			sourceTree = "<group>";
 		};
 		E6DA451B2E79A63100E3F688 /* MockDeviceKit */ = {
@@ -225,6 +257,29 @@
 			productReference = 3A3A3A3A3A3A3A3A3A3A3A3A /* CameraAccess.app */;
 			productType = "com.apple.product-type.application";
 		};
+		E66CC00C2F3E05D900B07379 /* CameraAccessUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E66CC0172F3E05D900B07379 /* Build configuration list for PBXNativeTarget "CameraAccessUITests" */;
+			buildPhases = (
+				E66CC0092F3E05D900B07379 /* Sources */,
+				E66CC00A2F3E05D900B07379 /* Frameworks */,
+				E66CC00B2F3E05D900B07379 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				E66CC0142F3E05D900B07379 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				E66CC00E2F3E05D900B07379 /* CameraAccessUITests */,
+			);
+			name = CameraAccessUITests;
+			packageProductDependencies = (
+			);
+			productName = CameraAccessUITests;
+			productReference = E66CC00D2F3E05D900B07379 /* CameraAccessUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
 		E699CC942E8150670052C240 /* CameraAccessTests */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = E699CC9D2E8150670052C240 /* Build configuration list for PBXNativeTarget "CameraAccessTests" */;
@@ -253,11 +308,15 @@
 		CCCCCCCCCCCCCCCCCCCCCC /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastSwiftUpdateCheck = 2600;
+				LastSwiftUpdateCheck = 2620;
 				LastUpgradeCheck = 1250;
 				TargetAttributes = {
 					8A8A8A8A8A8A8A8A8A8A8A8A = {
 						CreatedOnToolsVersion = 12.5;
+					};
+					E66CC00C2F3E05D900B07379 = {
+						CreatedOnToolsVersion = 26.2;
+						TestTargetID = 8A8A8A8A8A8A8A8A8A8A8A8A;
 					};
 					E699CC942E8150670052C240 = {
 						CreatedOnToolsVersion = 26.0;
@@ -283,6 +342,7 @@
 			targets = (
 				8A8A8A8A8A8A8A8A8A8A8A8A /* CameraAccess */,
 				E699CC942E8150670052C240 /* CameraAccessTests */,
+				E66CC00C2F3E05D900B07379 /* CameraAccessUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -292,7 +352,16 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E66CC01B2F3E1A9300B07379 /* plant.png in Resources */,
+				E66CC01C2F3E1A9300B07379 /* plant.mp4 in Resources */,
 				8FD96B8D2E6F0A9800F56AB1 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E66CC00B2F3E05D900B07379 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -335,6 +404,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		E66CC0092F3E05D900B07379 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		E699CC912E8150670052C240 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -345,6 +421,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		E66CC0142F3E05D900B07379 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8A8A8A8A8A8A8A8A8A8A8A8A /* CameraAccess */;
+			targetProxy = E66CC0132F3E05D900B07379 /* PBXContainerItemProxy */;
+		};
 		E699CC9A2E8150670052C240 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 8A8A8A8A8A8A8A8A8A8A8A8A /* CameraAccess */;
@@ -411,6 +492,57 @@
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "Facebook Generic";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		E66CC0152F3E05D900B07379 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.meta.wearables.external.CameraAccessUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = CameraAccess;
+			};
+			name = Debug;
+		};
+		E66CC0162F3E05D900B07379 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.meta.wearables.external.CameraAccessUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = CameraAccess;
 			};
 			name = Release;
 		};
@@ -608,6 +740,15 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
+		E66CC0172F3E05D900B07379 /* Build configuration list for PBXNativeTarget "CameraAccessUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E66CC0152F3E05D900B07379 /* Debug */,
+				E66CC0162F3E05D900B07379 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		E699CC9D2E8150670052C240 /* Build configuration list for PBXNativeTarget "CameraAccessTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -625,7 +766,7 @@
 			repositoryURL = "https://github.com/facebook/meta-wearables-dat-ios";
 			requirement = {
 				kind = exactVersion;
-				version = 0.4.0;
+				version = 0.5.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */

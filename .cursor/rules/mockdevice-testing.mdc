@@ -1,0 +1,113 @@
+---
+description: MockDeviceKit for testing without physical glasses hardware
+globs: **/*Mock*, **/*Test*
+---
+
+
+# MockDevice Testing (iOS)
+
+Guide for testing DAT SDK integrations without physical Meta glasses.
+
+## Overview
+
+MockDeviceKit simulates Meta glasses behavior for development and testing. It provides:
+- `MockDeviceKit` — Entry point for creating simulated devices
+- `MockRaybanMeta` — Simulated Ray-Ban Meta glasses
+- `MockCameraKit` — Simulated camera with configurable video feed and photo capture
+
+## Setup
+
+Add `MWDATMockDevice` to your target via Swift Package Manager (it's included in the `meta-wearables-dat-ios` package).
+
+```swift
+import MWDATMockDevice
+```
+
+## Creating a mock device
+
+```swift
+let mockDevice = MockDeviceKit.shared.pairRaybanMeta()
+```
+
+## Simulating device states
+
+```swift
+// Simulate glasses lifecycle
+await mockDevice.powerOn()
+await mockDevice.unfold()
+await mockDevice.don()    // Simulate wearing the glasses
+
+// Later...
+await mockDevice.doff()   // Simulate removing
+await mockDevice.fold()
+await mockDevice.powerOff()
+```
+
+## Setting up mock camera feeds
+
+### Video streaming
+
+```swift
+let camera = mockDevice.getCameraKit()
+await camera.setCameraFeed(fileURL: videoURL)
+```
+
+### Photo capture
+
+```swift
+let camera = mockDevice.getCameraKit()
+await camera.setCapturedImage(fileURL: imageURL)
+```
+
+## Writing tests with MockDeviceKit
+
+Create a reusable test base class:
+
+```swift
+import XCTest
+import MetaWearablesDAT
+
+@MainActor
+class MockDeviceKitTestCase: XCTestCase {
+    private var mockDevice: MockRaybanMeta?
+    private var cameraKit: MockCameraKit?
+
+    override func setUp() async throws {
+        try await super.setUp()
+        try? Wearables.configure()
+        mockDevice = MockDeviceKit.shared.pairRaybanMeta()
+        cameraKit = mockDevice?.getCameraKit()
+    }
+
+    override func tearDown() async throws {
+        MockDeviceKit.shared.pairedDevices.forEach { device in
+            MockDeviceKit.shared.unpairDevice(device)
+        }
+        mockDevice = nil
+        cameraKit = nil
+        try await super.tearDown()
+    }
+}
+```
+
+## Using MockDeviceKit in the CameraAccess sample
+
+The CameraAccess sample app includes a Debug menu for MockDeviceKit:
+
+1. Tap the **Debug icon** to open the MockDeviceKit menu
+2. Tap **Pair RayBan Meta** to create a simulated device
+3. Use **PowerOn**, **Unfold**, **Don** to simulate glasses states
+4. Select video/image files to configure mock camera feeds
+5. Start streaming to see simulated frames
+
+## Supported media formats
+
+| Type | Formats |
+|------|---------|
+| Video | h.265 (HEVC) |
+| Image | JPEG, PNG |
+
+## Links
+
+- [Mock Device Kit overview](https://wearables.developer.meta.com/docs/mock-device-kit)
+- [iOS testing guide](https://wearables.developer.meta.com/docs/testing-mdk-ios)

@@ -52,31 +52,31 @@ struct MockDeviceCardView: View {
 
         VStack(spacing: 8) {
           HStack(spacing: 8) {
-            MockDeviceKitButton("Power On") {
+            MockDeviceKitButton("Power On", disabled: viewModel.isPoweredOn) {
               viewModel.powerOn()
             }
 
-            MockDeviceKitButton("Power Off") {
+            MockDeviceKitButton("Power Off", disabled: !viewModel.isPoweredOn) {
               viewModel.powerOff()
             }
           }
 
           HStack(spacing: 8) {
-            MockDeviceKitButton("Don") {
+            MockDeviceKitButton("Don", disabled: viewModel.isDonned) {
               viewModel.don()
             }
 
-            MockDeviceKitButton("Doff") {
+            MockDeviceKitButton("Doff", disabled: !viewModel.isDonned) {
               viewModel.doff()
             }
           }
 
           HStack(spacing: 8) {
-            MockDeviceKitButton("Unfold") {
+            MockDeviceKitButton("Unfold", disabled: viewModel.isUnfolded) {
               viewModel.unfold()
             }
 
-            MockDeviceKitButton("Fold") {
+            MockDeviceKitButton("Fold", disabled: !viewModel.isUnfolded) {
               viewModel.fold()
             }
           }
