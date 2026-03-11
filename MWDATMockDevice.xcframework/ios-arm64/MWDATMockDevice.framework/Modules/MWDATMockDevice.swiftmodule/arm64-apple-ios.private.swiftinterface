@@ -1,0 +1,78 @@
+// swift-interface-format-version: 1.0
+// swift-compiler-version: Apple Swift version 6.2.3 (swiftlang-6.2.3.3.21 clang-1700.6.3.2)
+// swift-module-flags: -target arm64-apple-ios15.2 -enable-objc-interop -enable-library-evolution -swift-version 6 -Osize -module-name MWDATMockDevice
+// swift-module-flags-ignorable: -no-verify-emitted-module-interface -formal-cxx-interoperability-mode=off -interface-compiler-version 6.2.3
+import AVFoundation
+import Foundation
+import MWDATCore
+import Swift
+import _Concurrency
+import _StringProcessing
+import _SwiftConcurrencyShims
+public protocol MockCameraKit {
+  func setCameraFeed(fileURL: Foundation.URL) async
+  func setCapturedImage(fileURL: Foundation.URL) async
+}
+@_Concurrency.MainActor public protocol MockDevice {
+  @_Concurrency.MainActor var deviceIdentifier: MWDATCore.DeviceIdentifier { get }
+  @_Concurrency.MainActor func powerOn()
+  @_Concurrency.MainActor func powerOff()
+  @_Concurrency.MainActor func don()
+  @_Concurrency.MainActor func doff()
+}
+@frozen public enum MockDeviceKitError : Swift.Error {
+  case unknown
+  public static func == (a: MWDATMockDevice.MockDeviceKitError, b: MWDATMockDevice.MockDeviceKitError) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+@_Concurrency.MainActor public protocol MockDeviceKitInterface {
+  @_Concurrency.MainActor func pairRaybanMeta() -> any MWDATMockDevice.MockRaybanMeta
+  @_Concurrency.MainActor func unpairDevice(_ device: any MWDATMockDevice.MockDevice)
+  @_Concurrency.MainActor var pairedDevices: [any MWDATMockDevice.MockDevice] { get }
+}
+@_Concurrency.MainActor public enum MockDeviceKit {
+  @_Concurrency.MainActor public static let shared: any MWDATMockDevice.MockDeviceKitInterface
+}
+@_Concurrency.MainActor public protocol MockDisplaylessGlasses : MWDATMockDevice.MockDevice {
+  @_Concurrency.MainActor func fold()
+  @_Concurrency.MainActor func unfold()
+  @_Concurrency.MainActor func getCameraKit() -> any MWDATMockDevice.MockCameraKit
+}
+@_Concurrency.MainActor public protocol MockRaybanMeta : MWDATMockDevice.MockDisplaylessGlasses {
+}
+@_hasMissingDesignatedInitializers @objc(MockCameraKit) final public class ObjC_MockCameraKit : ObjectiveC.NSObject {
+  @objc final public func setCameraFeed(fileURL: Foundation.URL) async
+  @objc final public func setCapturedImage(fileURL: Foundation.URL) async
+  @objc deinit
+}
+@objc(MockDevice) @_Concurrency.MainActor public protocol ObjC_MockDevice {
+  @objc @_Concurrency.MainActor var deviceIdentifier: Swift.String { get }
+  @objc @_Concurrency.MainActor func powerOn()
+  @objc @_Concurrency.MainActor func powerOff()
+  @objc @_Concurrency.MainActor func don()
+  @objc @_Concurrency.MainActor func doff()
+}
+@_hasMissingDesignatedInitializers @objc(MWDATMockDeviceKit) @_Concurrency.MainActor final public class ObjC_MockDeviceKit : ObjectiveC.NSObject {
+  @objc @_Concurrency.MainActor public static let sharedInstance: MWDATMockDevice.ObjC_MockDeviceKit
+  @objc @_Concurrency.MainActor final public var pairedDevices: [any MWDATMockDevice.ObjC_MockDevice] {
+    @objc get
+  }
+  @objc @_Concurrency.MainActor final public func pairRaybanMeta() -> any MWDATMockDevice.ObjC_MockRaybanMeta
+  @objc @_Concurrency.MainActor final public func unpairDevice(_ device: any MWDATMockDevice.ObjC_MockDevice)
+  @objc deinit
+}
+@objc(MockDisplaylessGlasses) @_Concurrency.MainActor public protocol ObjC_MockDisplaylessGlasses : MWDATMockDevice.ObjC_MockDevice {
+  @objc @_Concurrency.MainActor func fold()
+  @objc @_Concurrency.MainActor func unfold()
+  @objc @_Concurrency.MainActor func getCameraKit() -> MWDATMockDevice.ObjC_MockCameraKit
+}
+@objc(MockRaybanMeta) @_Concurrency.MainActor public protocol ObjC_MockRaybanMeta : MWDATMockDevice.ObjC_MockDisplaylessGlasses {
+}
+extension MWDATMockDevice.MockDeviceKitError : Swift.Equatable {}
+extension MWDATMockDevice.MockDeviceKitError : Swift.Hashable {}
+extension MWDATMockDevice.MockDeviceKitError : Swift.BitwiseCopyable {}
+extension MWDATMockDevice.MockDeviceKit : Swift.Sendable {}
+extension MWDATMockDevice.ObjC_MockDeviceKit : Swift.Sendable {}
