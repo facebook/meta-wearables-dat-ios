@@ -1,0 +1,1339 @@
+// swift-interface-format-version: 1.0
+// swift-compiler-version: Apple Swift version 6.2.3 (swiftlang-6.2.3.3.21 clang-1700.6.3.2)
+// swift-module-flags: -target arm64-apple-ios15.2-simulator -enable-objc-interop -enable-library-evolution -swift-version 6 -Osize -module-name MWDATCore -package-name MetaWearablesDAT
+// swift-module-flags-ignorable: -no-verify-emitted-module-interface -formal-cxx-interoperability-mode=off -interface-compiler-version 6.2.3
+import CoreBluetooth
+import CryptoKit
+import Foundation
+import Swift
+import UIKit
+import _Concurrency
+import _StringProcessing
+import _SwiftConcurrencyShims
+public typealias DeviceIdentifier = Swift.String
+public enum DeviceType : Swift.String, Swift.CaseIterable, Swift.Sendable {
+  case unknown
+  case rayBanMeta
+  case oakleyMetaHSTN
+  case oakleyMetaVanguard
+  case metaRayBanDisplay
+  case rayBanMetaOptics
+  #if compiler(>=5.3) && $NonescapableTypes
+  public init?(rawValue: Swift.String)
+  #endif
+  public typealias AllCases = [MWDATCore.DeviceType]
+  public typealias RawValue = Swift.String
+  nonisolated public static var allCases: [MWDATCore.DeviceType] {
+    get
+  }
+  public var rawValue: Swift.String {
+    get
+  }
+}
+@frozen public enum LinkState : Swift.Equatable, Swift.Sendable {
+  case disconnected
+  case connecting
+  case connected
+  public static func == (a: MWDATCore.LinkState, b: MWDATCore.LinkState) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+public protocol AnyListenerToken : Swift.Sendable {
+  func cancel() async
+}
+public protocol Announcer<T> {
+  associatedtype T : Swift.Sendable
+  func listen(_ listener: @escaping @Sendable (Self.T) -> Swift.Void) -> any MWDATCore.AnyListenerToken
+}
+public struct Mutex<Value> : ~Swift.Copyable where Value : ~Copyable {
+  #if compiler(>=5.3) && $SendingArgsAndResults
+  public init(_ initialValue: consuming sending Value)
+  #else
+  public init(_ initialValue: consuming Value)
+  #endif
+  #if compiler(>=5.3) && $SendingArgsAndResults
+  @discardableResult
+  public borrowing func withLock<Result, E>(_ body: (inout sending Value) throws(E) -> sending Result) throws(E) -> sending Result where E : Swift.Error, Result : ~Copyable
+  #else
+  @discardableResult
+  public borrowing func withLock<Result, E>(_ body: (inout Value) throws(E) -> Result) throws(E) -> Result where E : Swift.Error, Result : ~Copyable
+  #endif
+}
+extension MWDATCore.Mutex : @unchecked Swift.Sendable where Value : ~Copyable {
+}
+public enum Permission : Swift.Sendable, Swift.CaseIterable {
+  case camera
+  case microphone
+  public static func == (a: MWDATCore.Permission, b: MWDATCore.Permission) -> Swift.Bool
+  public typealias AllCases = [MWDATCore.Permission]
+  nonisolated public static var allCases: [MWDATCore.Permission] {
+    get
+  }
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+public enum PermissionStatus : Swift.Sendable {
+  case granted
+  case denied
+  public static func == (a: MWDATCore.PermissionStatus, b: MWDATCore.PermissionStatus) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+@objc(MWDATPermissionError) public enum PermissionError : Swift.Int, Swift.Error, Swift.Sendable {
+  case noDevice
+  case noDeviceWithConnection
+  case connectionError
+  case metaAINotInstalled
+  case requestInProgress
+  case requestTimeout
+  case internalError
+  public var description: Swift.String {
+    get
+  }
+  #if compiler(>=5.3) && $NonescapableTypes
+  public init?(rawValue: Swift.Int)
+  #endif
+  public typealias RawValue = Swift.Int
+  public static var _nsErrorDomain: Swift.String {
+    get
+  }
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+@objc(MWDATRegistrationState) @frozen public enum RegistrationState : Swift.Int {
+  case unavailable
+  case available
+  case registering
+  case registered
+  public var description: Swift.String {
+    get
+  }
+  #if compiler(>=5.3) && $NonescapableTypes
+  public init?(rawValue: Swift.Int)
+  #endif
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+@objc(MWDATRegistrationError) @frozen public enum RegistrationError : Swift.Int, Swift.Error {
+  case alreadyRegistered
+  case configurationInvalid
+  case metaAINotInstalled
+  case networkUnavailable
+  case unknown
+  public var description: Swift.String {
+    get
+  }
+  #if compiler(>=5.3) && $NonescapableTypes
+  public init?(rawValue: Swift.Int)
+  #endif
+  public typealias RawValue = Swift.Int
+  public static var _nsErrorDomain: Swift.String {
+    get
+  }
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+@objc(MWDATUnregistrationError) @frozen public enum UnregistrationError : Swift.Int, Swift.Error {
+  case alreadyUnregistered
+  case configurationInvalid
+  case metaAINotInstalled
+  case unknown
+  public var description: Swift.String {
+    get
+  }
+  #if compiler(>=5.3) && $NonescapableTypes
+  public init?(rawValue: Swift.Int)
+  #endif
+  public typealias RawValue = Swift.Int
+  public static var _nsErrorDomain: Swift.String {
+    get
+  }
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+@objc(MWDATSessionState) @frozen public enum SessionState : Swift.Int, Swift.Sendable {
+  case stopped
+  case waitingForDevice
+  case running
+  case paused
+  case unknown
+  public var description: Swift.String {
+    get
+  }
+  #if compiler(>=5.3) && $NonescapableTypes
+  public init?(rawValue: Swift.Int)
+  #endif
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+@frozen public enum CapabilityState : Swift.Sendable {
+  case active
+  case stopped
+  public static func == (a: MWDATCore.CapabilityState, b: MWDATCore.CapabilityState) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+public protocol Capability : AnyObject, Swift.Sendable {
+  var capabilityState: MWDATCore.CapabilityState { get }
+  func stop() async
+}
+public enum Compatibility : Swift.CaseIterable, Swift.Sendable {
+  case undefined
+  case compatible
+  case deviceUpdateRequired
+  case sdkUpdateRequired
+  public var displayString: Swift.String {
+    get
+  }
+  public static func == (a: MWDATCore.Compatibility, b: MWDATCore.Compatibility) -> Swift.Bool
+  public typealias AllCases = [MWDATCore.Compatibility]
+  nonisolated public static var allCases: [MWDATCore.Compatibility] {
+    get
+  }
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+@_hasMissingDesignatedInitializers final public class Device : Swift.Sendable {
+  final public let identifier: MWDATCore.DeviceIdentifier
+  final public var name: Swift.String {
+    get
+  }
+  final public var deviceUUID: Foundation.UUID {
+    get
+  }
+  final public func nameOrId() -> Swift.String
+  final public var linkState: MWDATCore.LinkState {
+    get
+  }
+  final public func addLinkStateListener(_ listener: @escaping @Sendable (MWDATCore.LinkState) -> Swift.Void) -> any MWDATCore.AnyListenerToken
+  final public func addCompatibilityListener(_ listener: @escaping @Sendable (MWDATCore.Compatibility) -> Swift.Void) -> any MWDATCore.AnyListenerToken
+  final public func deviceType() -> MWDATCore.DeviceType
+  final public func compatibility() -> MWDATCore.Compatibility
+  @objc deinit
+}
+public protocol DeviceSelector : Swift.Sendable {
+  #if compiler(>=5.3) && $NonescapableTypes
+  var activeDevice: MWDATCore.DeviceIdentifier? { get }
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
+  func activeDeviceStream() -> MWDATCore.AnyAsyncSequence<MWDATCore.DeviceIdentifier?>
+  #endif
+}
+final public class SpecificDeviceSelector : MWDATCore.DeviceSelector {
+  #if compiler(>=5.3) && $NonescapableTypes
+  final public var activeDevice: MWDATCore.DeviceIdentifier? {
+    get
+  }
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
+  final public func activeDeviceStream() -> MWDATCore.AnyAsyncSequence<MWDATCore.DeviceIdentifier?>
+  #endif
+  public init(device: MWDATCore.DeviceIdentifier)
+  @objc deinit
+}
+final public class AutoDeviceSelector : MWDATCore.DeviceSelector {
+  #if compiler(>=5.3) && $NonescapableTypes
+  final public var activeDevice: MWDATCore.DeviceIdentifier? {
+    get
+  }
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
+  final public func activeDeviceStream() -> MWDATCore.AnyAsyncSequence<MWDATCore.DeviceIdentifier?>
+  #endif
+  public init(wearables: any MWDATCore.WearablesInterface)
+  @objc deinit
+}
+@_hasMissingDesignatedInitializers final public class DeviceSession : Swift.Sendable {
+  final public let deviceId: MWDATCore.DeviceIdentifier
+  final public var statePublisher: any MWDATCore.Announcer<MWDATCore.DeviceSessionState> {
+    get
+  }
+  final public var errorPublisher: any MWDATCore.Announcer<MWDATCore.DeviceSessionError> {
+    get
+  }
+  final public var state: MWDATCore.DeviceSessionState {
+    get
+  }
+  @objc deinit
+  final public func start() throws(MWDATCore.DeviceSessionError)
+  final public func stop()
+  final public func addCapability(_ capability: some Capability) throws(MWDATCore.DeviceSessionError)
+  final public func removeCapability<T>(_ type: T.Type) throws(MWDATCore.DeviceSessionError) where T : MWDATCore.Capability
+  final public func stateStream() -> _Concurrency.AsyncStream<MWDATCore.DeviceSessionState>
+  final public func errorStream() -> _Concurrency.AsyncStream<MWDATCore.DeviceSessionError>
+  public static func create_FOR_TESTING(deviceId: MWDATCore.DeviceIdentifier, deviceManager: any MWDATCore.DeviceManager, appId: Swift.String = "com.test.app") -> MWDATCore.DeviceSession
+}
+@frozen public enum DeviceSessionError : Swift.Error, Swift.Equatable, Swift.Sendable, Foundation.LocalizedError {
+  case noEligibleDevice
+  case sessionAlreadyStopped
+  case sessionAlreadyExists
+  case sessionIdle
+  case capabilityAlreadyActive
+  case capabilityNotFound
+  case unexpectedError(description: Swift.String)
+  #if compiler(>=5.3) && $NonescapableTypes
+  public var errorDescription: Swift.String? {
+    get
+  }
+  #endif
+  public static func == (a: MWDATCore.DeviceSessionError, b: MWDATCore.DeviceSessionError) -> Swift.Bool
+}
+@frozen public enum DeviceSessionState : Swift.Equatable, Swift.Sendable {
+  case idle
+  case starting
+  case started
+  case paused
+  case stopping
+  case stopped
+  public var description: Swift.String {
+    get
+  }
+  public static func == (a: MWDATCore.DeviceSessionState, b: MWDATCore.DeviceSessionState) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+@_hasMissingDesignatedInitializers final public class DeviceStateSession : Swift.Sendable {
+  final public var state: MWDATCore.SessionState {
+    get
+  }
+  final public func start() async throws
+  final public func stop() async throws
+  convenience public init(deviceSelector: any MWDATCore.DeviceSelector)
+  @objc deinit
+}
+@_hasMissingDesignatedInitializers @objc public class ObjC_AnyListenerToken : ObjectiveC.NSObject {
+  @objc public func cancel()
+  @objc deinit
+}
+@_hasMissingDesignatedInitializers @objc(MWDATDevice) public class ObjC_Device : ObjectiveC.NSObject {
+  @objc public var identifier: MWDATCore.DeviceIdentifier {
+    @objc get
+  }
+  @objc public var name: Swift.String {
+    @objc get
+  }
+  @objc public func nameOrId() -> Swift.String
+  public var linkState: MWDATCore.LinkState {
+    get
+  }
+  public func addLinkStateListener(_ listener: @escaping @Sendable (MWDATCore.LinkState) -> Swift.Void) -> MWDATCore.ObjC_AnyListenerToken
+  public func deviceType() -> MWDATCore.DeviceType
+  @objc public static func makeDeviceForTest_DO_NOT_USE(identifier: Swift.String, name: Swift.String) -> MWDATCore.ObjC_Device
+  @objc deinit
+}
+@_hasMissingDesignatedInitializers @objc(MWDATDeviceSession) final public class ObjC_DeviceSession : ObjectiveC.NSObject, Swift.Sendable {
+  @_spi(ObjCBridge) final public var wrappedSession: MWDATCore.DeviceSession {
+    @_spi(ObjCBridge) get
+  }
+  @objc final public var deviceIdentifier: MWDATCore.DeviceIdentifier {
+    @objc get
+  }
+  #if compiler(>=5.3) && $NonescapableTypes
+  @objc(start:) final public func start(_ error: Foundation.NSErrorPointer = nil)
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
+  @objc(startAndWaitUntilReadyWithCompletionHandler:) final public func startAndWaitUntilReady(completionHandler: @escaping @Sendable (Foundation.NSError?) -> Swift.Void)
+  #endif
+  @objc final public func stop()
+  @_spi(ObjCBridge) public static func create_FOR_TESTING(swiftSession: MWDATCore.DeviceSession) -> MWDATCore.ObjC_DeviceSession
+  @objc deinit
+}
+@objc(MWDATPermission) @frozen public enum ObjC_Permission : Swift.Int {
+  case camera
+  case microphone
+  public var description: Swift.String {
+    get
+  }
+  #if compiler(>=5.3) && $NonescapableTypes
+  public init?(rawValue: Swift.Int)
+  #endif
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+@objc(MWDATPermissionStatus) @frozen public enum ObjC_PermissionStatus : Swift.Int {
+  case granted
+  case denied
+  #if compiler(>=5.3) && $NonescapableTypes
+  public init?(rawValue: Swift.Int)
+  #endif
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+@objc extension Foundation.NSNotification {
+  @objc public static let wearablesRegistrationStateChanged: Foundation.Notification.Name
+  @objc public static let wearablesDevicesChanged: Foundation.Notification.Name
+}
+@_hasMissingDesignatedInitializers @objc(MWDATWearables) final public class ObjC_Wearables : ObjectiveC.NSObject, Swift.Sendable {
+  #if compiler(>=5.3) && $NonescapableTypes
+  @objc(configure:) public static func configure(_ error: Foundation.NSErrorPointer = nil)
+  #endif
+  @objc public static func resetForTesting()
+  @objc public static var sharedInstance: MWDATCore.ObjC_Wearables {
+    @objc get
+  }
+  @objc deinit
+  @objc final public var registrationState: MWDATCore.RegistrationState {
+    @objc get
+  }
+  @objc final public func startRegistration() async throws
+  @objc final public func handleUrl(_ url: Foundation.URL) async throws -> Swift.Bool
+  @objc final public func startUnregistration() async throws
+  @objc final public var devices: [MWDATCore.DeviceIdentifier] {
+    @objc get
+  }
+  #if compiler(>=5.3) && $NonescapableTypes
+  @objc final public func deviceForIdentifier(_ identifier: MWDATCore.DeviceIdentifier) -> MWDATCore.ObjC_Device?
+  #endif
+  @objc final public func checkPermissionStatus(_ permission: MWDATCore.ObjC_Permission) async throws -> MWDATCore.ObjC_PermissionStatus
+  @objc final public func requestPermission(_ permission: MWDATCore.ObjC_Permission) async throws -> MWDATCore.ObjC_PermissionStatus
+  #if compiler(>=5.3) && $NonescapableTypes
+  @objc(createSessionForDeviceIdentifier:error:) final public func createSession(forDeviceIdentifier deviceIdentifier: MWDATCore.DeviceIdentifier, error: Foundation.NSErrorPointer = nil) -> MWDATCore.ObjC_DeviceSession?
+  #endif
+  @objc final public func addDeviceSessionStateListener(forDeviceId deviceId: MWDATCore.DeviceIdentifier, listener: @escaping @Sendable (MWDATCore.SessionState) -> Swift.Void) async -> MWDATCore.ObjC_AnyListenerToken
+}
+@objc(MWDATWearablesError) @frozen public enum WearablesError : Swift.Int, Swift.Error {
+  case internalError
+  case alreadyConfigured
+  case configurationError
+  public var description: Swift.String {
+    get
+  }
+  #if compiler(>=5.3) && $NonescapableTypes
+  public init?(rawValue: Swift.Int)
+  #endif
+  public typealias RawValue = Swift.Int
+  public static var _nsErrorDomain: Swift.String {
+    get
+  }
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+@objc(MWDATWearablesHandleURLError) @frozen public enum WearablesHandleURLError : Swift.Int, Swift.Error {
+  case registrationError
+  case unregistrationError
+  public var description: Swift.String {
+    get
+  }
+  #if compiler(>=5.3) && $NonescapableTypes
+  public init?(rawValue: Swift.Int)
+  #endif
+  public typealias RawValue = Swift.Int
+  public static var _nsErrorDomain: Swift.String {
+    get
+  }
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+public protocol WearablesInterface : Swift.Sendable {
+  var registrationState: MWDATCore.RegistrationState { get }
+  func addRegistrationStateListener(_ listener: @escaping @Sendable (MWDATCore.RegistrationState) -> Swift.Void) -> any MWDATCore.AnyListenerToken
+  func registrationStateStream() -> _Concurrency.AsyncStream<MWDATCore.RegistrationState>
+  func startRegistration() async throws(MWDATCore.RegistrationError)
+  func handleUrl(_ url: Foundation.URL) async throws(MWDATCore.WearablesHandleURLError) -> Swift.Bool
+  func startUnregistration() async throws(MWDATCore.UnregistrationError)
+  var devices: [MWDATCore.DeviceIdentifier] { get }
+  func addDevicesListener(_ listener: @escaping @Sendable ([MWDATCore.DeviceIdentifier]) -> Swift.Void) -> any MWDATCore.AnyListenerToken
+  func devicesStream() -> _Concurrency.AsyncStream<[MWDATCore.DeviceIdentifier]>
+  #if compiler(>=5.3) && $NonescapableTypes
+  func deviceForIdentifier(_ identifier: MWDATCore.DeviceIdentifier) -> MWDATCore.Device?
+  #endif
+  func checkPermissionStatus(_ permission: MWDATCore.Permission) async throws(MWDATCore.PermissionError) -> MWDATCore.PermissionStatus
+  func requestPermission(_ permission: MWDATCore.Permission) async throws(MWDATCore.PermissionError) -> MWDATCore.PermissionStatus
+  func createSession(deviceSelector: any MWDATCore.DeviceSelector) throws(MWDATCore.DeviceSessionError) -> MWDATCore.DeviceSession
+  func addDeviceSessionStateListener(forDeviceId: MWDATCore.DeviceIdentifier, listener: @escaping @Sendable (MWDATCore.SessionState) -> Swift.Void) async -> any MWDATCore.AnyListenerToken
+}
+public enum Wearables {
+  public static func configure() throws(MWDATCore.WearablesError)
+  public static var shared: any MWDATCore.WearablesInterface {
+    get
+  }
+}
+extension MWDATCore.WearablesInterface {
+  public func registrationStateStream() -> _Concurrency.AsyncStream<MWDATCore.RegistrationState>
+  public func devicesStream() -> _Concurrency.AsyncStream<[MWDATCore.DeviceIdentifier]>
+}
+extension MWDATCore.AnalyticsProtocol {
+  public func markerStart(markerId: Swift.Int32, instanceKey: Swift.Int32)
+  public func markerAnnotate<T>(markerId: Swift.Int32, instanceKey: Swift.Int32, key: Swift.String, value: T) where T : MWDATCore.QPLAnnotatable
+  public func markerEnd(markerId: Swift.Int32, instanceKey: Swift.Int32, actionId: Swift.Int16)
+  public func markerPoint(markerId: Swift.Int32, instanceKey: Swift.Int32, name: Swift.String, level: MWDATCore.QPLLogLevel)
+}
+public enum QPLLogLevel {
+  case debug
+  case info
+  case warn
+  case error
+  case fatal
+  public static func == (a: MWDATCore.QPLLogLevel, b: MWDATCore.QPLLogLevel) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+public protocol QPLAnnotatable {
+  func annotateQPL(using wrapper: MWDATCore.QPLLoggerWrapper, markerId: Swift.Int32, instanceKey: Swift.Int32, key: Swift.String)
+}
+extension Swift.String : MWDATCore.QPLAnnotatable {
+  public func annotateQPL(using wrapper: MWDATCore.QPLLoggerWrapper, markerId: Swift.Int32, instanceKey: Swift.Int32, key: Swift.String)
+}
+extension Swift.Int : MWDATCore.QPLAnnotatable {
+  public func annotateQPL(using wrapper: MWDATCore.QPLLoggerWrapper, markerId: Swift.Int32, instanceKey: Swift.Int32, key: Swift.String)
+}
+extension Swift.Int64 : MWDATCore.QPLAnnotatable {
+  public func annotateQPL(using wrapper: MWDATCore.QPLLoggerWrapper, markerId: Swift.Int32, instanceKey: Swift.Int32, key: Swift.String)
+}
+extension Swift.Double : MWDATCore.QPLAnnotatable {
+  public func annotateQPL(using wrapper: MWDATCore.QPLLoggerWrapper, markerId: Swift.Int32, instanceKey: Swift.Int32, key: Swift.String)
+}
+extension Swift.Bool : MWDATCore.QPLAnnotatable {
+  public func annotateQPL(using wrapper: MWDATCore.QPLLoggerWrapper, markerId: Swift.Int32, instanceKey: Swift.Int32, key: Swift.String)
+}
+extension MWDATCore.Analytics {
+  final public func markerStart(markerId: Swift.Int32, instanceKey: Swift.Int32)
+  final public func markerAnnotate<T>(markerId: Swift.Int32, instanceKey: Swift.Int32, key: Swift.String, value: T) where T : MWDATCore.QPLAnnotatable
+  final public func markerEnd(markerId: Swift.Int32, instanceKey: Swift.Int32, actionId: Swift.Int16)
+  final public func markerPoint(markerId: Swift.Int32, instanceKey: Swift.Int32, name: Swift.String, level: MWDATCore.QPLLogLevel)
+}
+public struct AnalyticsRuntimeConfig : Swift.Sendable {
+  public init(sessionUuid: Swift.String, sessionStartTime: Swift.Int64, publicKeyHash: Swift.String)
+}
+@_hasMissingDesignatedInitializers final public class Analytics : MWDATCore.AnalyticsProtocol, Swift.Sendable {
+  public static let shared: MWDATCore.Analytics
+  final public func log(event: any MWDATCore.AnalyticsEvent)
+  public static func log(event: any MWDATCore.AnalyticsEvent)
+  final public func configure(with configuration: MWDATCore.Configuration, runtimeConfig: MWDATCore.AnalyticsRuntimeConfig)
+  @objc deinit
+}
+public protocol AnalyticsEvent : Swift.Sendable {
+  var name: Swift.String { get }
+  var data: [Swift.String : Any] { get }
+}
+public protocol AnalyticsProtocol : Swift.Sendable {
+  func log(event: any MWDATCore.AnalyticsEvent)
+}
+@_hasMissingDesignatedInitializers final public class QPLLoggerWrapper : Swift.Sendable {
+  @objc deinit
+}
+public struct WearablesSDKAttestationEvent : MWDATCore.AnalyticsEvent {
+  public init()
+  #if compiler(>=5.3) && $NonescapableTypes
+  public init(attestationSessionId: Swift.String? = nil, errorType: Swift.String? = nil, eventType: MWDATCore.WearablesSDKAttestationEventType? = nil)
+  #endif
+  public var name: Swift.String {
+    get
+  }
+  public var data: [Swift.String : Any] {
+    get
+  }
+  public func toMap() -> [Swift.String : Any]
+  #if compiler(>=5.3) && $NonescapableTypes
+  @discardableResult
+  public mutating func setAttestationSessionId(_ attestationSessionId: Swift.String?) -> MWDATCore.WearablesSDKAttestationEvent
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
+  @discardableResult
+  public mutating func setErrorType(_ errorType: Swift.String?) -> MWDATCore.WearablesSDKAttestationEvent
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
+  @discardableResult
+  public mutating func setEventType(_ eventType: MWDATCore.WearablesSDKAttestationEventType?) -> MWDATCore.WearablesSDKAttestationEvent
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
+  public static func create(attestationSessionId: Swift.String? = nil, errorType: Swift.String? = nil, eventType: MWDATCore.WearablesSDKAttestationEventType? = nil) -> MWDATCore.WearablesSDKAttestationEvent
+  #endif
+}
+public enum WearablesSDKAttestationEventType : Swift.String, Swift.Codable, Swift.Sendable {
+  case started_attestation
+  case completed_attestation
+  case failed_attestation
+  case challenge_requested
+  case key_generated
+  case attestation_object_created
+  case assertion_object_created
+  case certificate_chain_created
+  #if compiler(>=5.3) && $NonescapableTypes
+  public init?(rawValue: Swift.String)
+  #endif
+  public typealias RawValue = Swift.String
+  public var rawValue: Swift.String {
+    get
+  }
+}
+public struct WearablesSDKCheckPermissionEvent : MWDATCore.AnalyticsEvent {
+  public init()
+  #if compiler(>=5.3) && $NonescapableTypes
+  public init(deviceSocBuildVersion: Swift.String? = nil, error: Swift.String? = nil, hasPermission: Swift.Bool? = nil, permission: Swift.String? = nil, success: Swift.Bool? = nil)
+  #endif
+  public var name: Swift.String {
+    get
+  }
+  public var data: [Swift.String : Any] {
+    get
+  }
+  public func toMap() -> [Swift.String : Any]
+  #if compiler(>=5.3) && $NonescapableTypes
+  @discardableResult
+  public mutating func setDeviceSocBuildVersion(_ deviceSocBuildVersion: Swift.String?) -> MWDATCore.WearablesSDKCheckPermissionEvent
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
+  @discardableResult
+  public mutating func setError(_ error: Swift.String?) -> MWDATCore.WearablesSDKCheckPermissionEvent
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
+  @discardableResult
+  public mutating func setHasPermission(_ hasPermission: Swift.Bool?) -> MWDATCore.WearablesSDKCheckPermissionEvent
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
+  @discardableResult
+  public mutating func setPermission(_ permission: Swift.String?) -> MWDATCore.WearablesSDKCheckPermissionEvent
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
+  @discardableResult
+  public mutating func setSuccess(_ success: Swift.Bool?) -> MWDATCore.WearablesSDKCheckPermissionEvent
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
+  public static func create(deviceSocBuildVersion: Swift.String? = nil, error: Swift.String? = nil, hasPermission: Swift.Bool? = nil, permission: Swift.String? = nil, success: Swift.Bool? = nil) -> MWDATCore.WearablesSDKCheckPermissionEvent
+  #endif
+}
+public struct WearablesSDKDeviceAnalyticsEvent : MWDATCore.AnalyticsEvent {
+  public init()
+  #if compiler(>=5.3) && $NonescapableTypes
+  public init(deviceIdentifier: Swift.String? = nil, deviceSocBuildVersion: Swift.String? = nil, error: Swift.String? = nil, eventType: MWDATCore.WearablesSDKDeviceAnalyticsEventType? = nil)
+  #endif
+  public var name: Swift.String {
+    get
+  }
+  public var data: [Swift.String : Any] {
+    get
+  }
+  public func toMap() -> [Swift.String : Any]
+  #if compiler(>=5.3) && $NonescapableTypes
+  @discardableResult
+  public mutating func setDeviceIdentifier(_ deviceIdentifier: Swift.String?) -> MWDATCore.WearablesSDKDeviceAnalyticsEvent
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
+  @discardableResult
+  public mutating func setDeviceSocBuildVersion(_ deviceSocBuildVersion: Swift.String?) -> MWDATCore.WearablesSDKDeviceAnalyticsEvent
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
+  @discardableResult
+  public mutating func setError(_ error: Swift.String?) -> MWDATCore.WearablesSDKDeviceAnalyticsEvent
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
+  @discardableResult
+  public mutating func setEventType(_ eventType: MWDATCore.WearablesSDKDeviceAnalyticsEventType?) -> MWDATCore.WearablesSDKDeviceAnalyticsEvent
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
+  public static func create(deviceIdentifier: Swift.String? = nil, deviceSocBuildVersion: Swift.String? = nil, error: Swift.String? = nil, eventType: MWDATCore.WearablesSDKDeviceAnalyticsEventType? = nil) -> MWDATCore.WearablesSDKDeviceAnalyticsEvent
+  #endif
+}
+public enum WearablesSDKDeviceAnalyticsEventType : Swift.String, Swift.Codable, Swift.Sendable {
+  case device_discovered
+  case device_forgotten
+  case error
+  #if compiler(>=5.3) && $NonescapableTypes
+  public init?(rawValue: Swift.String)
+  #endif
+  public typealias RawValue = Swift.String
+  public var rawValue: Swift.String {
+    get
+  }
+}
+public struct WearablesSDKGetPermissionsEvent : MWDATCore.AnalyticsEvent {
+  public init()
+  #if compiler(>=5.3) && $NonescapableTypes
+  public init(deviceSocBuildVersion: Swift.String? = nil, error: Swift.String? = nil, permissions: [Swift.String : Swift.String]? = nil, success: Swift.Bool? = nil)
+  #endif
+  public var name: Swift.String {
+    get
+  }
+  public var data: [Swift.String : Any] {
+    get
+  }
+  public func toMap() -> [Swift.String : Any]
+  #if compiler(>=5.3) && $NonescapableTypes
+  @discardableResult
+  public mutating func setDeviceSocBuildVersion(_ deviceSocBuildVersion: Swift.String?) -> MWDATCore.WearablesSDKGetPermissionsEvent
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
+  @discardableResult
+  public mutating func setError(_ error: Swift.String?) -> MWDATCore.WearablesSDKGetPermissionsEvent
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
+  @discardableResult
+  public mutating func setPermissions(_ permissions: [Swift.String : Swift.String]?) -> MWDATCore.WearablesSDKGetPermissionsEvent
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
+  @discardableResult
+  public mutating func setSuccess(_ success: Swift.Bool?) -> MWDATCore.WearablesSDKGetPermissionsEvent
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
+  public static func create(deviceSocBuildVersion: Swift.String? = nil, error: Swift.String? = nil, permissions: [Swift.String : Swift.String]? = nil, success: Swift.Bool? = nil) -> MWDATCore.WearablesSDKGetPermissionsEvent
+  #endif
+}
+public struct WearablesSDKMockDeviceEvent : MWDATCore.AnalyticsEvent {
+  public init()
+  #if compiler(>=5.3) && $NonescapableTypes
+  public init(deviceIdentifier: Swift.String? = nil, deviceType: Swift.Int64? = nil, eventType: MWDATCore.WearablesSDKMockDeviceEventType? = nil)
+  #endif
+  public var name: Swift.String {
+    get
+  }
+  public var data: [Swift.String : Any] {
+    get
+  }
+  public func toMap() -> [Swift.String : Any]
+  #if compiler(>=5.3) && $NonescapableTypes
+  @discardableResult
+  public mutating func setDeviceIdentifier(_ deviceIdentifier: Swift.String?) -> MWDATCore.WearablesSDKMockDeviceEvent
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
+  @discardableResult
+  public mutating func setDeviceType(_ deviceType: Swift.Int64?) -> MWDATCore.WearablesSDKMockDeviceEvent
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
+  @discardableResult
+  public mutating func setEventType(_ eventType: MWDATCore.WearablesSDKMockDeviceEventType?) -> MWDATCore.WearablesSDKMockDeviceEvent
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
+  public static func create(deviceIdentifier: Swift.String? = nil, deviceType: Swift.Int64? = nil, eventType: MWDATCore.WearablesSDKMockDeviceEventType? = nil) -> MWDATCore.WearablesSDKMockDeviceEvent
+  #endif
+}
+public enum WearablesSDKMockDeviceEventType : Swift.String, Swift.Codable, Swift.Sendable {
+  case doff
+  case don
+  case fold
+  case pair
+  case power_off
+  case power_on
+  case set_camera_feed
+  case set_captured_image
+  case unfold
+  case unpair
+  #if compiler(>=5.3) && $NonescapableTypes
+  public init?(rawValue: Swift.String)
+  #endif
+  public typealias RawValue = Swift.String
+  public var rawValue: Swift.String {
+    get
+  }
+}
+public struct WearablesSDKMockServiceEvent : MWDATCore.AnalyticsEvent {
+  public init()
+  #if compiler(>=5.3) && $NonescapableTypes
+  public init(error: Swift.String? = nil, eventType: MWDATCore.WearablesSDKMockServiceEventType? = nil, serviceId: Swift.Int64? = nil, success: Swift.Bool? = nil)
+  #endif
+  public var name: Swift.String {
+    get
+  }
+  public var data: [Swift.String : Any] {
+    get
+  }
+  public func toMap() -> [Swift.String : Any]
+  #if compiler(>=5.3) && $NonescapableTypes
+  @discardableResult
+  public mutating func setError(_ error: Swift.String?) -> MWDATCore.WearablesSDKMockServiceEvent
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
+  @discardableResult
+  public mutating func setEventType(_ eventType: MWDATCore.WearablesSDKMockServiceEventType?) -> MWDATCore.WearablesSDKMockServiceEvent
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
+  @discardableResult
+  public mutating func setServiceId(_ serviceId: Swift.Int64?) -> MWDATCore.WearablesSDKMockServiceEvent
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
+  @discardableResult
+  public mutating func setSuccess(_ success: Swift.Bool?) -> MWDATCore.WearablesSDKMockServiceEvent
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
+  public static func create(error: Swift.String? = nil, eventType: MWDATCore.WearablesSDKMockServiceEventType? = nil, serviceId: Swift.Int64? = nil, success: Swift.Bool? = nil) -> MWDATCore.WearablesSDKMockServiceEvent
+  #endif
+}
+public enum WearablesSDKMockServiceEventType : Swift.String, Swift.Codable, Swift.Sendable {
+  case capture
+  case handle_message
+  case service_connect
+  case service_disconnect
+  case stream_start
+  case stream_stop
+  #if compiler(>=5.3) && $NonescapableTypes
+  public init?(rawValue: Swift.String)
+  #endif
+  public typealias RawValue = Swift.String
+  public var rawValue: Swift.String {
+    get
+  }
+}
+public struct WearablesSDKRegisterEvent : MWDATCore.AnalyticsEvent {
+  public init()
+  #if compiler(>=5.3) && $NonescapableTypes
+  public init(appLinkingFlowId: Swift.String? = nil, registrationStep: MWDATCore.WearablesSDKRegisterEventType? = nil)
+  #endif
+  public var name: Swift.String {
+    get
+  }
+  public var data: [Swift.String : Any] {
+    get
+  }
+  public func toMap() -> [Swift.String : Any]
+  #if compiler(>=5.3) && $NonescapableTypes
+  @discardableResult
+  public mutating func setAppLinkingFlowId(_ appLinkingFlowId: Swift.String?) -> MWDATCore.WearablesSDKRegisterEvent
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
+  @discardableResult
+  public mutating func setRegistrationStep(_ registrationStep: MWDATCore.WearablesSDKRegisterEventType?) -> MWDATCore.WearablesSDKRegisterEvent
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
+  public static func create(appLinkingFlowId: Swift.String? = nil, registrationStep: MWDATCore.WearablesSDKRegisterEventType? = nil) -> MWDATCore.WearablesSDKRegisterEvent
+  #endif
+}
+public enum WearablesSDKRegisterEventType : Swift.String, Swift.Codable, Swift.Sendable {
+  case started_registration
+  case started_unregistration
+  case completed_registration
+  case completed_unregistration
+  case failed_registration
+  case failed_unregistration
+  #if compiler(>=5.3) && $NonescapableTypes
+  public init?(rawValue: Swift.String)
+  #endif
+  public typealias RawValue = Swift.String
+  public var rawValue: Swift.String {
+    get
+  }
+}
+public struct WearablesSDKSessionEvent : MWDATCore.AnalyticsEvent {
+  public init(deviceIdentifier: Swift.String, sessionState: MWDATCore.WearablesSDKSessionState)
+  #if compiler(>=5.3) && $NonescapableTypes
+  public init(deviceIdentifier: Swift.String, sessionState: MWDATCore.WearablesSDKSessionState, deviceSocBuildVersion: Swift.String? = nil, error: Swift.String? = nil, previousSessionState: MWDATCore.WearablesSDKSessionState? = nil)
+  #endif
+  public var name: Swift.String {
+    get
+  }
+  public var data: [Swift.String : Any] {
+    get
+  }
+  public func toMap() -> [Swift.String : Any]
+  #if compiler(>=5.3) && $NonescapableTypes
+  @discardableResult
+  public mutating func setDeviceSocBuildVersion(_ deviceSocBuildVersion: Swift.String?) -> MWDATCore.WearablesSDKSessionEvent
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
+  @discardableResult
+  public mutating func setError(_ error: Swift.String?) -> MWDATCore.WearablesSDKSessionEvent
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
+  @discardableResult
+  public mutating func setPreviousSessionState(_ previousSessionState: MWDATCore.WearablesSDKSessionState?) -> MWDATCore.WearablesSDKSessionEvent
+  #endif
+}
+public enum WearablesSDKSessionState : Swift.String, Swift.Codable, Swift.Sendable {
+  case stopped
+  case waiting_for_device
+  case running
+  case paused
+  case unknown
+  #if compiler(>=5.3) && $NonescapableTypes
+  public init?(rawValue: Swift.String)
+  #endif
+  public typealias RawValue = Swift.String
+  public var rawValue: Swift.String {
+    get
+  }
+}
+public struct WearablesSDKStreamSessionEvent : MWDATCore.AnalyticsEvent {
+  public init()
+  #if compiler(>=5.3) && $NonescapableTypes
+  public init(audioCodec: Swift.String? = nil, deviceIdentifier: Swift.String? = nil, deviceSocBuildVersion: Swift.String? = nil, durationSeconds: Swift.Int64? = nil, errorType: Swift.String? = nil, eventType: MWDATCore.WearablesSDKStreamSessionEventType? = nil, frameDelivery: Swift.String? = nil, resolution: Swift.String? = nil, sessionId: Swift.String? = nil, videoCodec: Swift.String? = nil)
+  #endif
+  public var name: Swift.String {
+    get
+  }
+  public var data: [Swift.String : Any] {
+    get
+  }
+  public func toMap() -> [Swift.String : Any]
+  #if compiler(>=5.3) && $NonescapableTypes
+  @discardableResult
+  public mutating func setAudioCodec(_ audioCodec: Swift.String?) -> MWDATCore.WearablesSDKStreamSessionEvent
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
+  @discardableResult
+  public mutating func setDeviceIdentifier(_ deviceIdentifier: Swift.String?) -> MWDATCore.WearablesSDKStreamSessionEvent
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
+  @discardableResult
+  public mutating func setDeviceSocBuildVersion(_ deviceSocBuildVersion: Swift.String?) -> MWDATCore.WearablesSDKStreamSessionEvent
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
+  @discardableResult
+  public mutating func setDurationSeconds(_ durationSeconds: Swift.Int64?) -> MWDATCore.WearablesSDKStreamSessionEvent
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
+  @discardableResult
+  public mutating func setErrorType(_ errorType: Swift.String?) -> MWDATCore.WearablesSDKStreamSessionEvent
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
+  @discardableResult
+  public mutating func setEventType(_ eventType: MWDATCore.WearablesSDKStreamSessionEventType?) -> MWDATCore.WearablesSDKStreamSessionEvent
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
+  @discardableResult
+  public mutating func setFrameDelivery(_ frameDelivery: Swift.String?) -> MWDATCore.WearablesSDKStreamSessionEvent
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
+  @discardableResult
+  public mutating func setResolution(_ resolution: Swift.String?) -> MWDATCore.WearablesSDKStreamSessionEvent
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
+  @discardableResult
+  public mutating func setSessionId(_ sessionId: Swift.String?) -> MWDATCore.WearablesSDKStreamSessionEvent
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
+  @discardableResult
+  public mutating func setVideoCodec(_ videoCodec: Swift.String?) -> MWDATCore.WearablesSDKStreamSessionEvent
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
+  public static func create(audioCodec: Swift.String? = nil, deviceIdentifier: Swift.String? = nil, deviceSocBuildVersion: Swift.String? = nil, durationSeconds: Swift.Int64? = nil, errorType: Swift.String? = nil, eventType: MWDATCore.WearablesSDKStreamSessionEventType? = nil, frameDelivery: Swift.String? = nil, resolution: Swift.String? = nil, sessionId: Swift.String? = nil, videoCodec: Swift.String? = nil) -> MWDATCore.WearablesSDKStreamSessionEvent
+  #endif
+}
+public enum WearablesSDKStreamSessionEventType : Swift.String, Swift.Codable, Swift.Sendable {
+  case stream_session_duration
+  case stream_session_error
+  case stream_session_prepare_completed
+  case stream_session_prepare_started
+  case stream_session_start_completed
+  case stream_session_start_started
+  case stream_session_stop_completed
+  case stream_session_stop_started
+  #if compiler(>=5.3) && $NonescapableTypes
+  public init?(rawValue: Swift.String)
+  #endif
+  public typealias RawValue = Swift.String
+  public var rawValue: Swift.String {
+    get
+  }
+}
+public struct WearablesSDKVoiceInvocationsEvent : MWDATCore.AnalyticsEvent {
+  public init()
+  #if compiler(>=5.3) && $NonescapableTypes
+  public init(actionType: Swift.String? = nil, deviceIdentifier: Swift.String? = nil, deviceSocBuildVersion: Swift.String? = nil, durationSeconds: Swift.Int64? = nil, errorType: Swift.String? = nil, eventType: MWDATCore.WearablesSDKVoiceInvocationsEventType? = nil, interactionId: Swift.String? = nil, sessionId: Swift.String? = nil)
+  #endif
+  public var name: Swift.String {
+    get
+  }
+  public var data: [Swift.String : Any] {
+    get
+  }
+  public func toMap() -> [Swift.String : Any]
+  #if compiler(>=5.3) && $NonescapableTypes
+  @discardableResult
+  public mutating func setActionType(_ actionType: Swift.String?) -> MWDATCore.WearablesSDKVoiceInvocationsEvent
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
+  @discardableResult
+  public mutating func setDeviceIdentifier(_ deviceIdentifier: Swift.String?) -> MWDATCore.WearablesSDKVoiceInvocationsEvent
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
+  @discardableResult
+  public mutating func setDeviceSocBuildVersion(_ deviceSocBuildVersion: Swift.String?) -> MWDATCore.WearablesSDKVoiceInvocationsEvent
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
+  @discardableResult
+  public mutating func setDurationSeconds(_ durationSeconds: Swift.Int64?) -> MWDATCore.WearablesSDKVoiceInvocationsEvent
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
+  @discardableResult
+  public mutating func setErrorType(_ errorType: Swift.String?) -> MWDATCore.WearablesSDKVoiceInvocationsEvent
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
+  @discardableResult
+  public mutating func setEventType(_ eventType: MWDATCore.WearablesSDKVoiceInvocationsEventType?) -> MWDATCore.WearablesSDKVoiceInvocationsEvent
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
+  @discardableResult
+  public mutating func setInteractionId(_ interactionId: Swift.String?) -> MWDATCore.WearablesSDKVoiceInvocationsEvent
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
+  @discardableResult
+  public mutating func setSessionId(_ sessionId: Swift.String?) -> MWDATCore.WearablesSDKVoiceInvocationsEvent
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
+  public static func create(actionType: Swift.String? = nil, deviceIdentifier: Swift.String? = nil, deviceSocBuildVersion: Swift.String? = nil, durationSeconds: Swift.Int64? = nil, errorType: Swift.String? = nil, eventType: MWDATCore.WearablesSDKVoiceInvocationsEventType? = nil, interactionId: Swift.String? = nil, sessionId: Swift.String? = nil) -> MWDATCore.WearablesSDKVoiceInvocationsEvent
+  #endif
+}
+public enum WearablesSDKVoiceInvocationsEventType : Swift.String, Swift.Codable, Swift.Sendable {
+  case voice_invocation_action_started
+  case voice_invocation_duration
+  case voice_invocation_error
+  case voice_invocation_response_success
+  case voice_invocation_start_completed
+  case voice_invocation_start_started
+  case voice_invocation_stop_completed
+  case voice_invocation_stop_started
+  #if compiler(>=5.3) && $NonescapableTypes
+  public init?(rawValue: Swift.String)
+  #endif
+  public typealias RawValue = Swift.String
+  public var rawValue: Swift.String {
+    get
+  }
+}
+public protocol AnyChannel : Swift.Sendable {
+  func close()
+  func send(_ data: Foundation.Data, messageType: Swift.UInt16) -> Swift.UInt16
+}
+public protocol AnyConnection : Swift.Sendable {
+  func openChannel(serviceID: Swift.UInt16, onReceived: @escaping (Swift.UInt16, Foundation.Data) -> Swift.Void, onError: @escaping (Swift.UInt16) -> Swift.Void, onClosed: @escaping () -> Swift.Void) -> any MWDATCore.AnyChannel
+}
+extension MWDATCore.AppManager {
+  #if compiler(>=5.3) && $NonescapableTypes
+  public static func withSharedLinkedAppManager(configuration: MWDATCore.Configuration, deviceManager: (any MWDATCore.DeviceManager)? = nil) throws -> MWDATCore.AppManager
+  #endif
+}
+@_hasMissingDesignatedInitializers final public class AppManager : Swift.Sendable {
+  final public let registrationManager: MWDATCore.RegistrationManager
+  final public let deviceManager: any MWDATCore.DeviceManager
+  final public let permissionsManager: MWDATCore.PermissionsManager
+  final public let sessionManager: any MWDATCore.SessionManager
+  final public func start()
+  @objc deinit
+}
+@_hasMissingDesignatedInitializers final public class AttestationManager {
+  @objc deinit
+}
+public enum DATAttestationStatus : Swift.String, Swift.Sendable {
+  case passed
+  case failed
+  case skipped
+  #if compiler(>=5.3) && $NonescapableTypes
+  public init?(rawValue: Swift.String)
+  #endif
+  public typealias RawValue = Swift.String
+  public var rawValue: Swift.String {
+    get
+  }
+}
+public struct AnalyticsConfiguration : Swift.Sendable {
+  public let enabled: Swift.Bool
+  public let endpointUrl: Swift.String
+}
+public struct AppConfiguration : Swift.Sendable {
+  public let bundleIdentifier: Swift.String
+  public let appName: Swift.String
+  public let appVersion: Swift.String
+  public let buildNumber: Swift.String
+  public let mwdatVersion: Swift.String
+  public let appLinkURLScheme: Swift.String?
+  public let metaAppId: Swift.String?
+  public let clientToken: Swift.String?
+  public let teamID: Swift.String?
+}
+public struct AttestationConfiguration : Swift.Sendable {
+  public let endpointUrl: Swift.String
+  public let keyRotationIntervalInDays: Swift.Int
+  public let hasCompleteData: Swift.Bool
+}
+public enum ConfigurationError : Swift.Error {
+  case missingInfoDictionary
+  case missingBundleIdentifier
+  case missingAppName
+  case missingAppVersion
+  case missingBuildNumber
+  public static func == (a: MWDATCore.ConfigurationError, b: MWDATCore.ConfigurationError) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+public struct Configuration : Swift.Sendable {
+  public let appConfiguration: MWDATCore.AppConfiguration
+  public let loggingConfiguration: MWDATCore.LoggingConfiguration
+  public let analyticsConfiguration: MWDATCore.AnalyticsConfiguration
+  public let attestationConfiguration: MWDATCore.AttestationConfiguration
+  public let usesDam: Swift.Bool
+  public init(bundle: Foundation.Bundle) throws(MWDATCore.ConfigurationError)
+  public init(infoDictionary: [Swift.String : Any]) throws(MWDATCore.ConfigurationError)
+}
+public struct LoggingConfiguration : Swift.Sendable {
+  public let enabled: Swift.Bool
+  public let directory: Swift.String
+  public let filename: Swift.String
+  public let level: Swift.String
+  public let maxSizeBytes: Swift.Int
+  public let maxFiles: Swift.Int
+}
+public protocol DeviceManager : Swift.Sendable {
+  var devices: [any MWDATCore.DevicePrivate] { get }
+  var devicesStream: MWDATCore.AnyAsyncSequence<[any MWDATCore.DevicePrivate]> { get }
+}
+extension MWDATCore.DeviceManager {
+  #if compiler(>=5.3) && $NonescapableTypes
+  public func findDevice(with identifier: MWDATCore.DeviceIdentifier) -> (any MWDATCore.DevicePrivate)?
+  #endif
+}
+final public class DeviceManagerImpl : MWDATCore.DeviceManager {
+  final public let devicesStream: MWDATCore.AnyAsyncSequence<[any MWDATCore.DevicePrivate]>
+  final public var devices: [any MWDATCore.DevicePrivate] {
+    get
+  }
+  public init(deviceProvider: any MWDATCore.DeviceProvider)
+  @objc deinit
+  final public func attachFake(appManager: Any)
+  final public func detachFake()
+}
+public protocol DevicePrivate : Swift.Sendable {
+  var identifier: MWDATCore.DeviceIdentifier { get }
+  #if compiler(>=5.3) && $NonescapableTypes
+  var name: Swift.String? { get }
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
+  var connection: (any MWDATCore.AnyConnection)? { get }
+  #endif
+  var linkState: MWDATCore.LinkState { get }
+  var deviceType: MWDATCore.DeviceType { get }
+  var compatibility: MWDATCore.Compatibility { get }
+  #if compiler(>=5.3) && $NonescapableTypes
+  var firmwareInfo: Swift.String? { get }
+  #endif
+  var deviceUUID: Foundation.UUID { get }
+  func addLinkStateListener(_ listener: @escaping @Sendable (MWDATCore.LinkState) -> Swift.Void) -> any MWDATCore.AnyListenerToken
+  func addCompatibilityListener(_ listener: @escaping @Sendable (MWDATCore.Compatibility) -> Swift.Void) -> any MWDATCore.AnyListenerToken
+}
+public enum DeviceProviderEvent : Swift.Sendable {
+  case discovered(any MWDATCore.DevicePrivate)
+  case forgotten(any MWDATCore.DevicePrivate)
+}
+public protocol DeviceProvider : Swift.Sendable {
+  var deviceEventStream: MWDATCore.AnyAsyncSequence<MWDATCore.DeviceProviderEvent> { get }
+}
+@_hasMissingDesignatedInitializers final public class Logging {
+  public static func configure(withConfig config: MWDATCore.LoggingConfiguration)
+  public static func error(_ message: @autoclosure () -> Swift.String, file: Swift.StaticString = #fileID, line: Swift.Int32 = #line, function: Swift.StaticString = #function)
+  public static func warn(_ message: @autoclosure () -> Swift.String, file: Swift.StaticString = #fileID, line: Swift.Int32 = #line, function: Swift.StaticString = #function)
+  public static func info(_ message: @autoclosure () -> Swift.String, file: Swift.StaticString = #fileID, line: Swift.Int32 = #line, function: Swift.StaticString = #function)
+  public static func debug(_ message: @autoclosure () -> Swift.String, file: Swift.StaticString = #fileID, line: Swift.Int32 = #line, function: Swift.StaticString = #function)
+  public static func flush()
+  @objc deinit
+}
+final public class MockDevicePrivate : MWDATCore.DevicePrivate {
+  final public let identifier: MWDATCore.DeviceIdentifier
+  final public let name: Swift.String?
+  final public let connection: (any MWDATCore.AnyConnection)?
+  final public let linkState: MWDATCore.LinkState
+  final public let deviceType: MWDATCore.DeviceType
+  final public let compatibility: MWDATCore.Compatibility
+  final public let firmwareInfo: Swift.String?
+  final public let deviceUUID: Foundation.UUID
+  #if compiler(>=5.3) && $NonescapableTypes
+  public init(identifier: MWDATCore.DeviceIdentifier, name: Swift.String? = nil, connection: (any MWDATCore.AnyConnection)? = nil, linkState: MWDATCore.LinkState = .disconnected, deviceType: MWDATCore.DeviceType = .unknown, compatibility: MWDATCore.Compatibility = Compatibility.compatible, firmwareInfo: Swift.String? = nil, deviceUUID: Foundation.UUID = UUID())
+  #endif
+  final public func addLinkStateListener(_ listener: @escaping (MWDATCore.LinkState) -> Swift.Void) -> any MWDATCore.AnyListenerToken
+  final public func addCompatibilityListener(_ listener: @escaping (MWDATCore.Compatibility) -> Swift.Void) -> any MWDATCore.AnyListenerToken
+  final public func createDevice() -> MWDATCore.Device
+  @objc deinit
+}
+public struct PermissionEntry : Swift.Sendable {
+  public let permissionName: Swift.String
+  public let isGranted: Swift.Bool
+}
+@_hasMissingDesignatedInitializers final public class PermissionsManager : Swift.Sendable {
+  final public func attachFake(urlOpener: any MWDATCore.PermissionURLOpening)
+  final public func detachFake()
+  final public func checkPermissionStatus(_ permission: MWDATCore.Permission) async throws(MWDATCore.PermissionError) -> MWDATCore.PermissionStatus
+  final public func requestPermission(_ permission: MWDATCore.Permission) async throws(MWDATCore.PermissionError) -> MWDATCore.PermissionStatus
+  final public func handlePermissionUrl(_ url: Foundation.URL) -> Swift.Bool
+  @objc deinit
+}
+public protocol PermissionURLOpening : Swift.Sendable {
+  @_Concurrency.MainActor func canOpenURL(_ url: Foundation.URL) -> Swift.Bool
+  @_Concurrency.MainActor func open(url: Foundation.URL)
+}
+@_hasMissingDesignatedInitializers final public class RegistrationManager : Swift.Sendable {
+  @objc deinit
+  #if compiler(>=5.3) && $NonescapableTypes
+  final public func attachFake(fakeAppManager: Any, registrationHandler: (any MWDATCore.FakeRegistrationHandling)? = nil)
+  #endif
+  final public func detachFake()
+  final public let registrationStateStream: MWDATCore.AnyAsyncSequence<MWDATCore.RegistrationState>
+  final public var isDevMode: Swift.Bool {
+    get
+  }
+  final public var registrationState: MWDATCore.RegistrationState {
+    get
+    set
+  }
+  final public func startRegistration() async throws(MWDATCore.RegistrationError)
+  final public func startRegistrationInternal() async throws(MWDATCore.RegistrationError)
+  final public func handleFinishRegistrationUrl(_ url: Foundation.URL) throws -> Swift.Bool
+  final public func handleDeleteRegistrationUrl(_ url: Foundation.URL) async throws -> Swift.Bool
+  final public func startUnregistration() async throws(MWDATCore.UnregistrationError)
+}
+public protocol FakeRegistrationHandling : Swift.Sendable {
+  @_Concurrency.MainActor func canOpenURL(_ url: Foundation.URL) -> Swift.Bool
+  func open(url: Foundation.URL)
+  func handleUnregisterUrl(_ url: Foundation.URL) async throws
+  func finishRegistration(authorityKey: Swift.String, constellationGroupID: Swift.String) throws
+  var publicKey: Swift.String { get }
+}
+@_hasMissingDesignatedInitializers final public class SessionChannel : Swift.Sendable {
+  final public func requestStartSession()
+  final public func requestStopSession()
+  @objc deinit
+}
+public protocol SessionManager : Swift.Sendable {
+  func requestSessionHandle(forDeviceId: MWDATCore.DeviceIdentifier, listener: @escaping @Sendable (MWDATCore.SessionState) -> Swift.Void) async -> any MWDATCore.AnyListenerToken
+  func addDeviceSessionStateListener(forDeviceId: MWDATCore.DeviceIdentifier, listener: @escaping @Sendable (MWDATCore.SessionState) -> Swift.Void) async -> any MWDATCore.AnyListenerToken
+}
+public struct AnyAsyncSequence<Element> : _Concurrency.AsyncSequence, Swift.Sendable {
+  public init<S>(_ sequence: S) where Element == S.Element, S : Swift.Sendable, S : _Concurrency.AsyncSequence
+  public func makeAsyncIterator() -> MWDATCore.AnyAsyncSequence<Element>.AnyAsyncIterator
+  public struct AnyAsyncIterator : _Concurrency.AsyncIteratorProtocol {
+    #if compiler(>=5.3) && $NonescapableTypes
+    public mutating func next() async -> Element?
+    #endif
+    @available(iOS 18.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, macOS 15.0, *)
+    @_implements(_Concurrency.AsyncIteratorProtocol, Failure) public typealias __AsyncIteratorProtocol_Failure = Swift.Never
+  }
+  public typealias AsyncIterator = MWDATCore.AnyAsyncSequence<Element>.AnyAsyncIterator
+  @available(iOS 18.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, macOS 15.0, *)
+  @_implements(_Concurrency.AsyncSequence, Failure) public typealias __AsyncSequence_Failure = Swift.Never
+}
+extension _Concurrency.AsyncSequence where Self : Swift.Sendable {
+  public func eraseToAnySequence() -> MWDATCore.AnyAsyncSequence<Self.Element>
+}
+@_hasMissingDesignatedInitializers final public class ExclusiveAsyncExecutor : @unchecked Swift.Sendable {
+  @objc deinit
+}
+public struct VersionData {
+  public static let minMWAVersion: Swift.Int
+  public static let FirmwareVersions: [MWDATCore.DeviceType : Swift.String]
+}
+public protocol WearablesPrivate : Swift.Sendable {
+  var configuration: MWDATCore.Configuration { get }
+  var deviceManager: any MWDATCore.DeviceManager { get }
+  var sessionManager: any MWDATCore.SessionManager { get }
+  var registrationManager: MWDATCore.RegistrationManager { get }
+  var permissionsManager: MWDATCore.PermissionsManager { get }
+}
+public enum BuildInfo {
+  public static let version: Swift.String
+  public static let releaseVersion: Swift.Int
+  public static let hotfixVersion: Swift.Int
+  public static let experimentationVersion: Swift.Int
+  public static let betaVersion: Swift.Int
+  public static let alphaVersion: Swift.Int
+}
+extension MWDATCore.DeviceType : Swift.Equatable {}
+extension MWDATCore.DeviceType : Swift.Hashable {}
+extension MWDATCore.DeviceType : Swift.RawRepresentable {}
+extension MWDATCore.LinkState : Swift.Hashable {}
+extension MWDATCore.LinkState : Swift.BitwiseCopyable {}
+extension MWDATCore.Permission : Swift.Equatable {}
+extension MWDATCore.Permission : Swift.Hashable {}
+extension MWDATCore.PermissionStatus : Swift.Equatable {}
+extension MWDATCore.PermissionStatus : Swift.Hashable {}
+extension MWDATCore.PermissionError : Swift.Equatable {}
+extension MWDATCore.PermissionError : Swift.Hashable {}
+extension MWDATCore.PermissionError : Swift.RawRepresentable {}
+extension MWDATCore.RegistrationState : Swift.Equatable {}
+extension MWDATCore.RegistrationState : Swift.Hashable {}
+extension MWDATCore.RegistrationState : Swift.RawRepresentable {}
+extension MWDATCore.RegistrationState : Swift.Sendable {}
+extension MWDATCore.RegistrationState : Swift.BitwiseCopyable {}
+extension MWDATCore.RegistrationError : Swift.Equatable {}
+extension MWDATCore.RegistrationError : Swift.Hashable {}
+extension MWDATCore.RegistrationError : Swift.RawRepresentable {}
+extension MWDATCore.RegistrationError : Swift.BitwiseCopyable {}
+extension MWDATCore.UnregistrationError : Swift.Equatable {}
+extension MWDATCore.UnregistrationError : Swift.Hashable {}
+extension MWDATCore.UnregistrationError : Swift.RawRepresentable {}
+extension MWDATCore.UnregistrationError : Swift.BitwiseCopyable {}
+extension MWDATCore.SessionState : Swift.Equatable {}
+extension MWDATCore.SessionState : Swift.Hashable {}
+extension MWDATCore.SessionState : Swift.RawRepresentable {}
+extension MWDATCore.SessionState : Swift.BitwiseCopyable {}
+extension MWDATCore.CapabilityState : Swift.Equatable {}
+extension MWDATCore.CapabilityState : Swift.Hashable {}
+extension MWDATCore.CapabilityState : Swift.BitwiseCopyable {}
+extension MWDATCore.Compatibility : Swift.Equatable {}
+extension MWDATCore.Compatibility : Swift.Hashable {}
+extension MWDATCore.DeviceSessionState : Swift.Hashable {}
+extension MWDATCore.DeviceSessionState : Swift.BitwiseCopyable {}
+extension MWDATCore.ObjC_Permission : Swift.Equatable {}
+extension MWDATCore.ObjC_Permission : Swift.Hashable {}
+extension MWDATCore.ObjC_Permission : Swift.RawRepresentable {}
+extension MWDATCore.ObjC_Permission : Swift.Sendable {}
+extension MWDATCore.ObjC_Permission : Swift.BitwiseCopyable {}
+extension MWDATCore.ObjC_PermissionStatus : Swift.Equatable {}
+extension MWDATCore.ObjC_PermissionStatus : Swift.Hashable {}
+extension MWDATCore.ObjC_PermissionStatus : Swift.RawRepresentable {}
+extension MWDATCore.ObjC_PermissionStatus : Swift.Sendable {}
+extension MWDATCore.ObjC_PermissionStatus : Swift.BitwiseCopyable {}
+extension MWDATCore.WearablesError : Swift.Equatable {}
+extension MWDATCore.WearablesError : Swift.Hashable {}
+extension MWDATCore.WearablesError : Swift.RawRepresentable {}
+extension MWDATCore.WearablesError : Swift.BitwiseCopyable {}
+extension MWDATCore.WearablesHandleURLError : Swift.Equatable {}
+extension MWDATCore.WearablesHandleURLError : Swift.Hashable {}
+extension MWDATCore.WearablesHandleURLError : Swift.RawRepresentable {}
+extension MWDATCore.WearablesHandleURLError : Swift.BitwiseCopyable {}
+extension MWDATCore.QPLLogLevel : Swift.Equatable {}
+extension MWDATCore.QPLLogLevel : Swift.Hashable {}
+extension MWDATCore.WearablesSDKAttestationEventType : Swift.Equatable {}
+extension MWDATCore.WearablesSDKAttestationEventType : Swift.Hashable {}
+extension MWDATCore.WearablesSDKAttestationEventType : Swift.RawRepresentable {}
+extension MWDATCore.WearablesSDKDeviceAnalyticsEventType : Swift.Equatable {}
+extension MWDATCore.WearablesSDKDeviceAnalyticsEventType : Swift.Hashable {}
+extension MWDATCore.WearablesSDKDeviceAnalyticsEventType : Swift.RawRepresentable {}
+extension MWDATCore.WearablesSDKMockDeviceEventType : Swift.Equatable {}
+extension MWDATCore.WearablesSDKMockDeviceEventType : Swift.Hashable {}
+extension MWDATCore.WearablesSDKMockDeviceEventType : Swift.RawRepresentable {}
+extension MWDATCore.WearablesSDKMockServiceEventType : Swift.Equatable {}
+extension MWDATCore.WearablesSDKMockServiceEventType : Swift.Hashable {}
+extension MWDATCore.WearablesSDKMockServiceEventType : Swift.RawRepresentable {}
+extension MWDATCore.WearablesSDKRegisterEventType : Swift.Equatable {}
+extension MWDATCore.WearablesSDKRegisterEventType : Swift.Hashable {}
+extension MWDATCore.WearablesSDKRegisterEventType : Swift.RawRepresentable {}
+extension MWDATCore.WearablesSDKSessionState : Swift.Equatable {}
+extension MWDATCore.WearablesSDKSessionState : Swift.Hashable {}
+extension MWDATCore.WearablesSDKSessionState : Swift.RawRepresentable {}
+extension MWDATCore.WearablesSDKStreamSessionEventType : Swift.Equatable {}
+extension MWDATCore.WearablesSDKStreamSessionEventType : Swift.Hashable {}
+extension MWDATCore.WearablesSDKStreamSessionEventType : Swift.RawRepresentable {}
+extension MWDATCore.WearablesSDKVoiceInvocationsEventType : Swift.Equatable {}
+extension MWDATCore.WearablesSDKVoiceInvocationsEventType : Swift.Hashable {}
+extension MWDATCore.WearablesSDKVoiceInvocationsEventType : Swift.RawRepresentable {}
+extension MWDATCore.AttestationManager : Swift.Sendable {}
+extension MWDATCore.DATAttestationStatus : Swift.Equatable {}
+extension MWDATCore.DATAttestationStatus : Swift.Hashable {}
+extension MWDATCore.DATAttestationStatus : Swift.RawRepresentable {}
+extension MWDATCore.ConfigurationError : Swift.Equatable {}
+extension MWDATCore.ConfigurationError : Swift.Hashable {}

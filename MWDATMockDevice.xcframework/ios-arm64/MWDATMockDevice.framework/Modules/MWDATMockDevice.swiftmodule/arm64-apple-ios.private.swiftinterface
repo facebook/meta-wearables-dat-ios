@@ -1,0 +1,110 @@
+// swift-interface-format-version: 1.0
+// swift-compiler-version: Apple Swift version 6.2.3 (swiftlang-6.2.3.3.21 clang-1700.6.3.2)
+// swift-module-flags: -target arm64-apple-ios15.2 -enable-objc-interop -enable-library-evolution -swift-version 6 -Osize -module-name MWDATMockDevice -package-name MetaWearablesDAT
+// swift-module-flags-ignorable: -no-verify-emitted-module-interface -formal-cxx-interoperability-mode=off -interface-compiler-version 6.2.3
+import AVFoundation
+import Foundation
+import ImageIO
+import MWDATCore
+import Network
+import Swift
+import _Concurrency
+import _StringProcessing
+import _SwiftConcurrencyShims
+public enum CameraFacing : Swift.Sendable {
+  case front
+  case back
+  public static func == (a: MWDATMockDevice.CameraFacing, b: MWDATMockDevice.CameraFacing) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+public protocol MockCameraKit : Swift.Sendable {
+  func setCameraFeed(fileURL: Foundation.URL)
+  func setCameraFeed(cameraFacing: MWDATMockDevice.CameraFacing) async
+  func setCapturedImage(fileURL: Foundation.URL)
+}
+public protocol MockDevice : Swift.Sendable {
+  var deviceIdentifier: MWDATCore.DeviceIdentifier { get }
+  func powerOn()
+  func powerOff()
+  func don()
+  func doff()
+}
+public protocol MockDeviceKitInterface : Swift.Sendable {
+  var isEnabled: Swift.Bool { get }
+  func enable(config: MWDATMockDevice.MockDeviceKitConfig)
+  func disable()
+  func pairRaybanMeta() -> any MWDATMockDevice.MockRaybanMeta
+  func unpairDevice(_ device: any MWDATMockDevice.MockDevice)
+  var pairedDevices: [any MWDATMockDevice.MockDevice] { get }
+  var permissions: any MWDATMockDevice.MockPermissions { get }
+}
+extension MWDATMockDevice.MockDeviceKitInterface {
+  public func enable()
+}
+public enum MockDeviceKit : Swift.Sendable {
+  public static let shared: any MWDATMockDevice.MockDeviceKitInterface
+}
+@frozen public struct MockDeviceKitConfig : Swift.Sendable {
+  public let initiallyRegistered: Swift.Bool
+  public let initialPermissionsGranted: Swift.Bool
+  public init(initiallyRegistered: Swift.Bool = true, initialPermissionsGranted: Swift.Bool = true)
+}
+public protocol MockDisplaylessGlasses : MWDATMockDevice.MockDevice {
+  func fold()
+  func unfold()
+  var services: any MWDATMockDevice.MockDisplaylessGlassesServices { get }
+}
+public protocol MockDisplaylessGlassesServices : Swift.Sendable {
+  var camera: any MWDATMockDevice.MockCameraKit { get }
+}
+public protocol MockPermissions : Swift.Sendable {
+  func set(_ permission: MWDATCore.Permission, _ status: MWDATCore.PermissionStatus)
+  func setRequestResult(_ permission: MWDATCore.Permission, result: MWDATCore.PermissionStatus)
+}
+public protocol MockRaybanMeta : MWDATMockDevice.MockDisplaylessGlasses {
+}
+@_hasMissingDesignatedInitializers @objc(MockCameraKit) final public class ObjC_MockCameraKit : ObjectiveC.NSObject, Swift.Sendable {
+  @objc final public func setCameraFeed(fileURL: Foundation.URL)
+  @objc final public func setCameraFeed(cameraFacing: Swift.Int) async
+  @objc final public func setCapturedImage(fileURL: Foundation.URL)
+  @objc deinit
+}
+@objc(MockDevice) public protocol ObjC_MockDevice : Swift.Sendable {
+  @objc var deviceIdentifier: Swift.String { get }
+  @objc func powerOn()
+  @objc func powerOff()
+  @objc func don()
+  @objc func doff()
+}
+@_hasMissingDesignatedInitializers @objc(MWDATMockDeviceKit) final public class ObjC_MockDeviceKit : ObjectiveC.NSObject, Swift.Sendable {
+  @objc public static let sharedInstance: MWDATMockDevice.ObjC_MockDeviceKit
+  @objc final public var isEnabled: Swift.Bool {
+    @objc get
+  }
+  @objc final public func enable()
+  @objc final public func enable(initiallyRegistered: Swift.Bool)
+  @objc final public func disable()
+  @objc final public var pairedDevices: [any MWDATMockDevice.ObjC_MockDevice] {
+    @objc get
+  }
+  @objc final public func pairRaybanMeta() -> any MWDATMockDevice.ObjC_MockRaybanMeta
+  @objc final public func unpairDevice(_ device: any MWDATMockDevice.ObjC_MockDevice)
+  @objc deinit
+}
+@objc(MockDisplaylessGlasses) public protocol ObjC_MockDisplaylessGlasses : MWDATMockDevice.ObjC_MockDevice {
+  @objc func fold()
+  @objc func unfold()
+  @objc var services: MWDATMockDevice.ObjC_MockDisplaylessGlassesServices { get }
+}
+@_hasMissingDesignatedInitializers @objc(MockDisplaylessGlassesServices) final public class ObjC_MockDisplaylessGlassesServices : ObjectiveC.NSObject, Swift.Sendable {
+  @objc final public let camera: MWDATMockDevice.ObjC_MockCameraKit
+  @objc deinit
+}
+@objc(MockRaybanMeta) public protocol ObjC_MockRaybanMeta : MWDATMockDevice.ObjC_MockDisplaylessGlasses {
+}
+extension MWDATMockDevice.CameraFacing : Swift.Equatable {}
+extension MWDATMockDevice.CameraFacing : Swift.Hashable {}
+extension MWDATMockDevice.MockDeviceKitConfig : Swift.BitwiseCopyable {}
