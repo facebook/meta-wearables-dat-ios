@@ -26,7 +26,12 @@ import MWDATMockDevice
 ## Creating a mock device
 
 ```swift
-let mockDevice = MockDeviceKit.shared.pairRaybanMeta()
+import MWDATMockDevice
+
+let mockDeviceKit = MockDeviceKit.shared
+mockDeviceKit.enable()
+
+let mockDevice = mockDeviceKit.pairRaybanMeta()
 ```
 
 ## Simulating device states
@@ -48,15 +53,15 @@ await mockDevice.powerOff()
 ### Video streaming
 
 ```swift
-let camera = mockDevice.getCameraKit()
-await camera.setCameraFeed(fileURL: videoURL)
+let camera = mockDevice.services.camera
+camera.setCameraFeed(fileURL: videoURL)
 ```
 
 ### Photo capture
 
 ```swift
-let camera = mockDevice.getCameraKit()
-await camera.setCapturedImage(fileURL: imageURL)
+let camera = mockDevice.services.camera
+camera.setCapturedImage(fileURL: imageURL)
 ```
 
 ## Writing tests with MockDeviceKit
@@ -74,15 +79,13 @@ class MockDeviceKitTestCase: XCTestCase {
 
     override func setUp() async throws {
         try await super.setUp()
-        try? Wearables.configure()
+        MockDeviceKit.shared.enable()
         mockDevice = MockDeviceKit.shared.pairRaybanMeta()
-        cameraKit = mockDevice?.getCameraKit()
+        cameraKit = mockDevice?.services.camera
     }
 
     override func tearDown() async throws {
-        MockDeviceKit.shared.pairedDevices.forEach { device in
-            MockDeviceKit.shared.unpairDevice(device)
-        }
+        MockDeviceKit.shared.disable()
         mockDevice = nil
         cameraKit = nil
         try await super.tearDown()

@@ -162,16 +162,20 @@ Add mock device support to develop without glasses:
 import MWDATMockDevice
 
 func setupMockDevice() async {
-    let device = MockDeviceKit.shared.pairRaybanMeta()
-    await device?.powerOn()
-    await device?.unfold()
-    await device?.don()
+    let mockDeviceKit = MockDeviceKit.shared
+    mockDeviceKit.enable()
 
-    // Set up mock camera feed
+    let device = mockDeviceKit.pairRaybanMeta()
+    device.don()
+
     if let videoURL = Bundle.main.url(forResource: "test_video", withExtension: "mov") {
-        let camera = device?.getCameraKit()
-        await camera?.setCameraFeed(fileURL: videoURL)
+        let camera = device.services.camera
+        camera.setCameraFeed(fileURL: videoURL)
     }
+}
+
+func tearDownMockDevice() {
+    MockDeviceKit.shared.disable()
 }
 ```
 

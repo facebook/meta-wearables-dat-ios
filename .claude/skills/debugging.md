@@ -72,7 +72,7 @@ Ensure compatible versions of SDK, Meta AI app, and glasses firmware:
 
 | SDK | Meta AI App | Ray-Ban Meta | Meta Ray-Ban Display |
 |-----|-------------|--------------|----------------------|
-| 0.5.0 | Check [version dependencies](https://wearables.developer.meta.com/docs/version-dependencies) | Check docs | Check docs |
+| 0.6.0 | Check [version dependencies](https://wearables.developer.meta.com/docs/version-dependencies) | Check docs | Check docs |
 | 0.4.0 | V254 | V20 | V21 |
 | 0.3.0 | V249 | V20 | — |
 

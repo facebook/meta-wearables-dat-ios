@@ -52,11 +52,19 @@
 	</dict>
 	<key>UIBackgroundModes</key>
 	<array>
+		<string>processing</string>
+		<string>bluetooth-central</string>
 		<string>bluetooth-peripheral</string>
 		<string>external-accessory</string>
 	</array>
 	<key>NSBluetoothAlwaysUsageDescription</key>
 	<string>Needed to connect to Meta AI Glasses</string>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>This allows your phone to find and connect to your glasses over Wi-Fi.</string>
+	<key>NSBonjourServices</key>
+	<array>
+		<string>_bonjour._tcp</string>
+	</array>
 	<key>UISupportedExternalAccessoryProtocols</key>
 	<array>
 		<string>com.meta.ar.wearable</string>
@@ -64,6 +72,8 @@
 	<!-- End required section for Device Access Toolkit Apps -->
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>This app needs access to save photos captured from your glasses.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>This app needs camera access to stream from your phone's camera as a mock device feed.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

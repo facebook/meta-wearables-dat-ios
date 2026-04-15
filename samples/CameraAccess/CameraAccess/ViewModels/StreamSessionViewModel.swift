@@ -6,14 +6,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-//
-// StreamSessionViewModel.swift
-//
-// Core view model demonstrating video streaming from Meta wearable devices using the DAT SDK.
-// This class showcases the key streaming patterns: device selection, session management,
-// video frame handling, photo capture, and error handling.
-//
-
+import Combine
 import MWDATCamera
 import MWDATCore
 import SwiftUI
@@ -24,130 +17,94 @@ enum StreamingStatus {
   case stopped
 }
 
+/// ViewModel for video streaming UI. Delegates device management to DeviceSessionManager.
 @MainActor
-class StreamSessionViewModel: ObservableObject {
+final class StreamSessionViewModel: ObservableObject {
+  // MARK: - Published State
+
   @Published var currentVideoFrame: UIImage?
   @Published var hasReceivedFirstFrame: Bool = false
   @Published var streamingStatus: StreamingStatus = .stopped
   @Published var showError: Bool = false
   @Published var errorMessage: String = ""
-  @Published var hasActiveDevice: Bool = false
 
-  var isStreaming: Bool {
-    streamingStatus != .stopped
-  }
-
-  // Photo capture properties
   @Published var capturedPhoto: UIImage?
   @Published var showPhotoPreview: Bool = false
-  // The core DAT SDK StreamSession - handles all streaming operations
-  private var streamSession: StreamSession
-  // Listener tokens are used to manage DAT SDK event subscriptions
+  @Published var showPhotoCaptureError: Bool = false
+  @Published var isCapturingPhoto: Bool = false
+
+  @Published var hasActiveDevice: Bool = false
+  @Published var isDeviceSessionReady: Bool = false
+
+  var isStreaming: Bool { streamingStatus != .stopped }
+
+  // MARK: - Private
+
+  private let sessionManager: DeviceSessionManager
+  private let wearables: WearablesInterface
+  private var streamSession: StreamSession?
+  private var cancellables = Set<AnyCancellable>()
+
   private var stateListenerToken: AnyListenerToken?
   private var videoFrameListenerToken: AnyListenerToken?
   private var errorListenerToken: AnyListenerToken?
   private var photoDataListenerToken: AnyListenerToken?
-  private let wearables: WearablesInterface
-  private let deviceSelector: AutoDeviceSelector
-  private var deviceMonitorTask: Task<Void, Never>?
+
+  // MARK: - Init
 
   init(wearables: WearablesInterface) {
     self.wearables = wearables
-    // Let the SDK auto-select from available devices
-    self.deviceSelector = AutoDeviceSelector(wearables: wearables)
-    let config = StreamSessionConfig(
-      videoCodec: VideoCodec.raw,
-      resolution: StreamingResolution.low,
-      frameRate: 24)
-    streamSession = StreamSession(streamSessionConfig: config, deviceSelector: deviceSelector)
+    self.sessionManager = DeviceSessionManager(wearables: wearables)
 
-    // Monitor device availability
-    deviceMonitorTask = Task { @MainActor in
-      for await device in deviceSelector.activeDeviceStream() {
-        self.hasActiveDevice = device != nil
-      }
-    }
-
-    // Subscribe to session state changes using the DAT SDK listener pattern
-    // State changes tell us when streaming starts, stops, or encounters issues
-    stateListenerToken = streamSession.statePublisher.listen { [weak self] state in
-      Task { @MainActor [weak self] in
-        self?.updateStatusFromState(state)
-      }
-    }
-
-    // Subscribe to video frames from the device camera
-    // Each VideoFrame contains the raw camera data that we convert to UIImage
-    videoFrameListenerToken = streamSession.videoFramePublisher.listen { [weak self] videoFrame in
-      Task { @MainActor [weak self] in
-        guard let self else { return }
-
-        if let image = videoFrame.makeUIImage() {
-          self.currentVideoFrame = image
-          if !self.hasReceivedFirstFrame {
-            self.hasReceivedFirstFrame = true
-          }
-        }
-      }
-    }
-
-    // Subscribe to streaming errors
-    // Errors include device disconnection, streaming failures, etc.
-    errorListenerToken = streamSession.errorPublisher.listen { [weak self] error in
-      Task { @MainActor [weak self] in
-        guard let self else { return }
-        let newErrorMessage = formatStreamingError(error)
-        if newErrorMessage != self.errorMessage {
-          showError(newErrorMessage)
-        }
-      }
-    }
-
-    updateStatusFromState(streamSession.state)
-
-    // Subscribe to photo capture events
-    // PhotoData contains the captured image in the requested format (JPEG/HEIC)
-    photoDataListenerToken = streamSession.photoDataPublisher.listen { [weak self] photoData in
-      Task { @MainActor [weak self] in
-        guard let self else { return }
-        if let uiImage = UIImage(data: photoData.data) {
-          self.capturedPhoto = uiImage
-          self.showPhotoPreview = true
-        }
-      }
-    }
+    // Forward session manager state to this ViewModel for SwiftUI binding
+    sessionManager.$hasActiveDevice
+      .receive(on: DispatchQueue.main)
+      .assign(to: &$hasActiveDevice)
+    sessionManager.$isReady
+      .receive(on: DispatchQueue.main)
+      .assign(to: &$isDeviceSessionReady)
   }
+
+  // MARK: - Public API
 
   func handleStartStreaming() async {
     let permission = Permission.camera
     do {
-      let status = try await wearables.checkPermissionStatus(permission)
-      if status == .granted {
-        await startSession()
+      var status = try await wearables.checkPermissionStatus(permission)
+      if status != .granted {
+        status = try await wearables.requestPermission(permission)
+      }
+      guard status == .granted else {
+        showError("Permission denied")
         return
       }
-      let requestStatus = try await wearables.requestPermission(permission)
-      if requestStatus == .granted {
-        await startSession()
-        return
-      }
-      showError("Permission denied")
+      await startSession()
     } catch {
       showError("Permission error: \(error.description)")
     }
   }
 
-  func startSession() async {
-    await streamSession.start()
-  }
-
-  private func showError(_ message: String) {
-    errorMessage = message
-    showError = true
-  }
-
   func stopSession() async {
-    await streamSession.stop()
+    guard let stream = streamSession else { return }
+    streamSession = nil
+    clearListeners()
+    streamingStatus = .stopped
+    currentVideoFrame = nil
+    hasReceivedFirstFrame = false
+    await stream.stop()
+  }
+
+  func capturePhoto() {
+    guard !isCapturingPhoto, streamingStatus == .streaming else {
+      showPhotoCaptureError = true
+      return
+    }
+    isCapturingPhoto = true
+    let success = streamSession?.capturePhoto(format: .jpeg) ?? false
+    if !success {
+      isCapturingPhoto = false
+      showPhotoCaptureError = true
+    }
   }
 
   func dismissError() {
@@ -155,8 +112,8 @@ class StreamSessionViewModel: ObservableObject {
     errorMessage = ""
   }
 
-  func capturePhoto() {
-    streamSession.capturePhoto(format: .jpeg)
+  func dismissPhotoCaptureError() {
+    showPhotoCaptureError = false
   }
 
   func dismissPhotoPreview() {
@@ -164,7 +121,51 @@ class StreamSessionViewModel: ObservableObject {
     capturedPhoto = nil
   }
 
-  private func updateStatusFromState(_ state: StreamSessionState) {
+  // MARK: - Private
+
+  private func startSession() async {
+    guard let deviceSession = await sessionManager.getSession() else { return }
+    guard deviceSession.state == .started else { return }
+
+    let config = StreamSessionConfig(
+      videoCodec: VideoCodec.raw,
+      resolution: StreamingResolution.low,
+      frameRate: 24
+    )
+
+    guard let stream = try? deviceSession.addStream(config: config) else { return }
+    streamSession = stream
+    streamingStatus = .waiting
+    setupListeners(for: stream)
+    await stream.start()
+  }
+
+  private func setupListeners(for stream: StreamSession) {
+    stateListenerToken = stream.statePublisher.listen { [weak self] state in
+      Task { @MainActor in self?.handleStateChange(state) }
+    }
+
+    videoFrameListenerToken = stream.videoFramePublisher.listen { [weak self] frame in
+      Task { @MainActor in self?.handleVideoFrame(frame) }
+    }
+
+    errorListenerToken = stream.errorPublisher.listen { [weak self] error in
+      Task { @MainActor in self?.handleError(error) }
+    }
+
+    photoDataListenerToken = stream.photoDataPublisher.listen { [weak self] data in
+      Task { @MainActor in self?.handlePhotoData(data) }
+    }
+  }
+
+  private func clearListeners() {
+    stateListenerToken = nil
+    videoFrameListenerToken = nil
+    errorListenerToken = nil
+    photoDataListenerToken = nil
+  }
+
+  private func handleStateChange(_ state: StreamSessionState) {
     switch state {
     case .stopped:
       currentVideoFrame = nil
@@ -176,7 +177,36 @@ class StreamSessionViewModel: ObservableObject {
     }
   }
 
-  private func formatStreamingError(_ error: StreamSessionError) -> String {
+  private func handleVideoFrame(_ frame: VideoFrame) {
+    if let image = frame.makeUIImage() {
+      currentVideoFrame = image
+      if !hasReceivedFirstFrame {
+        hasReceivedFirstFrame = true
+      }
+    }
+  }
+
+  private func handleError(_ error: StreamSessionError) {
+    let message = formatError(error)
+    if message != errorMessage {
+      showError(message)
+    }
+  }
+
+  private func handlePhotoData(_ data: PhotoData) {
+    isCapturingPhoto = false
+    if let image = UIImage(data: data.data) {
+      capturedPhoto = image
+      showPhotoPreview = true
+    }
+  }
+
+  private func showError(_ message: String) {
+    errorMessage = message
+    showError = true
+  }
+
+  private func formatError(_ error: StreamSessionError) -> String {
     switch error {
     case .internalError:
       return "An internal error occurred. Please try again."

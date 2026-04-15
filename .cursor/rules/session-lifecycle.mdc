@@ -45,7 +45,7 @@ Task {
 
 StreamSession has its own state flow:
 
-```
+```text
 stopped → waitingForDevice → starting → streaming → paused → stopped
 ```
 

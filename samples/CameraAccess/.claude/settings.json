@@ -1,0 +1,4 @@
+{
+  "permissions": {},
+  "projectContext": "This is the CameraAccess sample app for the Meta Wearables Device Access Toolkit (iOS). It demonstrates camera streaming, photo capture, and MockDeviceKit testing with Ray-Ban Meta glasses. See https://wearables.developer.meta.com/docs/develop/ for full documentation and https://github.com/facebook/meta-wearables-dat-ios for the SDK repository which includes comprehensive AI development skills in its .claude/ directory."
+}

@@ -24,10 +24,23 @@ extension MockDeviceKitView {
   class ViewModel: ObservableObject {
     private let mockDeviceKit: MockDeviceKitInterface
     @Published var cardViewModels: [MockDeviceCardView.ViewModel] = []
+    @Published var isEnabled: Bool
 
     init(mockDeviceKit: MockDeviceKitInterface) {
       self.mockDeviceKit = mockDeviceKit
+      self.isEnabled = mockDeviceKit.isEnabled
       self.cardViewModels = mockDeviceKit.pairedDevices.map { MockDeviceCardView.ViewModel(device: $0) }
+    }
+
+    func enable() {
+      mockDeviceKit.enable()
+      isEnabled = true
+    }
+
+    func disable() {
+      mockDeviceKit.disable()
+      cardViewModels = []
+      isEnabled = false
     }
 
     // Add a new mock Ray-Ban Meta device

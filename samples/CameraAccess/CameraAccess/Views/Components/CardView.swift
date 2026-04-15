@@ -25,10 +25,10 @@ struct CardView<Content: View>: View {
     VStack(spacing: 0) {
       content
     }
-    .background(Color(.systemBackground))
+    .background(Color(.secondarySystemGroupedBackground))
     .cornerRadius(12)
     .shadow(
-      color: Color.black.opacity(0.1),
+      color: Color.black.opacity(0.15),
       radius: 4,
       x: 0,
       y: 2

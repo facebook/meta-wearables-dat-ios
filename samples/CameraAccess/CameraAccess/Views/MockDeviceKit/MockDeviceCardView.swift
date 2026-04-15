@@ -17,6 +17,7 @@
 
 #if DEBUG
 
+import MWDATMockDevice
 import SwiftUI
 
 struct MockDeviceCardView: View {
@@ -24,16 +25,24 @@ struct MockDeviceCardView: View {
   let onUnpairDevice: () -> Void
   @State private var showingVideoPicker = false
   @State private var showingImagePicker = false
+  @State private var expanded = true
+
+  private var isCameraSourceSelected: Bool {
+    viewModel.cameraSource == .front || viewModel.cameraSource == .back
+  }
 
   var body: some View {
     CardView {
-      VStack(spacing: 8) {
+      VStack(spacing: 0) {
+        // Header: device name + unpair, tappable to expand/collapse
         HStack {
           VStack(alignment: .leading, spacing: 4) {
             Text(viewModel.deviceName)
               .font(.headline)
+              .fontWeight(.semibold)
               .foregroundColor(.primary)
               .lineLimit(1)
+              .truncationMode(.tail)
             Text(viewModel.id)
               .font(.caption)
               .foregroundColor(.secondary)
@@ -47,77 +56,132 @@ struct MockDeviceCardView: View {
             onUnpairDevice()
           }
         }
-
-        Divider()
-
-        VStack(spacing: 8) {
-          HStack(spacing: 8) {
-            MockDeviceKitButton("Power On", disabled: viewModel.isPoweredOn) {
-              viewModel.powerOn()
-            }
-
-            MockDeviceKitButton("Power Off", disabled: !viewModel.isPoweredOn) {
-              viewModel.powerOff()
-            }
+        .contentShape(Rectangle())
+        .onTapGesture {
+          withAnimation {
+            expanded.toggle()
           }
+        }
 
-          HStack(spacing: 8) {
-            MockDeviceKitButton("Don", disabled: viewModel.isDonned) {
-              viewModel.don()
+        // Collapsible content
+        if expanded {
+          Divider()
+            .padding(.vertical, 4)
+
+          VStack(spacing: 8) {
+            // Toggle switches
+            VStack(spacing: 0) {
+              Toggle(
+                "Power",
+                isOn: Binding(
+                  get: { viewModel.isPoweredOn },
+                  set: { newValue in
+                    if newValue { viewModel.powerOn() } else { viewModel.powerOff() }
+                  }
+                )
+              )
+              .frame(height: 36)
+
+              Toggle(
+                "Donned",
+                isOn: Binding(
+                  get: { viewModel.isDonned },
+                  set: { newValue in
+                    if newValue { viewModel.don() } else { viewModel.doff() }
+                  }
+                )
+              )
+              .frame(height: 36)
+
+              Toggle(
+                "Unfolded",
+                isOn: Binding(
+                  get: { viewModel.isUnfolded },
+                  set: { newValue in
+                    if newValue { viewModel.unfold() } else { viewModel.fold() }
+                  }
+                )
+              )
+              .frame(height: 36)
             }
 
-            MockDeviceKitButton("Doff", disabled: !viewModel.isDonned) {
-              viewModel.doff()
-            }
-          }
-
-          HStack(spacing: 8) {
-            MockDeviceKitButton("Unfold", disabled: viewModel.isUnfolded) {
-              viewModel.unfold()
-            }
-
-            MockDeviceKitButton("Fold", disabled: !viewModel.isUnfolded) {
-              viewModel.fold()
-            }
-          }
-
-          HStack(spacing: 8) {
-            MockDeviceKitButton("Select video") {
-              showingVideoPicker = true
-            }
+            // Camera source picker
+            CameraSourcePicker(
+              cameraSource: viewModel.cameraSource,
+              hasCameraFeed: viewModel.hasCameraFeed,
+              onFrontCamera: { viewModel.setCameraFeed(.front) },
+              onBackCamera: { viewModel.setCameraFeed(.back) },
+              onVideoFile: { showingVideoPicker = true }
+            )
             .sheet(isPresented: $showingVideoPicker) {
               MediaPickerView(mode: .video) { url, _ in
                 viewModel.selectVideo(from: url)
               }
             }
 
-            StatusText(
-              isActive: viewModel.hasCameraFeed,
-              activeText: "Has camera feed",
-              inactiveText: "No camera feed"
-            )
+            // Captured image control — hidden when a camera source (front/back) is selected
+            if !isCameraSourceSelected {
+              if viewModel.hasCapturedImage {
+                Text("Has captured image")
+                  .font(.caption)
+                  .foregroundColor(.green)
+                  .frame(maxWidth: .infinity, alignment: .leading)
+              }
 
-          }
-
-          HStack(spacing: 8) {
-            MockDeviceKitButton("Select image") {
-              showingImagePicker = true
-            }
-            .sheet(isPresented: $showingImagePicker) {
-              MediaPickerView(mode: .image) { url, _ in
-                viewModel.selectImage(from: url)
+              MockDeviceKitButton("Select image") {
+                showingImagePicker = true
+              }
+              .sheet(isPresented: $showingImagePicker) {
+                MediaPickerView(mode: .image) { url, _ in
+                  viewModel.selectImage(from: url)
+                }
               }
             }
-
-            StatusText(
-              isActive: viewModel.hasCapturedImage,
-              activeText: "Has captured image",
-              inactiveText: "No captured image"
-            )
           }
         }
       }
       .padding()
+    }
+  }
+}
+
+private struct CameraSourcePicker: View {
+  let cameraSource: CameraFacing?
+  let hasCameraFeed: Bool
+  let onFrontCamera: () -> Void
+  let onBackCamera: () -> Void
+  let onVideoFile: () -> Void
+
+  private var currentSourceLabel: String {
+    if let source = cameraSource {
+      return source == .front ? "Front Camera" : "Back Camera"
+    } else if hasCameraFeed {
+      return "Video File"
+    }
+    return "None"
+  }
+
+  var body: some View {
+    Menu {
+      Button("Front Camera") { onFrontCamera() }
+      Button("Back Camera") { onBackCamera() }
+      Button("Video File") { onVideoFile() }
+    } label: {
+      HStack {
+        Text("Camera Source: \(currentSourceLabel)")
+          .font(.body)
+          .foregroundColor(.primary)
+        Spacer()
+        Image(systemName: "chevron.down")
+          .font(.caption)
+          .foregroundColor(.secondary)
+      }
+      .frame(maxWidth: .infinity, minHeight: 44)
+      .padding(.horizontal, 12)
+      .overlay(
+        RoundedRectangle(cornerRadius: 16)
+          .stroke(Color.secondary.opacity(0.3), lineWidth: 1)
+      )
     }
   }
 }

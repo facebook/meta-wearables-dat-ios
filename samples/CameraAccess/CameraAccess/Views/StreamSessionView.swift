@@ -42,5 +42,12 @@ struct StreamSessionView: View {
     } message: {
       Text(viewModel.errorMessage)
     }
+    .alert("Photo capture failed", isPresented: $viewModel.showPhotoCaptureError) {
+      Button("OK") {
+        viewModel.dismissPhotoCaptureError()
+      }
+    } message: {
+      Text("Unable to capture photo. This may be due to low storage on device or another capture already in progress. Please try again in a few moments.")
+    }
   }
 }

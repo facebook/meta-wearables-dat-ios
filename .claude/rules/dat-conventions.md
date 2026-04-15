@@ -69,6 +69,6 @@ do {
 
 ## Links
 
-- [iOS API Reference](https://wearables.developer.meta.com/docs/reference/ios_swift/dat/0.5)
+- [iOS API Reference](https://wearables.developer.meta.com/docs/reference/ios_swift/dat/0.6)
 - [Developer Documentation](https://wearables.developer.meta.com/docs/develop/)
 - [GitHub Repository](https://github.com/facebook/meta-wearables-dat-ios)

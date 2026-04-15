@@ -20,25 +20,53 @@ struct NonStreamView: View {
   @ObservedObject var viewModel: StreamSessionViewModel
   @ObservedObject var wearablesVM: WearablesViewModel
   @State private var sheetHeight: CGFloat = 300
+  @State private var showSettingsMenu: Bool = false
 
   var body: some View {
     ZStack {
       Color.black.edgesIgnoringSafeArea(.all)
 
+      // Dismiss overlay when tapping outside the settings menu (placed first so it's behind content)
+      if showSettingsMenu {
+        Color.clear
+          .contentShape(Rectangle())
+          .onTapGesture {
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+              showSettingsMenu = false
+            }
+          }
+          .edgesIgnoringSafeArea(.all)
+      }
+
       VStack {
         HStack {
           Spacer()
-          Menu {
-            Button("Disconnect", role: .destructive) {
-              wearablesVM.disconnectGlasses()
+          Button {
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+              showSettingsMenu.toggle()
             }
-            .disabled(wearablesVM.registrationState != .registered)
           } label: {
             Image(systemName: "gearshape")
               .resizable()
               .aspectRatio(contentMode: .fit)
               .foregroundColor(.white)
               .frame(width: 24, height: 24)
+          }
+          .overlay(alignment: .trailing) {
+            if showSettingsMenu {
+              CustomButton(
+                title: "Disconnect",
+                style: .destructive,
+                isDisabled: wearablesVM.registrationState != .registered
+              ) {
+                wearablesVM.disconnectGlasses()
+                withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                  showSettingsMenu = false
+                }
+              }
+              .frame(width: 120)
+              .transition(.scale(scale: 0.01, anchor: .trailing).combined(with: .opacity))
+            }
           }
         }
 

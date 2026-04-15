@@ -14,7 +14,6 @@ import XCTest
 
 @testable import CameraAccess
 
-@MainActor
 class ViewModelIntegrationTests: XCTestCase {
 
   private var mockDevice: MockRaybanMeta?
@@ -24,10 +23,12 @@ class ViewModelIntegrationTests: XCTestCase {
     try await super.setUp()
     try? Wearables.configure()
 
+    MockDeviceKit.shared.enable()
+
     // Pair mock device and set up camera kit
     let pairedMockDevice = MockDeviceKit.shared.pairRaybanMeta()
     mockDevice = pairedMockDevice
-    cameraKit = pairedMockDevice.getCameraKit()
+    cameraKit = pairedMockDevice.services.camera
 
     // Power on and unfold the device to make it available
     pairedMockDevice.powerOn()
@@ -38,9 +39,7 @@ class ViewModelIntegrationTests: XCTestCase {
   }
 
   override func tearDown() async throws {
-    MockDeviceKit.shared.pairedDevices.forEach { mockDevice in
-      MockDeviceKit.shared.unpairDevice(mockDevice)
-    }
+    MockDeviceKit.shared.disable()
     mockDevice = nil
     cameraKit = nil
     try await super.tearDown()
@@ -61,7 +60,7 @@ class ViewModelIntegrationTests: XCTestCase {
     }
 
     // Setup camera feed
-    await camera.setCameraFeed(fileURL: videoURL)
+    camera.setCameraFeed(fileURL: videoURL)
 
     let viewModel = StreamSessionViewModel(wearables: Wearables.shared)
 
@@ -110,8 +109,8 @@ class ViewModelIntegrationTests: XCTestCase {
     }
 
     // Setup camera feed
-    await camera.setCameraFeed(fileURL: videoURL)
-    await camera.setCapturedImage(fileURL: imageURL)
+    camera.setCameraFeed(fileURL: videoURL)
+    camera.setCapturedImage(fileURL: imageURL)
 
     let viewModel = StreamSessionViewModel(wearables: Wearables.shared)
 

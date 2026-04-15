@@ -44,21 +44,21 @@ struct CameraAccessApp: App {
     #if DEBUG
     // Auto-configure MockDeviceKit when launched by XCUITests
     if ProcessInfo.processInfo.arguments.contains("--ui-testing") {
+      MockDeviceKit.shared.enable()
       let device = MockDeviceKit.shared.pairRaybanMeta()
 
-      let cameraKit = device.getCameraKit()
-      Task {
-        guard let videoURL = Bundle.main.url(forResource: "plant", withExtension: "mp4"),
-          let imageURL = Bundle.main.url(forResource: "plant", withExtension: "png")
-        else {
-          fatalError("Test resources not found - are you running a Release build?")
-        }
-        await cameraKit.setCameraFeed(fileURL: videoURL)
-        await cameraKit.setCapturedImage(fileURL: imageURL)
-
-        device.powerOn()
-        device.don()
+      let cameraKit = device.services.camera
+      guard let videoURL = Bundle.main.url(forResource: "plant", withExtension: "mp4"),
+        let imageURL = Bundle.main.url(forResource: "plant", withExtension: "png")
+      else {
+        fatalError("Test resources not found - are you running a Release build?")
       }
+      cameraKit.setCameraFeed(fileURL: videoURL)
+      cameraKit.setCapturedImage(fileURL: imageURL)
+
+      device.powerOn()
+      device.don()
+
     }
     #endif
 

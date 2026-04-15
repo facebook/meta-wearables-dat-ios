@@ -71,7 +71,7 @@ do {
 
 ## Links
 
-- [iOS API Reference](https://wearables.developer.meta.com/docs/reference/ios_swift/dat/0.5)
+- [iOS API Reference](https://wearables.developer.meta.com/docs/reference/ios_swift/dat/0.6)
 - [Developer Documentation](https://wearables.developer.meta.com/docs/develop/)
 - [GitHub Repository](https://github.com/facebook/meta-wearables-dat-ios)
 
@@ -258,7 +258,12 @@ import MWDATMockDevice
 ## Creating a mock device
 
 ```swift
-let mockDevice = MockDeviceKit.shared.pairRaybanMeta()
+import MWDATMockDevice
+
+let mockDeviceKit = MockDeviceKit.shared
+mockDeviceKit.enable()
+
+let mockDevice = mockDeviceKit.pairRaybanMeta()
 ```
 
 ## Simulating device states
@@ -280,14 +285,14 @@ await mockDevice.powerOff()
 ### Video streaming
 
 ```swift
-let camera = mockDevice.getCameraKit()
+let camera = mockDevice.services.camera
 camera.setCameraFeed(fileURL: videoURL)
 ```
 
 ### Photo capture
 
 ```swift
-let camera = mockDevice.getCameraKit()
+let camera = mockDevice.services.camera
 camera.setCapturedImage(fileURL: imageURL)
 ```
 
@@ -306,15 +311,13 @@ class MockDeviceKitTestCase: XCTestCase {
 
     override func setUp() async throws {
         try await super.setUp()
-        try? Wearables.configure()
+        MockDeviceKit.shared.enable()
         mockDevice = MockDeviceKit.shared.pairRaybanMeta()
-        cameraKit = mockDevice?.getCameraKit()
+        cameraKit = mockDevice?.services.camera
     }
 
     override func tearDown() async throws {
-        MockDeviceKit.shared.pairedDevices.forEach { device in
-            MockDeviceKit.shared.unpairDevice(device)
-        }
+        MockDeviceKit.shared.disable()
         mockDevice = nil
         cameraKit = nil
         try await super.tearDown()
@@ -472,8 +475,8 @@ let specific = SpecificDeviceSelector(deviceIdentifier: deviceId)
 
 ## Links
 
-- [StreamSession API reference](https://wearables.developer.meta.com/docs/reference/ios_swift/dat/0.5/mwdatcamera_streamsession)
-- [StreamSessionConfig API reference](https://wearables.developer.meta.com/docs/reference/ios_swift/dat/0.5/mwdatcamera_streamsessionconfig)
+- [StreamSession API reference](https://wearables.developer.meta.com/docs/reference/ios_swift/dat/0.6/mwdatcamera_streamsession)
+- [StreamSessionConfig API reference](https://wearables.developer.meta.com/docs/reference/ios_swift/dat/0.6/mwdatcamera_streamsessionconfig)
 - [Integration guide](https://wearables.developer.meta.com/docs/build-integration-ios)
 
 ## Session management
@@ -754,7 +757,7 @@ Ensure compatible versions of SDK, Meta AI app, and glasses firmware:
 
 | SDK | Meta AI App | Ray-Ban Meta | Meta Ray-Ban Display |
 |-----|-------------|--------------|----------------------|
-| 0.5.0 | Check [version dependencies](https://wearables.developer.meta.com/docs/version-dependencies) | Check docs | Check docs |
+| 0.6.0 | Check [version dependencies](https://wearables.developer.meta.com/docs/version-dependencies) | Check docs | Check docs |
 | 0.4.0 | V254 | V20 | V21 |
 | 0.3.0 | V249 | V20 | — |
 
@@ -956,16 +959,20 @@ Add mock device support to develop without glasses:
 import MWDATMockDevice
 
 func setupMockDevice() async {
-    let device = MockDeviceKit.shared.pairRaybanMeta()
-    await device?.powerOn()
-    await device?.unfold()
-    await device?.don()
+    let mockDeviceKit = MockDeviceKit.shared
+    mockDeviceKit.enable()
 
-    // Set up mock camera feed
+    let device = mockDeviceKit.pairRaybanMeta()
+    device.don()
+
     if let videoURL = Bundle.main.url(forResource: "test_video", withExtension: "mov") {
-        let camera = device?.getCameraKit()
-        await camera?.setCameraFeed(fileURL: videoURL)
+        let camera = device.services.camera
+        camera.setCameraFeed(fileURL: videoURL)
     }
+}
+
+func tearDownMockDevice() {
+    MockDeviceKit.shared.disable()
 }
 ```
 
@@ -981,3 +988,4 @@ Your DAT app should only depend on:
 - [CameraAccess sample](https://github.com/facebook/meta-wearables-dat-ios/tree/main/samples)
 - [Full integration guide](https://wearables.developer.meta.com/docs/build-integration-ios)
 - [Developer documentation](https://wearables.developer.meta.com/docs/develop/)
+

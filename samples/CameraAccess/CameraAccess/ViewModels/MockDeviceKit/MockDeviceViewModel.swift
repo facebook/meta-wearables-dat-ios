@@ -16,6 +16,7 @@
 
 #if DEBUG
 
+import AVFoundation
 import Foundation
 import MWDATMockDevice
 
@@ -25,6 +26,7 @@ extension MockDeviceCardView {
     let device: MockDevice
     @Published var hasCameraFeed: Bool = false
     @Published var hasCapturedImage: Bool = false
+    @Published var cameraSource: CameraFacing?
     @Published var isPoweredOn: Bool = false
     @Published var isDonned: Bool = false
     @Published var isUnfolded: Bool = false
@@ -59,7 +61,9 @@ extension MockDeviceCardView {
 
     func don() {
       device.don()
+      isPoweredOn = true
       isDonned = true
+      isUnfolded = true
     }
 
     func doff() {
@@ -78,26 +82,36 @@ extension MockDeviceCardView {
       if let rayBanDevice = device as? MockDisplaylessGlasses {
         rayBanDevice.fold()
         isUnfolded = false
+        isDonned = false
+      }
+    }
+
+    func setCameraFeed(_ facing: CameraFacing) {
+      if let cameraKit = (device as? MockDisplaylessGlasses)?.services.camera {
+        Task {
+          let granted = await AVCaptureDevice.requestAccess(for: .video)
+          guard granted else { return }
+          await cameraKit.setCameraFeed(cameraFacing: facing)
+          self.cameraSource = facing
+          self.hasCameraFeed = false
+        }
       }
     }
 
     // Load mock video content
     func selectVideo(from url: URL) {
-      if let cameraKit = (device as? MockDisplaylessGlasses)?.getCameraKit() {
-        Task {
-          await cameraKit.setCameraFeed(fileURL: url)
-          hasCameraFeed = true
-        }
+      if let cameraKit = (device as? MockDisplaylessGlasses)?.services.camera {
+        cameraKit.setCameraFeed(fileURL: url)
+        hasCameraFeed = true
+        cameraSource = nil
       }
     }
 
     // Load mock image content
     func selectImage(from url: URL) {
-      if let cameraKit = (device as? MockDisplaylessGlasses)?.getCameraKit() {
-        Task {
-          await cameraKit.setCapturedImage(fileURL: url)
-          hasCapturedImage = true
-        }
+      if let cameraKit = (device as? MockDisplaylessGlasses)?.services.camera {
+        cameraKit.setCapturedImage(fileURL: url)
+        hasCapturedImage = true
       }
     }
   }

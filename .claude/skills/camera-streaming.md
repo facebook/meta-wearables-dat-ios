@@ -129,6 +129,6 @@ let specific = SpecificDeviceSelector(deviceIdentifier: deviceId)
 
 ## Links
 
-- [StreamSession API reference](https://wearables.developer.meta.com/docs/reference/ios_swift/dat/0.5/mwdatcamera_streamsession)
-- [StreamSessionConfig API reference](https://wearables.developer.meta.com/docs/reference/ios_swift/dat/0.5/mwdatcamera_streamsessionconfig)
+- [StreamSession API reference](https://wearables.developer.meta.com/docs/reference/ios_swift/dat/0.6/mwdatcamera_streamsession)
+- [StreamSessionConfig API reference](https://wearables.developer.meta.com/docs/reference/ios_swift/dat/0.6/mwdatcamera_streamsessionconfig)
 - [Integration guide](https://wearables.developer.meta.com/docs/build-integration-ios)

@@ -25,41 +25,56 @@ struct MockDeviceKitView: View {
   var body: some View {
     NavigationView {
       ScrollView {
-        VStack(spacing: 16) {
+        VStack(spacing: 12) {
           CardView {
-            VStack(spacing: 8) {
+            VStack(spacing: 6) {
               HStack {
                 Text("Mock Device Kit")
-                  .font(.title2)
+                  .font(.headline)
+                  .fontWeight(.bold)
                   .foregroundColor(.primary)
                 Spacer()
 
-                Text("\(viewModel.cardViewModels.count) device(s) paired")
-                  .font(.subheadline)
-                  .foregroundColor(.green)
+                if viewModel.isEnabled {
+                  Text("\(viewModel.cardViewModels.count) device(s) paired")
+                    .font(.subheadline)
+                    .foregroundColor(.green)
+                }
               }
 
               Text("This screen handles simulating devices, mocking capabilities, and states")
-                .font(.body)
+                .font(.caption)
                 .foregroundColor(.secondary)
                 .frame(maxWidth: .infinity, alignment: .leading)
 
               Divider()
 
-              MockDeviceKitButton("Pair RayBan Meta", disabled: viewModel.cardViewModels.count > 2) {
-                viewModel.pairRaybanMeta()
+              if viewModel.isEnabled {
+                MockDeviceKitButton("Disable MockDeviceKit", style: .destructive) {
+                  viewModel.disable()
+                }
+
+                MockDeviceKitButton("Pair RayBan Meta", disabled: viewModel.cardViewModels.count >= 3) {
+                  viewModel.pairRaybanMeta()
+                }
+              } else {
+                MockDeviceKitButton("Enable MockDeviceKit") {
+                  viewModel.enable()
+                }
               }
             }
-            .padding()
+            .padding(12)
           }
 
-          ForEach(viewModel.cardViewModels, id: \.id) { cardViewModel in
-            MockDeviceCardView(
-              viewModel: cardViewModel,
-              onUnpairDevice: {
-                viewModel.unpairDevice(cardViewModel.device)
-              }
-            )
+          if viewModel.isEnabled {
+            ForEach(viewModel.cardViewModels, id: \.id) { cardViewModel in
+              MockDeviceCardView(
+                viewModel: cardViewModel,
+                onUnpairDevice: {
+                  viewModel.unpairDevice(cardViewModel.device)
+                }
+              )
+            }
           }
 
           Spacer()

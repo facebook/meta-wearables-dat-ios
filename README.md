@@ -1,7 +1,7 @@
 # Meta Wearables Device Access Toolkit for iOS
 
-[![Swift Package](https://img.shields.io/badge/Swift_Package-0.5.0-brightgreen?logo=swift&logoColor=white)](https://github.com/facebook/meta-wearables-dat-ios/tags)
-[![Docs](https://img.shields.io/badge/API_Reference-0.5-blue?logo=meta)](https://wearables.developer.meta.com/docs/reference/ios_swift/dat/0.5)
+[![Swift Package](https://img.shields.io/badge/Swift_Package-0.6.0-brightgreen?logo=swift&logoColor=white)](https://github.com/facebook/meta-wearables-dat-ios/tags)
+[![Docs](https://img.shields.io/badge/API_Reference-0.6-blue?logo=meta)](https://wearables.developer.meta.com/docs/reference/ios_swift/dat/0.6)
 
 The Meta Wearables Device Access Toolkit enables developers to utilize Meta's AI glasses to build hands-free wearable experiences into their mobile applications.
 By integrating this SDK, developers can reliably connect to Meta's AI glasses and leverage capabilities like video streaming and photo capture.
@@ -78,25 +78,33 @@ Add or modify the following in your `Info.plist` file.
 
 ## AI-Assisted Development
 
-This repository includes AI development skills that work with [Claude Code](https://docs.anthropic.com/en/docs/claude-code), [Cursor](https://cursor.sh/), and other AI coding assistants that support project-level context.
+This repository includes config for three AI coding assistants, all generated from the same canonical SDK knowledge:
+
+| Tool | Config | How it loads |
+|------|--------|-------------|
+| [Claude Code](https://docs.anthropic.com/en/docs/claude-code) | `.claude/skills/*.md` | Auto-discovered when you open the project |
+| [GitHub Copilot](https://github.com/features/copilot) | `.github/copilot-instructions.md` | Auto-loaded by Copilot in VS Code |
+| [Cursor](https://cursor.sh/) | `.cursor/rules/*.mdc` | Auto-loaded with glob-based triggers |
 
 ### Quick setup
 
-Add the skills to your project with a single command:
+Install config for your preferred tool:
+
+```bash
+# Install a specific tool's config
+./install-skills.sh claude    # Claude Code only
+./install-skills.sh copilot   # GitHub Copilot only
+./install-skills.sh cursor    # Cursor only
+./install-skills.sh all       # All tools
+```
+
+Or install everything remotely with a single command:
 
 ```bash
 curl -sL https://raw.githubusercontent.com/facebook/meta-wearables-dat-ios/main/install-skills.sh | bash
 ```
 
-Or manually download the `.claude/` directory into your project root:
-
-```bash
-cd your-project
-curl -sL https://github.com/facebook/meta-wearables-dat-ios/archive/refs/heads/main.tar.gz \
-  | tar xz --strip-components=1 'meta-wearables-dat-ios-main/.claude'
-```
-
-If you cloned this repository, the skills are already included — no setup needed.
+If you cloned this repository, the config is already included — no setup needed.
 
 ### What's included
 
@@ -108,7 +116,7 @@ If you cloned this repository, the skills are already included — no setup need
 - **Debugging** — Common issues, Developer Mode, version compatibility
 - **Sample app guide** — Building a complete DAT app
 
-Skills are loaded automatically from `.claude/settings.json` when your AI assistant opens the project.
+For API reference, point your AI tool at the [llms.txt endpoint](https://wearables.developer.meta.com/llms.txt?full=true).
 
 ## License
 
