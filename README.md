@@ -33,6 +33,61 @@ The easiest way to add the SDK to your project is by using Swift Package Manager
 1. Select the target to which you want to add the packages
 1. Click **Add Package**
 
+## iOS target configuration checklist
+
+After adding the Swift package products your app uses, verify that your iOS app target includes the native configuration required by your DAT flows.
+
+For registration and app-link handling, add an `MWDAT` dictionary to your app `Info.plist` with the values from your Wearables Developer Center project or release channel:
+
+```xml
+<key>MWDAT</key>
+<dict>
+    <key>AppLinkURLScheme</key>
+    <string>your-app-scheme://</string>
+    <key>MetaAppID</key>
+    <string>your-meta-app-id</string>
+    <key>ClientToken</key>
+    <string>your-client-token</string>
+    <key>TeamID</key>
+    <string>your-apple-team-id</string>
+</dict>
+```
+
+Also register the same app link scheme as a URL type so Meta AI can return users to your app after registration and permission flows:
+
+```xml
+<key>CFBundleURLTypes</key>
+<array>
+    <dict>
+        <key>CFBundleTypeRole</key>
+        <string>Editor</string>
+        <key>CFBundleURLName</key>
+        <string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+        <key>CFBundleURLSchemes</key>
+        <array>
+            <string>your-app-scheme</string>
+        </array>
+    </dict>
+</array>
+```
+
+For local Developer Mode builds, follow the Developer Center guidance for developer-mode credentials. Do not ship release or TestFlight builds with placeholder app IDs or missing release-channel credentials.
+
+Depending on the capabilities your app uses, also verify these iOS target settings:
+
+- `LSApplicationQueriesSchemes` includes `fb-viewapp` so the app can query/open Meta AI during registration and permission flows.
+- `UISupportedExternalAccessoryProtocols` includes `com.meta.ar.wearable` for Meta wearable external accessory support.
+- `NSBonjourServices` includes the Bonjour service required by your DAT integration. The CameraAccess sample uses `_bonjour._tcp`.
+- `NSLocalNetworkUsageDescription` explains why the app needs local network access to find and connect to nearby glasses.
+- `NSBluetoothAlwaysUsageDescription` explains why the app needs Bluetooth access.
+- `NSMicrophoneUsageDescription` is present if your app records voice or otherwise uses microphone input.
+- `NSPhotoLibraryAddUsageDescription` is present if the app saves captured media to the photo library.
+- `UIBackgroundModes` includes only the modes your app actually needs. The CameraAccess sample uses `processing`, `bluetooth-central`, `bluetooth-peripheral`, and `external-accessory`.
+
+If you use `MWDATMockDevice`, keep mock-device support limited to debug/internal builds and make the mock-vs-real mode explicit in your build configuration. Release and TestFlight builds intended for real glasses should use real DAT credentials and should not enable mock-device mode.
+
+For Expo, React Native, or other generated iOS projects, make sure these values are produced by your config plugin or native project generation step before building the iOS app.
+
 ## Developer Terms
 
 - By using the Wearables Device Access Toolkit, you agree to our [Meta Wearables Developer Terms](https://wearables.developer.meta.com/terms),
