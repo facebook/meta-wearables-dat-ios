@@ -83,13 +83,13 @@ This repository ships one public DAT knowledge base in two first-class formats:
 | Tool | Public artifact | Recommended setup |
 |------|-----------------|-------------------|
 | [Claude Code](https://docs.anthropic.com/en/docs/claude-code) | `.claude-plugin/marketplace.json` + `plugins/mwdat-ios/.claude-plugin/plugin.json` | Add this GitHub repo as a marketplace, then install `mwdat-ios` |
-| Codex | `plugins/mwdat-ios/.codex-plugin/plugin.json` | Install the plugin from a cloned checkout of this repo |
+| Codex | `plugins/mwdat-ios/.codex-plugin/plugin.json` | Add this GitHub repo as a Codex marketplace |
 | [GitHub Copilot](https://github.com/features/copilot) | `.github/copilot-instructions.md` | Auto-loaded by Copilot in VS Code |
 | [Cursor](https://cursor.sh/) | `.cursor/rules/*.mdc` | Auto-loaded with glob-based triggers |
 | AGENTS.md-compatible tools | `AGENTS.md` | Portable fallback for agents that read `AGENTS.md` |
 | MCP-compatible editors | `https://mcp.facebook.com/wearables_dat` | Connect as a remote HTTP MCP server |
 
-Claude and Codex install from the plugin payload under `plugins/`. Copilot, Cursor, and `AGENTS.md` readers use the native file-based artifacts at repo root.
+Claude installs from the plugin payload under `plugins/`. Codex adds this repository as a plugin marketplace. Copilot, Cursor, and `AGENTS.md` readers use the native file-based artifacts at repo root.
 
 ### Claude Code
 
@@ -109,7 +109,7 @@ Or use the helper script:
 ```bash
 git clone https://github.com/facebook/meta-wearables-dat-ios.git
 cd meta-wearables-dat-ios
-codex plugin install ./plugins/mwdat-ios
+codex plugin marketplace add .
 ```
 
 Or use the helper script:
