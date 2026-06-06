@@ -317,14 +317,14 @@ let mockDevice = mockDeviceKit.pairRaybanMeta()
 
 ```swift
 // Simulate glasses lifecycle
-await mockDevice.powerOn()
-await mockDevice.unfold()
-await mockDevice.don()    // Simulate wearing the glasses
+mockDevice.powerOn()
+mockDevice.unfold()
+mockDevice.don()    // Simulate wearing the glasses
 
 // Later...
-await mockDevice.doff()   // Simulate removing
-await mockDevice.fold()
-await mockDevice.powerOff()
+mockDevice.doff()   // Simulate removing
+mockDevice.fold()
+mockDevice.powerOff()
 ```
 
 ## Configuring permissions
