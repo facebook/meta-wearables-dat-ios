@@ -66,14 +66,14 @@ install_claude() {
 }
 
 install_codex() {
-  echo "Installing Codex plugin for iOS..."
+  echo "Adding Codex marketplace for iOS..."
   require_command codex
   download_archive
-  if [ -d "${PLUGIN_DIR}" ]; then
-    codex plugin install "${PLUGIN_DIR}" || return 1
-    echo "Installed Codex plugin from ${PLUGIN_DIR}."
+  if [ -d "${EXTRACT_DIR}" ]; then
+    codex plugin marketplace add "./${EXTRACT_DIR}" || return 1
+    echo "Added Codex marketplace from ./${EXTRACT_DIR}."
   else
-    echo "Error: Failed to download Codex plugin payload." >&2
+    echo "Error: Failed to download Codex marketplace payload." >&2
     return 1
   fi
 }
@@ -126,7 +126,7 @@ install_all() {
   if command -v codex >/dev/null 2>&1; then
     install_codex || failed=1
   else
-    echo "Skipping Codex plugin install because 'codex' is not on PATH."
+    echo "Skipping Codex marketplace install because 'codex' is not on PATH."
   fi
   install_copilot || failed=1
   install_cursor || failed=1
