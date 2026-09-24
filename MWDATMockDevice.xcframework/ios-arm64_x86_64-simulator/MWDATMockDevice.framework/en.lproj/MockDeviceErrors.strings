@@ -1,0 +1,22 @@
+/* (c) Meta Platforms, Inc. and affiliates. Confidential and proprietary. */
+
+/* Localized error descriptions.
+   Keys match Android strings.xml for cross-platform parity. */
+
+"dat_error_mock_app_management_unsupported_app_id" = "App management unsupported app id";
+"dat_error_mock_app_management_unsupported_message_type" = "App management unsupported message type";
+"dat_error_mock_failed_sending_video_frames" = "Failed sending video frames";
+"dat_error_mock_peer_building_info_unsupported_message_type" = "Device Info, unsupported message type";
+"dat_error_mock_permissions_unsupported_message_type" = "Permissions, unsupported message type";
+"dat_error_mock_photo_capture" = "Exception during photo capture";
+"dat_error_mock_remote_session_device_not_ready" = "Remote session, device not ready";
+"dat_error_mock_remote_session_id_mismatch" = "Remote session, Session ID mismatch";
+"dat_error_mock_remote_session_unsupported_message_type" = "Remote session, unsupported message type";
+"dat_error_mock_stream_internal_error" = "An internal error occurred";
+"dat_error_mock_stream_no_camera_feed" = "No camera source configured";
+"dat_error_mock_stream_start_failure" = "Stream start failure";
+"dat_error_mock_streaming_error" = "Exception occurred while streaming";
+"dat_error_mock_streaming_unhandled_user_action" = "Unhandled user action";
+"dat_error_mock_voice_invocation_failed_to_parse_action_response" = "Voice Invocation, failed to parse action response";
+"dat_error_mock_voice_invocation_failed_to_parse_init_request" = "Voice Invocation, failed to parse init request";
+"dat_error_mock_voice_invocation_unknown_message_type" = "Voice Invocation, unknown message type";

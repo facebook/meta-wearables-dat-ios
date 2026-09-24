@@ -1,0 +1,12 @@
+/* (c) Meta Platforms, Inc. and affiliates. Confidential and proprietary. */
+
+/* Localized error descriptions.
+   Keys match Android strings.xml for cross-platform parity. */
+
+/* Speech */
+"dat_error_speech_already_listening" = "Speech is already listening";
+"dat_error_speech_device_disconnected" = "Device is not connected";
+"dat_error_speech_invalid_state" = "Invalid state for the requested operation";
+"dat_error_speech_start_failed" = "Failed to start speech";
+"dat_error_speech_unavailable" = "On-device speech is not available";
+"dat_error_speech_unexpected_error" = "Unexpected error";

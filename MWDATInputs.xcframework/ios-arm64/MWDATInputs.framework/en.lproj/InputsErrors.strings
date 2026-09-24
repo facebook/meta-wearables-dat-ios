@@ -1,0 +1,12 @@
+/* (c) Meta Platforms, Inc. and affiliates. Confidential and proprietary. */
+
+/* Localized error descriptions.
+   Keys match Android strings.xml for cross-platform parity. */
+
+"dat_error_inputs_activation_failed" = "Input activation failed";
+"dat_error_inputs_activation_timeout" = "Input activation timed out";
+"dat_error_inputs_capability_unavailable" = "Inputs are unavailable on this device";
+"dat_error_inputs_connection_closed" = "The input connection closed. Try again.";
+"dat_error_inputs_device_disconnected" = "Input device disconnected";
+"dat_error_inputs_permission_denied" = "Input permission not granted";
+"dat_error_inputs_communication_error" = "A communication error interrupted input events. Try again.";

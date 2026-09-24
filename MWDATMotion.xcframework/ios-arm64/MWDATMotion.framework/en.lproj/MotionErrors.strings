@@ -1,0 +1,5 @@
+/* (c) Meta Platforms, Inc. and affiliates. Confidential and proprietary. */
+
+"dat_error_motion_device_disconnected" = "Device disconnected. Check your connection and try again.";
+"dat_error_motion_sensor_unavailable" = "This device has no motion sensors. Try using a device with motion sensor support.";
+"dat_error_motion_capability_closed" = "Motion capability is closed";
