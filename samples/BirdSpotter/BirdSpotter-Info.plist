@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDisplayName</key>
+	<string>BirdSpotter</string>
+	<key>CFBundleExecutable</key>
+	<string>$(EXECUTABLE_NAME)</string>
+	<key>CFBundleIdentifier</key>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+	<key>CFBundleShortVersionString</key>
+	<string>$(MARKETING_VERSION)</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>birdspotter</string>
+			</array>
+		</dict>
+	</array>
+	<key>CFBundleVersion</key>
+	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>MWDAT</key>
+	<dict>
+		<key>Analytics</key>
+		<dict>
+			<key>OptOut</key>
+			<true/>
+		</dict>
+		<key>AppLinkURLScheme</key>
+		<string>birdspotter://</string>
+		<key>ClientToken</key>
+		<string>0</string>
+		<key>CrashReporting</key>
+		<dict>
+			<key>OptOut</key>
+			<true/>
+		</dict>
+		<key>MetaAppID</key>
+		<string>0</string>
+		<key>TeamID</key>
+		<string>$(DEVELOPMENT_TEAM)</string>
+	</dict>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>BirdSpotter links with your Meta AI glasses over Bluetooth, so a session can spot through their camera.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>BirdSpotter uses the camera for real-time identification — point it at a bird to put a name to it.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>BirdSpotter stamps each sighting with where you saw the bird, so your journal remembers the spot.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>BirdSpotter listens through the microphone to identify a bird by its call.</string>
+	<key>UIAppFonts</key>
+	<array>
+		<string>LibreCaslonDisplay-Regular.ttf</string>
+		<string>LibreCaslonText-Italic.ttf</string>
+		<string>PublicSans-Regular.ttf</string>
+		<string>PublicSans-Medium.ttf</string>
+		<string>PublicSans-SemiBold.ttf</string>
+		<string>PublicSans-Bold.ttf</string>
+		<string>Cinzel-Regular.ttf</string>
+		<string>Cinzel-Bold.ttf</string>
+	</array>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>audio</string>
+		<string>bluetooth-central</string>
+		<string>bluetooth-peripheral</string>
+		<string>external-accessory</string>
+		<string>fetch</string>
+	</array>
+	<key>UILaunchScreen</key>
+	<dict>
+		<key>UIColorName</key>
+		<string>LaunchBackground</string>
+		<key>UIImageName</key>
+		<string>LaunchBadge</string>
+	</dict>
+	<key>UISupportedExternalAccessoryProtocols</key>
+	<array>
+		<string>com.meta.ar.wearable</string>
+	</array>
+</dict>
+</plist>

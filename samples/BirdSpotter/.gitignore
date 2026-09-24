@@ -1,0 +1,5 @@
+*.xcframework/
+.DS_Store
+DerivedData/
+xcuserdata/
+*.xcuserstate

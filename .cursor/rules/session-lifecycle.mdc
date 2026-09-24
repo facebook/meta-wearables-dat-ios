@@ -48,9 +48,35 @@ Task {
 }
 ```
 
+`DeviceSession` exposes both shapes: `stateStream()` / `errorStream()` as
+`AsyncStream`, and `statePublisher` / `errorPublisher` as listener-token
+`Announcer`s. Pick one per call site; subscribe before calling `start()` so no
+initial transition is missed.
+
+## Session errors
+
+`errorStream()` and `errorPublisher` emit `DeviceSessionError`. Handle
+`.noEligibleDevice` (no matching device yet), `.sessionAlreadyExists`,
+`.capabilityAlreadyActive`, the thermal/battery cases (`.thermalCritical`,
+`.thermalEmergency`, `.peakPowerShutdown`, `.batteryCritical`), and
+`.datAppOnTheGlassesUpdateRequired`, which is delivered as a one-shot event and
+should open `Wearables.shared.openDATGlassesAppUpdate()`.
+
+`start()` uses typed throws, so you can catch the specific case:
+
+```swift
+do throws(DeviceSessionError) {
+    try session.start()
+} catch .datAppOnTheGlassesUpdateRequired {
+    showGlassesAppUpdatePrompt()
+} catch {
+    showError(error.localizedDescription)
+}
+```
+
 ## Stream state transitions
 
-A `Stream` is obtained from the `Camera` capability attached to a started `DeviceSession`:
+A `Stream` is a capability attached to a started `DeviceSession`:
 
 ```text
 stopped → waitingForDevice → starting → streaming → paused → stopped
@@ -91,8 +117,21 @@ Monitor device availability to know when sessions can start:
 
 ```swift
 Task {
-    for await devices in Wearables.shared.devicesStream() {
-        // Update list of available glasses
+    for await deviceIds in Wearables.shared.devicesStream() {
+        // deviceIds is [DeviceIdentifier]; resolve details with deviceForIdentifier(_:)
+    }
+}
+```
+
+A `DeviceSelector` also reports availability directly. `AutoDeviceSelector` and
+`SpecificDeviceSelector` both expose `activeDevice` and `activeDeviceStream()`,
+which yields `nil` when no eligible device is available:
+
+```swift
+let selector = AutoDeviceSelector(wearables: Wearables.shared)
+Task {
+    for await deviceId in selector.activeDeviceStream() {
+        hasActiveDevice = deviceId != nil
     }
 }
 ```

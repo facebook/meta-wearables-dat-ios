@@ -1,0 +1,10 @@
+---
+description: Receive navigation, button, capture, and drag input events from connected glasses on iOS
+globs: **/*Input*
+---
+
+# Inputs (iOS)
+
+Attach Inputs only after `DeviceSession` reaches `.started`. `addInputs(configuration:)` starts the capability automatically. Collect `inputs.events`, retain state/error listener tokens, and handle every `InputEvent` case. Cancel the event task and listeners before `session.removeInputs()`.
+
+Inputs requires WDC capability approval but has no runtime `Permission` value. Treat `InputsError.permissionDenied` as an approval/configuration problem. The capability is experimental and unavailable to production apps.

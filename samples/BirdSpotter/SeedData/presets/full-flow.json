@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "id": "starter-full-flow",
+  "name": "Full Flow",
+
+  "ambientCalls": [
+    {
+      "id": "robin",
+      "afterMillis": 8000,
+      "result": { "kind": "species", "speciesId": "american-robin", "confidence": 0.87 }
+    }
+  ],
+
+  "photoResponses": [
+    {
+      "id": "photo-1-cardinal",
+      "delayMillis": 2200,
+      "caption": "Northern Cardinal",
+      "spokenLine": "Northern Cardinal, 92 percent.",
+      "result": { "kind": "species", "speciesId": "northern-cardinal", "confidence": 0.92 }
+    }
+  ],
+
+  "questions": [
+    {
+      "id": "green-yellow-belly",
+      "delayMillis": 1500,
+      "prompts": [
+        "it's green with a yellow belly",
+        "green with a yellow belly",
+        "green bird yellow belly"
+      ],
+      "answer": "That's likely a Green Jay.",
+      "speciesId": "green-jay"
+    }
+  ],
+
+  "unmatchedQuestion": "Sorry — didn't catch that."
+}

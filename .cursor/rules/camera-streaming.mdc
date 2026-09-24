@@ -9,10 +9,14 @@ Guide for implementing camera streaming and photo capture with the DAT SDK.
 
 ## Key concepts
 
-- **Stream**: Main interface for camera streaming
-- **VideoFrame**: Individual video frames — call `.makeUIImage()` to render
-- **StreamConfiguration**: Configure resolution, frame rate, and codec
-- **PhotoData**: Still image captured from glasses
+- **DeviceSession**: The connection to the glasses. Create and start it first; it can stay connected with no camera attached.
+- **Camera**: The capability you attach to a started `DeviceSession` with `addCamera(config:)`. It owns the `Stream`.
+- **Stream**: `camera.stream` — start/stop streaming, capture photos, observe frames, state, and errors.
+- **VideoFrame**: Individual video frames. Use `.makeUIImage()` to render, or `.sampleBuffer` when you need the raw `CMSampleBuffer` (for example to write compressed frames to a file).
+- **StreamConfiguration**: Configure video codec, resolution, and frame rate.
+- **PhotoData**: Still image captured from glasses (`.data` plus `.format`).
+
+Treat "start a session" and "start the preview" as two separate user-visible steps, as the `CameraAccess` sample does. That keeps the session reusable when the user stops and restarts the preview.
 
 ## Creating a DeviceSession
 
@@ -34,7 +38,18 @@ for await state in deviceSession.stateStream() {
 
 ## Adding a Camera
 
-Once the `DeviceSession` is started, add a `Camera` capability and get its `stream`:
+Once the `DeviceSession` is started, add the `Camera` capability and stream through `camera.stream`.
+
+Check camera permission first. `checkPermissionStatus(.camera)` is a silent query, while `requestPermission(.camera)` switches to the Meta AI app. `CameraAccess` only calls `requestPermission` after the user confirms the app switch, so the redirect is never a surprise:
+
+```swift
+if try await wearables.checkPermissionStatus(.camera) != .granted {
+    // Confirm with the user, then:
+    guard try await wearables.requestPermission(.camera) == .granted else { return }
+}
+```
+
+Then attach the camera:
 
 ```swift
 let config = StreamConfiguration(
@@ -60,9 +75,18 @@ let stream = camera.stream
 
 ### Frame rate options
 
-Valid values: `2`, `7`, `15`, `24`, `30` FPS.
+`frameRate` is a `UInt`. Valid values: `2`, `7`, `15`, `24`, `30` FPS.
 
 Lower resolution and frame rate yield higher visual quality due to less Bluetooth compression.
+
+### Codec options
+
+`VideoCodec` has two cases:
+
+- `.raw` — decoded frames. Render them directly with `frame.makeUIImage()`.
+- `.hvc1` — compressed HEVC frames. Use this when you want to write frames to a file in passthrough mode; you must decode `frame.sampleBuffer` yourself for on-screen preview, as `CameraAccess` does.
+
+`StreamConfiguration()` with no arguments defaults to `.raw`, `.medium`, and 30 FPS.
 
 ## Observing stream state
 
@@ -98,32 +122,65 @@ let frameToken = stream.videoFramePublisher.listen { frame in
 }
 ```
 
+## Observing stream errors
+
+`stream.errorPublisher` emits typed `StreamError` values such as `.permissionDenied`,
+`.deviceNotConnected`, `.hingesClosed`, `.thermalHot`, `.batteryLow`, and
+`.photoCaptureFailed`. Surface `error.localizedDescription` rather than maintaining
+your own error-message map.
+
+```swift
+let errorToken = stream.errorPublisher.listen { error in
+    Task { @MainActor in
+        self.errorMessage = error.localizedDescription
+    }
+}
+```
+
+Keep listener tokens alive for as long as you need callbacks. `MWDATCore` provides
+`ListenerTokenBag` and `AnyListenerToken.store(in:)` for that:
+
+```swift
+let streamTokens = ListenerTokenBag()
+stream.statePublisher.listen { _ in }.store(in: streamTokens)
+stream.videoFramePublisher.listen { _ in }.store(in: streamTokens)
+// On teardown:
+streamTokens.clear()
+```
+
 ## Starting and stopping
 
 ```swift
 // Start the stream capability
 stream.start()
 
-// Stop the camera (teardown cascades to the stream)
+// Stop the camera — this cascades to its stream child and detaches the camera
+// from the session, so a later addCamera() can register a new one.
 camera.stop()
 
-// Stop the parent device session when you're done with all capabilities
+// Stop the parent device session when you're done with all capabilities.
+// Teardown cascades parent -> child, not child -> parent.
 deviceSession.stop()
 ```
 
 ## Photo capture
 
-Capture a still photo while streaming:
+Capture a still photo while streaming. `capturePhoto(format:)` returns `Bool`:
+`false` means the capture was not started (for example another capture is already
+in flight), so no `photoDataPublisher` event will arrive.
 
 ```swift
 // Listen for photo data
 let photoToken = stream.photoDataPublisher.listen { photoData in
-    let imageData = photoData.data
+    let imageData = photoData.data  // photoData.format is .jpeg or .heic
     // Convert to UIImage or save
 }
 
 // Trigger capture
-stream.capturePhoto(format: .jpeg)
+let started = stream.capturePhoto(format: .jpeg)
+if !started {
+    // Re-enable the shutter button and tell the user to try again
+}
 ```
 
 ## Bandwidth and quality

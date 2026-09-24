@@ -242,6 +242,7 @@ enum CarMaintenanceDisplay {
             iconName: isLastStep ? .checkmark : .triangleRightVerticalLine,
             onClick: onNext
           )
+          .actionRole(.primary)
           Button(label: "Watch video", style: .secondary, iconName: .videoCamera, onClick: onWatchVideo)
         }
       }

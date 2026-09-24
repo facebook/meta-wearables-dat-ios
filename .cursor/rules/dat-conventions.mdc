@@ -7,11 +7,12 @@ alwaysApply: true
 
 ## Architecture
 
-The SDK is organized into four modules:
-- **MWDATCore**: Device discovery, registration, permissions, device selectors
-- **MWDATCamera**: Stream, VideoFrame, photo capture
+The public SDK is organized into these modules:
+- **MWDATCore**: Device discovery, registration, permissions, device selectors, `DeviceSession`
+- **MWDATCamera**: `Camera`, `Stream`, `VideoFrame`, photo capture
 - **MWDATDisplay**: Display capability, display UI components, icons, images, buttons, video
 - **MWDATMockDevice**: MockDeviceKit for testing without hardware
+- **MWDATMockDeviceTestClient**: `MockDeviceTestClient` for driving MockDeviceKit over HTTP from a UI-test process
 
 ## Swift Patterns
 
@@ -47,13 +48,17 @@ import MWDATMockDevice  // MockDeviceKit, MockGlasses, MockCameraKit
 
 ## Key Types
 
-- `Wearables` — SDK entry point. Call `Wearables.configure()` at launch, then use `Wearables.shared`
-- `Stream` — Camera streaming session. Create with config + device selector
-- `Display` — Display capability attached to a started DeviceSession
-- `VideoFrame` — Individual video frame with `.makeUIImage()` convenience
-- `AutoDeviceSelector` — Automatically selects the best available device
-- `SpecificDeviceSelector` — Selects a specific device by identifier
+- `Wearables` — SDK entry point. Call `Wearables.configure()` at launch, then use `Wearables.shared` (an `any WearablesInterface`)
+- `DeviceSession` — The connection to a selected device. Create with `createSession(deviceSelector:)`, then attach capabilities
+- `Camera` — Camera capability from `session.addCamera(config:)`; owns `camera.stream`
+- `Stream` — Camera stream: `start()`, `stop()`, `capturePhoto(format:)`, and the frame/state/photo/error publishers
+- `Display` — Display capability from `session.addDisplay()`
+- `VideoFrame` — Individual video frame with `.makeUIImage()` and `.sampleBuffer`
+- `Device` / `DeviceIdentifier` — `DeviceIdentifier` is a `String`; resolve a `Device` with `deviceForIdentifier(_:)`
+- `AutoDeviceSelector` — Selects the best available device, optionally filtered (`filter: { $0.supportsDisplay() }`)
+- `SpecificDeviceSelector` — Selects a specific device by `DeviceIdentifier`
 - `StreamConfiguration` — Configure video codec, resolution, frame rate
+- `ListenerTokenBag` / `AnyListenerToken` — Keep `.listen {}` subscriptions alive; dropping a token cancels it
 - `MockDeviceKit` — Factory for creating simulated devices in tests
 
 ## Error Handling
@@ -105,7 +110,7 @@ xcodebuild -scheme CameraAccess -destination 'platform=iOS Simulator,name=iPhone
 
 ## Live docs search
 
-If your editor supports remote MCP servers, connect `https://mcp.developer.meta.com/wearables` and use `search_dat_docs` for current DAT setup, session lifecycle, camera streaming, MockDeviceKit, permissions, and exact API symbols. Request Markdown-formatted results when your client supports output formats.
+If your editor supports remote MCP servers, connect `https://mcp.developer.meta.com/wearables` and use `search_dat_docs` for current DAT setup, session lifecycle, camera streaming, MockDeviceKit, permissions, and exact API symbols. This public docs server does not require authentication; do not configure tokens, OAuth, or custom authorization headers for it.
 
 Use `llms.txt` when your tool only supports static reference context.
 

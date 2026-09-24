@@ -9,6 +9,7 @@
 import MWDATMockDeviceTestClient
 import XCTest
 
+@MainActor
 final class CameraAccessUITests: XCTestCase {
   private static let portFilePrefix = "mwdat_test_server_port_"
   private static let portFileSuffix = ".txt"
@@ -25,7 +26,7 @@ final class CameraAccessUITests: XCTestCase {
   /// skip the (otherwise wasted) wait for a prompt that will never reappear.
   private static var didAllowLocalNetwork = false
 
-  override func setUpWithError() throws {
+  override func setUp() async throws {
     continueAfterFailure = false
     removeStalePortFiles()
     addTeardownBlock { [portFilePath] in
@@ -38,14 +39,15 @@ final class CameraAccessUITests: XCTestCase {
 
     // Initialize the client *after* launch so the server has time to write the port file.
     mockClient = MockDeviceTestClient(portFilePath: portFilePath)
-    XCTAssertTrue(mockClient.waitForServer(timeout: 10), "Test server should be running")
+    let serverReachable = await mockClient.waitForServer(timeout: 10)
+    XCTAssertTrue(serverReachable, "Test server should be running")
   }
 
-  override func tearDownWithError() throws {
+  override func tearDown() async throws {
     cleanUpAppState()
 
     if pairedDeviceId != nil {
-      mockClient.unpairDevice(deviceId: pairedDeviceId)
+      _ = await mockClient.unpairDevice(deviceId: pairedDeviceId)
       pairedDeviceId = nil
     }
     app.terminate()
@@ -114,15 +116,15 @@ final class CameraAccessUITests: XCTestCase {
   }
 
   /// Registers, then pairs a mock device with default camera resources.
-  private func pairDeviceWithCameraResources() {
+  private func pairDeviceWithCameraResources() async {
     registerViaUI()
 
-    let deviceId = mockClient.pairDevice()
+    let deviceId = await mockClient.pairDevice()
     XCTAssertNotNil(deviceId, "pairDevice should return a deviceId")
     pairedDeviceId = deviceId
 
-    mockClient.setCameraFeed(deviceId: pairedDeviceId, resourceName: "plant", ext: "mp4")
-    mockClient.setCapturedImage(deviceId: pairedDeviceId, resourceName: "plant", ext: "png")
+    _ = await mockClient.setCameraFeed(deviceId: pairedDeviceId, resourceName: "plant", ext: "mp4")
+    _ = await mockClient.setCapturedImage(deviceId: pairedDeviceId, resourceName: "plant", ext: "png")
   }
 
   /// Waits for the camera screen idle state with an active device — the
@@ -191,8 +193,7 @@ final class CameraAccessUITests: XCTestCase {
   // MARK: - Device Pairing & Navigation Tests
 
   /// Verifies that launching without pairing a device shows the home screen.
-  @MainActor
-  func testLaunchWithoutDeviceShowsHomeScreen() {
+  func testLaunchWithoutDeviceShowsHomeScreen() async {
     let connectButton = app.buttons["Connect my glasses"]
     XCTAssertTrue(
       connectButton.waitForExistence(timeout: 10),
@@ -202,32 +203,30 @@ final class CameraAccessUITests: XCTestCase {
 
   /// Verifies that registering and pairing a device transitions the UI from the home
   /// screen to the camera screen with an active device.
-  @MainActor
-  func testRegisterAndPairShowsCameraScreen() {
-    pairDeviceWithCameraResources()
+  func testRegisterAndPairShowsCameraScreen() async {
+    await pairDeviceWithCameraResources()
     waitForActiveDevice()
   }
 
   /// Verifies that the device state query reflects the correct number of paired devices.
-  @MainActor
-  func testDeviceStateReflectsPairedDevices() {
+  func testDeviceStateReflectsPairedDevices() async {
     // Initially no devices paired
-    let state0 = mockClient.getDeviceState()
+    let state0 = await mockClient.getDeviceState()
     XCTAssertNotNil(state0, "getDeviceState should return a response")
     XCTAssertEqual(state0?["pairedDeviceCount"] as? Int, 0, "Should have 0 paired devices initially")
 
     // Register and pair a device
-    pairDeviceWithCameraResources()
+    await pairDeviceWithCameraResources()
 
-    let state1 = mockClient.getDeviceState()
+    let state1 = await mockClient.getDeviceState()
     XCTAssertNotNil(state1, "getDeviceState should return a response after pairing")
     XCTAssertEqual(state1?["pairedDeviceCount"] as? Int, 1, "Should have 1 paired device")
 
     // Unpair
-    mockClient.unpairDevice(deviceId: pairedDeviceId)
+    _ = await mockClient.unpairDevice(deviceId: pairedDeviceId)
     pairedDeviceId = nil
 
-    let state2 = mockClient.getDeviceState()
+    let state2 = await mockClient.getDeviceState()
     XCTAssertNotNil(state2, "getDeviceState should return a response after unpairing")
     XCTAssertEqual(state2?["pairedDeviceCount"] as? Int, 0, "Should have 0 paired devices after unpairing")
   }
@@ -237,13 +236,12 @@ final class CameraAccessUITests: XCTestCase {
   /// Verifies that doff is wear-only and keeps the device active — the transport
   /// and stream stay up across a doff/don, so the device never drops to the
   /// waiting state.
-  @MainActor
-  func testDoffKeepsDeviceActive() {
-    pairDeviceWithCameraResources()
+  func testDoffKeepsDeviceActive() async {
+    await pairDeviceWithCameraResources()
     waitForActiveDevice()
 
     // Doff the device → device stays active (doff no longer tears down the link).
-    mockClient.doff(deviceId: pairedDeviceId)
+    _ = await mockClient.doff(deviceId: pairedDeviceId)
     XCTAssertFalse(
       app.staticTexts["Waiting for an active device"].exists,
       "Doff should not deactivate the device"
@@ -251,24 +249,26 @@ final class CameraAccessUITests: XCTestCase {
     waitForActiveDevice()
 
     // Don the device → device remains active.
-    mockClient.don(deviceId: pairedDeviceId)
+    _ = await mockClient.don(deviceId: pairedDeviceId)
     waitForActiveDevice()
   }
 
   /// Verifies that powering off makes the device inactive and powering on
   /// with don reactivates it.
-  @MainActor
-  func testPowerCycleAffectsDeviceActivity() {
-    pairDeviceWithCameraResources()
+  func testPowerCycleAffectsDeviceActivity() async {
+    await pairDeviceWithCameraResources()
     waitForActiveDevice()
 
     // Power off → device becomes inactive
-    XCTAssertTrue(mockClient.powerOff(deviceId: pairedDeviceId), "Power off should succeed")
+    let powerOffResult = await mockClient.powerOff(deviceId: pairedDeviceId)
+    XCTAssertTrue(powerOffResult, "Power off should succeed")
     waitForInactiveDevice()
 
     // Power on + don → device becomes active again
-    XCTAssertTrue(mockClient.powerOn(deviceId: pairedDeviceId), "Power on should succeed")
-    XCTAssertTrue(mockClient.don(deviceId: pairedDeviceId), "Don should succeed")
+    let powerOnResult = await mockClient.powerOn(deviceId: pairedDeviceId)
+    XCTAssertTrue(powerOnResult, "Power on should succeed")
+    let donResult = await mockClient.don(deviceId: pairedDeviceId)
+    XCTAssertTrue(donResult, "Don should succeed")
     waitForActiveDevice()
   }
 
@@ -277,17 +277,15 @@ final class CameraAccessUITests: XCTestCase {
   /// Verifies the explicit Start Session → Start Streaming flow brings up the
   /// live preview and capture controls.
   // TestRail: C1599889064, C1602923640, C1602923646
-  @MainActor
-  func testStartSessionThenStreaming() {
-    pairDeviceWithCameraResources()
+  func testStartSessionThenStreaming() async {
+    await pairDeviceWithCameraResources()
     startSessionAndStream()
   }
 
   /// Verifies the capture row is disabled until the stream is streaming — starting
   /// a session shows the row greyed (present but not interactive).
-  @MainActor
-  func testCaptureDisabledUntilStreaming() {
-    pairDeviceWithCameraResources()
+  func testCaptureDisabledUntilStreaming() async {
+    await pairDeviceWithCameraResources()
     waitForActiveDevice().tap()
 
     // Session started, no stream yet → Start Preview is offered; the capture row is
@@ -301,9 +299,8 @@ final class CameraAccessUITests: XCTestCase {
 
   /// Verifies stopping the preview keeps the session alive, so the preview can be
   /// started again without starting a new session.
-  @MainActor
-  func testStopStreamingKeepsSession() {
-    pairDeviceWithCameraResources()
+  func testStopStreamingKeepsSession() async {
+    await pairDeviceWithCameraResources()
     startSessionAndStream()
 
     app.buttons["stop_preview_button"].tap()
@@ -320,9 +317,8 @@ final class CameraAccessUITests: XCTestCase {
 
   /// Verifies ending the session from session-ready returns the screen to the
   /// Start Session state. Stops the preview first, then ends via the bottom button.
-  @MainActor
-  func testEndSession() {
-    pairDeviceWithCameraResources()
+  func testEndSession() async {
+    await pairDeviceWithCameraResources()
     startSessionAndStream()
 
     app.buttons["stop_preview_button"].tap()
@@ -340,9 +336,8 @@ final class CameraAccessUITests: XCTestCase {
 
   /// Verifies End Session is available while streaming — the bottom button ends the
   /// session mid-preview on a single tap (the SDK cascades the stop to the stream).
-  @MainActor
-  func testEndSessionAvailableWhileStreaming() {
-    pairDeviceWithCameraResources()
+  func testEndSessionAvailableWhileStreaming() async {
+    await pairDeviceWithCameraResources()
     startSessionAndStream()
 
     let endSession = app.buttons["end_session_button"]
@@ -358,9 +353,8 @@ final class CameraAccessUITests: XCTestCase {
   // MARK: - Capture Tests
 
   /// Verifies starting and stopping a video recording while streaming.
-  @MainActor
-  func testVideoRecordStartAndStop() {
-    pairDeviceWithCameraResources()
+  func testVideoRecordStartAndStop() async {
+    await pairDeviceWithCameraResources()
     startSessionAndStream()
 
     // Start recording.
@@ -389,9 +383,8 @@ final class CameraAccessUITests: XCTestCase {
   }
 
   /// Verifies the video preview offers Share after recording.
-  @MainActor
-  func testVideoPreviewShowsShare() {
-    pairDeviceWithCameraResources()
+  func testVideoPreviewShowsShare() async {
+    await pairDeviceWithCameraResources()
     startSessionAndStream()
 
     let record = app.buttons["record_button"]
@@ -411,9 +404,8 @@ final class CameraAccessUITests: XCTestCase {
 
   /// Verifies a photo can still be captured while a video recording is in
   /// progress — capture stays available during recording.
-  @MainActor
-  func testPhotoCaptureWhileRecording() {
-    pairDeviceWithCameraResources()
+  func testPhotoCaptureWhileRecording() async {
+    await pairDeviceWithCameraResources()
     startSessionAndStream()
 
     app.buttons["record_button"].tap()
@@ -441,9 +433,8 @@ final class CameraAccessUITests: XCTestCase {
   /// Verifies photo capture while streaming shows a preview and can be dismissed
   /// while remaining on the camera screen.
   // TestRail: C1619609872, C1619610952
-  @MainActor
-  func testPhotoCaptureAndDismiss() {
-    pairDeviceWithCameraResources()
+  func testPhotoCaptureAndDismiss() async {
+    await pairDeviceWithCameraResources()
     startSessionAndStream()
 
     app.buttons["capture_button"].tap()
@@ -467,13 +458,13 @@ final class CameraAccessUITests: XCTestCase {
 
   /// Verifies that folding the glasses while previewing stops the stream and the device session,
   /// returning to the start-session screen (the device stays active).
-  @MainActor
-  func testFoldDuringStreamingStopsStream() {
-    pairDeviceWithCameraResources()
+  func testFoldDuringStreamingStopsStream() async {
+    await pairDeviceWithCameraResources()
     startSessionAndStream()
 
     // Fold the glasses → the session ends by device, which stops streaming
-    XCTAssertTrue(mockClient.fold(deviceId: pairedDeviceId), "Fold command should succeed")
+    let foldResult = await mockClient.fold(deviceId: pairedDeviceId)
+    XCTAssertTrue(foldResult, "Fold command should succeed")
 
     // The session-ended error surfaces an alert — dismiss it so the view hierarchy settles.
     let alertOK = app.alerts.buttons["OK"]
@@ -491,9 +482,8 @@ final class CameraAccessUITests: XCTestCase {
   /// Recording continues through a stream pause (single cap-touch tap), so the timer
   /// must keep counting — not freeze — for the whole pause. Guards the freeze-then-jump
   /// regression: a frame-driven timer stalls late in the pause; this one keeps ticking.
-  @MainActor
-  func testRecordingTimerCountsThroughPause() {
-    pairDeviceWithCameraResources()
+  func testRecordingTimerCountsThroughPause() async {
+    await pairDeviceWithCameraResources()
     startSessionAndStream()
 
     let record = app.buttons["record_button"]
@@ -503,7 +493,8 @@ final class CameraAccessUITests: XCTestCase {
     XCTAssertTrue(waitUntilTimerCounting(timer), "Recording clock should start counting before pausing")
 
     // Single tap → pause. Recording keeps running (held frame + audio).
-    XCTAssertTrue(mockClient.captouchTap(deviceId: pairedDeviceId), "captouchTap (pause) should succeed")
+    let pauseResult = await mockClient.captouchTap(deviceId: pairedDeviceId)
+    XCTAssertTrue(pauseResult, "captouchTap (pause) should succeed")
     XCTAssertTrue(app.staticTexts["Paused"].waitForExistence(timeout: 10), "Paused overlay should appear")
 
     // Sample twice, both past the mock's feed-stop latency (~5s), so a frame-driven
@@ -533,9 +524,8 @@ final class CameraAccessUITests: XCTestCase {
 
   /// Stopping a recording must work while the stream is paused (so a pause can't trap an
   /// in-progress recording): the Stop control stays enabled and finalizes the clip.
-  @MainActor
-  func testStopRecordingWhilePaused() {
-    pairDeviceWithCameraResources()
+  func testStopRecordingWhilePaused() async {
+    await pairDeviceWithCameraResources()
     startSessionAndStream()
 
     let record = app.buttons["record_button"]
@@ -545,7 +535,8 @@ final class CameraAccessUITests: XCTestCase {
     XCTAssertTrue(waitUntilTimerCounting(timer), "Recording clock should start counting before pausing")
 
     // Single tap → pause mid-recording.
-    XCTAssertTrue(mockClient.captouchTap(deviceId: pairedDeviceId), "captouchTap (pause) should succeed")
+    let pauseResult2 = await mockClient.captouchTap(deviceId: pairedDeviceId)
+    XCTAssertTrue(pauseResult2, "captouchTap (pause) should succeed")
     XCTAssertTrue(app.staticTexts["Paused"].waitForExistence(timeout: 10), "Paused overlay should appear")
 
     // Stop the recording while still paused → the clip finalizes and the preview opens.

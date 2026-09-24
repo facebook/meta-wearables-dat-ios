@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "name": "mwdat-ios",
+  "version": "1.0.0",
+  "displayName": "Meta Wearables DAT iOS",
+  "description": "Git-native DAT SDK guidance for iOS development, covering setup, camera streaming, display access, MockDeviceKit, session lifecycle, permissions, debugging, and sample app patterns.",
+  "compat": {
+    "manifestDir": ".muse-plugin"
+  },
+  "capabilities": {
+    "skills": [
+      {"id": "audio-streaming", "path": "skills/audio-streaming/SKILL.md"},
+      {"id": "camera-capture", "path": "skills/camera-capture/SKILL.md"},
+      {"id": "camera-streaming", "path": "skills/camera-streaming/SKILL.md"},
+      {"id": "dat-conventions", "path": "skills/dat-conventions/SKILL.md"},
+      {"id": "dat-docs-mcp", "path": "skills/dat-docs-mcp/SKILL.md"},
+      {"id": "debugging", "path": "skills/debugging/SKILL.md"},
+      {"id": "display-access", "path": "skills/display-access/SKILL.md"},
+      {"id": "getting-started", "path": "skills/getting-started/SKILL.md"},
+      {"id": "inputs", "path": "skills/inputs/SKILL.md"},
+      {"id": "live-debugging-mcp", "path": "skills/live-debugging-mcp/SKILL.md"},
+      {"id": "mockdevice-testing", "path": "skills/mockdevice-testing/SKILL.md"},
+      {"id": "motion", "path": "skills/motion/SKILL.md"},
+      {"id": "permissions-registration", "path": "skills/permissions-registration/SKILL.md"},
+      {"id": "sample-app-guide", "path": "skills/sample-app-guide/SKILL.md"},
+      {"id": "session-lifecycle", "path": "skills/session-lifecycle/SKILL.md"},
+      {"id": "speech", "path": "skills/speech/SKILL.md"},
+      {"id": "voice-invocations", "path": "skills/voice-invocations/SKILL.md"}
+    ],
+    "mcpServers": [
+      {
+        "id": "wearables",
+        "transport": "http",
+        "url": "https://mcp.developer.meta.com/wearables"
+      }
+    ]
+  }
+}

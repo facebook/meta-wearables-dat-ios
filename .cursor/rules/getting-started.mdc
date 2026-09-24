@@ -9,7 +9,7 @@ Set up the Meta Wearables Device Access Toolkit in an iOS app.
 
 ## Prerequisites
 
-- Xcode 15.0+, iOS 16.0+ deployment target
+- Xcode 26.4+, Swift 6.3+, iOS 17.2+ deployment target — this matches the public `CameraAccess` and `DisplayAccess` sample apps
 - Meta AI companion app installed on test device
 - Ray-Ban Meta glasses or Meta Ray-Ban Display glasses (or use MockDeviceKit for development)
 - Developer Mode enabled in Meta AI app (Settings > Your glasses > Developer Mode)
@@ -41,38 +41,54 @@ Add these required entries to your `Info.plist`:
   </dict>
 </array>
 
-<!-- Allow Meta AI to callback -->
-<key>LSApplicationQueriesSchemes</key>
-<array>
-  <string>fb-viewapp</string>
-</array>
-
-<!-- External accessory protocol -->
-<key>UISupportedExternalAccessoryProtocols</key>
-<array>
-  <string>com.meta.ar.wearable</string>
-</array>
-
-<!-- Background modes -->
-<key>UIBackgroundModes</key>
-<array>
-  <string>bluetooth-peripheral</string>
-  <string>external-accessory</string>
-</array>
-<key>NSBluetoothAlwaysUsageDescription</key>
-<string>Needed to connect to Meta Wearables</string>
-
 <!-- DAT configuration -->
 <key>MWDAT</key>
 <dict>
   <key>AppLinkURLScheme</key>
   <string>myexampleapp://</string>
   <key>MetaAppID</key>
-  <string>0</string>
+  <string>$(META_APP_ID)</string>
+  <key>ClientToken</key>
+  <string>$(CLIENT_TOKEN)</string>
+  <key>TeamID</key>
+  <string>$(DEVELOPMENT_TEAM)</string>
 </dict>
+
+<!-- Background modes and transport permissions -->
+<key>UIBackgroundModes</key>
+<array>
+  <string>processing</string>
+  <string>bluetooth-central</string>
+  <string>bluetooth-peripheral</string>
+  <string>external-accessory</string>
+</array>
+<key>UISupportedExternalAccessoryProtocols</key>
+<array>
+  <string>com.meta.ar.wearable</string>
+</array>
+<key>NSBluetoothAlwaysUsageDescription</key>
+<string>Needed to connect to Meta AI Glasses</string>
+<key>NSLocalNetworkUsageDescription</key>
+<string>This lets your phone find and connect to your glasses over Wi-Fi.</string>
+<key>NSBonjourServices</key>
+<array>
+  <string>_bonjour._tcp</string>
+</array>
 ```
 
-Replace `myexampleapp` with your app's URL scheme. Use `0` for `MetaAppID` during development with Developer Mode.
+Replace `myexampleapp` with your app's URL scheme and keep `MWDAT` > `AppLinkURLScheme` in sync with it — the SDK sends that scheme to Meta AI so it can call your app back.
+
+`MetaAppID`, `ClientToken`, and `TeamID` come from build settings in the sample apps. With Developer Mode you can leave `MetaAppID` empty, set it to `0`, or leave the `$(META_APP_ID)` placeholder unexpanded; the SDK treats all three as "no app ID" and skips attestation. For production, set `MetaAppID` and `ClientToken` from your app in the [Wearables Developer Center](https://wearables.developer.meta.com/) and set `TeamID` to your Apple Developer Team ID (Xcode > Signing & Capabilities).
+
+The SDK moves traffic over more than one link type and checks Info.plist before it can use each one, so declare all of them:
+
+| Link | Required Info.plist entries |
+|------|-----------------------------|
+| Bluetooth LE | `bluetooth-central` and `bluetooth-peripheral` background modes, `NSBluetoothAlwaysUsageDescription` |
+| Bluetooth Classic (used by camera streaming) | `external-accessory` background mode, `UISupportedExternalAccessoryProtocols` containing `com.meta.ar.wearable` |
+| Wi-Fi (high bandwidth) | non-empty `NSLocalNetworkUsageDescription`, `NSBonjourServices` with `_bonjour._tcp` |
+
+Only add the `audio` background mode and `NSMicrophoneUsageDescription` if you record glasses-microphone audio, as `CameraAccess` does.
 
 ## Step 3: Initialize the SDK
 
@@ -101,12 +117,22 @@ struct MyApp: App {
 
 ## Step 4: Handle URL callbacks
 
-Your app must handle the URL callback from Meta AI after registration:
+Your app must handle the URL callback from Meta AI after registration and permission flows. Both sample apps filter on the `metaWearablesAction` query item so unrelated deep links are not forwarded to the SDK:
 
 ```swift
 .onOpenURL { url in
+    guard
+        let components = URLComponents(url: url, resolvingAgainstBaseURL: false),
+        components.queryItems?.contains(where: { $0.name == "metaWearablesAction" }) == true
+    else {
+        return
+    }
     Task {
-        _ = try? await Wearables.shared.handleUrl(url)
+        do {
+            _ = try await Wearables.shared.handleUrl(url)
+        } catch {
+            // Surface the failure; `handleUrl` throws `WearablesHandleURLError`
+        }
     }
 }
 ```

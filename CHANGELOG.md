@@ -5,6 +5,41 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+The public API is covered by semantic versioning guarantees, but features labeled experimental may change between minor releases. They can be built and tested against, though apps using them cannot be published yet.
+
+## [1.0.0] - 2026-09-24
+
+### Added
+
+- Muse Code support. Use your Muse Code tools to build with DAT.
+- [Experimental] **Inputs.** The new `MWDATInputs` module adds `Inputs`, reporting glasses input to a session as `InputEvent` values, described by `InputSource`, `NavDirection`, `DragAction`, `ButtonType` and `CapturePressType`, with `InputsConfiguration`, `InputsState` and `InputsError`.
+- [Experimental] **Motion.** The new `MWDATMotion` module adds `Motion`, streaming device orientation and movement as `MotionSample` values built from `Vector3` and `Quaternion`, configured with `MotionConfiguration`, `MotionSamplingRate` and `MotionSource`, with `MotionState` and `MotionError`.
+- [Experimental] **Speech.** The new `MWDATSpeech` module adds `Speech`, delivering on-device transcription as `TranscriptionResult`, reporting `SpeechState` and `SpeechError`. Requires `Permission.microphone`.
+- [Experimental] **Voice invocations.** In `MWDATCore`, `VoiceInvocationsStream` delivers `VoiceInvocation` requests to a session, starting with `LaunchApp`, answered through `ResponseHandle`. `VoiceInvocationError` reports failures.
+- [Experimental] **Photo capture.** In `MWDATCamera`, `Camera.photo` captures standalone high-quality photos, delivering `PhotoCaptureData` and reporting `PhotoTransferProgress` while the image transfers. `PhotoResolution` and `PhotoQuality` control capture; `PhotoState` and `PhotoError` report lifecycle and failures.
+- [Experimental] **Camera audio streaming.** In `MWDATCamera`, `StreamConfiguration.audioCodec` and `Stream.audioFramePublisher` deliver `AudioFrame` data alongside video, described by `AudioCodec` and `AudioSampleRate`.
+- [API] **Device state on `Device`.** New accessors `batteryLevel` (`Int?`), `chargingState` (`ChargingState`), `donState` (`DonState`), `hingeState` (`HingeState`) and `thermalLevel` (`ThermalLevel`).
+- [API] `Device.addDeviceStateListener((DeviceState) -> Void)` delivers the device's `DeviceState` immediately and on every change.
+- [API] `DeviceSession.device: Device?` — the live device snapshot for the session's device.
+- [API] `Wearables.handleUrl(_:onRegistrationRequest:)`, the request-scoped `RegistrationRequest.continueRegistration()` / `cancelRegistration()` flow and `RegistrationRequestError`, for registration initiated by Meta AI app.
+- [API] `DeviceSessionError.insufficientSDKVersion`: A terminal error indicating that developers must release a newer version of their app built with the current SDK.
+- [API] `DeviceSessionError.dwaOutOfStuRange`: Adds a nonblocking compatibility warning. Apps can continue normally and may show a rate-limited update suggestion.
+- [API] Display buttons support `ActionRole.primary`; the first primary action receives focus when content first renders.
+- [Feature] **Mock display preview.** `GlassesModel.metaRayBanDisplay` and `MockDisplayKit` render the Display session locally on the phone, with `createPreviewView()` for the preview view and `sendClick(identifier:)` for click injection. Pairing uses the existing `pairGlasses` API.
+- [Feature] MockDeviceKit gains `MockCameraCaptureKit`, `MockInputKit`, `MockMotionKit`, `MockSpeechKit` and `MockVoiceInvocationKit` so the new capabilities can be exercised without physical glasses, reachable from `MockGlassesServices`. Adds `MockDevice.setBatteryLevel(_:)`, `setChargingState(_:)` and `setThermalLevel(_:)` for simulating device state, and `startTestServer(port:)` with `MockDeviceKitError.testServerUnavailable`.
+- [API] `MockDeviceKit.disable()` and `MockDeviceKit.unpairDevice(_:)` gain `async` overloads that return once teardown completes, giving tests a deterministic teardown point.
+- [API] `MockDeviceTestClient.sendLaunchAppAction(deviceId:)` and `sendIncompleteAction(deviceId:)` drive Hey Meta voice invocations from the UI test process.
+
+### Changed
+
+- [API] `DeviceState` gained `linkState`, `compatibility`, `batteryLevel`, `chargingState`, `donState` and `hingeState` alongside the existing `thermalLevel`.
+- [API] `StreamError` replaces `.thermalCritical`, `.thermalEmergency`, `.peakPowerShutdown` and `.batteryCritical` with `.thermalHot`, `.peakPowerLimit` and `.batteryLow`, matching the case names already used on Android. Map `.thermalCritical` and `.thermalEmergency` to `.thermalHot`, `.peakPowerShutdown` to `.peakPowerLimit`, and `.batteryCritical` to `.batteryLow`. Adds `.audioStreamingError` for audio failures.
+- [API] `NavigationError` now conforms to `DatError` rather than `Error`.
+
+### Removed
+
+- [API] `Wearables.deviceStateStream(for:)` — device state now lives on `Device`. Use `deviceForIdentifier(_:)` and observe `Device.addDeviceStateListener(_:)`, reading the delivered `DeviceState`.
+
 ## [0.9.0] - 2026-08-03
 
 ### Added
@@ -89,7 +124,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [API] Added `DeviceFilter` typealias and an optional `filter:` parameter on `AutoDeviceSelector(wearables:filter:)` (default `nil`) to constrain auto-selection — e.g., `filter: { $0.supportsDisplay() }`.
 - [API] Added `Device.supportsDisplay()` and `DeviceType.supportsDisplay` for capability-aware device filtering.
 - [API] Added Objective-C bridge expansion: `MWDATDeviceSession` now exposes `state` + `addStateListener`. New `MWDATDeviceSessionState`, `MWDATLinkState`, `MWDATCompatibility` Obj-C enums. `MWDATDevice` adds `linkState`, `compatibility`, `addLinkStateListener`, and `addCompatibilityListener` — gives Obj-C consumers parity with the Swift accessors previously shipped.
-- [API] Added `MockDeviceKitInterface.startTestServer(portFilePath:)` and `stopTestServer()` for managing the in-process MockDevice test server.
+- [API] Added `MockDeviceKitInterface.startTestServer(portFilePath:)`, port-aware `startTestServer(port:portFilePath:)`, and `stopTestServer()` for managing the in-process MockDevice test server.
 
 ### Changed
 

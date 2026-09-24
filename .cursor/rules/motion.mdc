@@ -1,0 +1,9 @@
+---
+description: Stream motion sensor samples from connected wearables on iOS
+globs: **/*Motion*, **/*Sensor*
+---
+
+# Motion (iOS)
+
+Attach Motion only after the device session starts. Register state, error, and sample observers before `motion.start()`. Treat every sensor component as optional, stop and cancel observers before `session.removeMotion()`, and use MockDevice motion recordings for deterministic tests. Motion has no runtime permission and is experimental.
+

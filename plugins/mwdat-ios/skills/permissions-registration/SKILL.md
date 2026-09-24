@@ -27,10 +27,24 @@ This opens the Meta AI app where the user approves your app. Meta AI then calls 
 
 ### Handle the callback
 
+Filter on the `metaWearablesAction` query item so unrelated deep links are not forwarded to the SDK:
+
 ```swift
 .onOpenURL { url in
+    guard
+        let components = URLComponents(url: url, resolvingAgainstBaseURL: false),
+        components.queryItems?.contains(where: { $0.name == "metaWearablesAction" }) == true
+    else {
+        return
+    }
     Task {
-        _ = try? await Wearables.shared.handleUrl(url)
+        do {
+            _ = try await Wearables.shared.handleUrl(url)
+        } catch let error as RegistrationError {
+            showError(error.description)
+        } catch {
+            showError(error.localizedDescription)
+        }
     }
 }
 ```
@@ -87,14 +101,36 @@ Users can link multiple glasses to Meta AI. The SDK handles this transparently:
 - You don't need to track which device has permissions
 - If all devices disconnect, permissions become unavailable
 
+## Typed errors
+
+Registration and permission APIs use typed throws. Prefer `error.description` or
+`error.localizedDescription` over your own error strings:
+
+- `startRegistration()` throws `RegistrationError`: `.alreadyRegistered`, `.configurationInvalid`, `.metaAINotInstalled`, `.networkUnavailable`, `.unknown`
+- `startUnregistration()` throws `UnregistrationError`: `.alreadyUnregistered`, `.configurationInvalid`, `.metaAINotInstalled`, `.unknown`
+- `handleUrl(_:)` throws `WearablesHandleURLError`: `.registrationError`, `.unregistrationError`
+- `checkPermissionStatus(_:)` and `requestPermission(_:)` throw `PermissionError`: `.noDevice`, `.noDeviceWithConnection`, `.connectionError`, `.metaAINotInstalled`, `.requestInProgress`, `.requestTimeout`, `.internalError`
+- `openFirmwareUpdate()` and `openDATGlassesAppUpdate()` throw `NavigationError`: `.metaAINotInstalled`, `.notRegistered`
+
+## Update flows
+
+When a device reports `compatibility() == .deviceUpdateRequired`, offer a firmware
+update. When session start reports `DeviceSessionError.datAppOnTheGlassesUpdateRequired`,
+offer the glasses app update. Both open Meta AI:
+
+```swift
+try await Wearables.shared.openFirmwareUpdate()
+try await Wearables.shared.openDATGlassesAppUpdate()
+```
+
 ## Developer Mode vs Production
 
 | Mode | Registration behavior |
 |------|----------------------|
-| Developer Mode | Registration always allowed (use `MetaAppID` = `0`) |
-| Production | Users must be in proper release channel |
+| Developer Mode | Registration always allowed. `MetaAppID` is empty, `0`, or an unexpanded `$(META_APP_ID)` placeholder, so the SDK skips attestation |
+| Production | `MetaAppID`, `ClientToken`, and `TeamID` must all be set, and users must be in the proper release channel |
 
-For production, get your `APPLICATION_ID` from the [Wearables Developer Center](https://wearables.developer.meta.com/).
+For production, get your app ID and client token from the [Wearables Developer Center](https://wearables.developer.meta.com/), and use your Apple Developer Team ID for `TeamID`.
 
 ## Prerequisites
 

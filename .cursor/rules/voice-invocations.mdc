@@ -1,0 +1,8 @@
+---
+description: Handle Hey Meta app launch invocations on iOS
+globs: **/*VoiceInvocation*, **/*LaunchApp*, **/*ResponseHandle*
+---
+
+# Voice Invocations (iOS)
+
+Voice Invocations is a Wearables-level stream and needs no DeviceSession or runtime camera/microphone permission. Retain the stream and listeners, register before `start(deviceIdentifier:)`, acknowledge every `LaunchApp` exactly once, and call `stop()` during cleanup. The feature is experimental.

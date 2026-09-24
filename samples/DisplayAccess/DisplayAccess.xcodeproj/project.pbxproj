@@ -17,6 +17,7 @@
 		DB01000000000008 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DB02000000000009 /* Assets.xcassets */; };
 		DB01000000000009 /* MWDATCore in Frameworks */ = {isa = PBXBuildFile; productRef = DB0A000000000001 /* MWDATCore */; };
 		DB0100000000000A /* MWDATDisplay in Frameworks */ = {isa = PBXBuildFile; productRef = DB0A000000000002 /* MWDATDisplay */; };
+		DB0100000000000B /* MWDATMockDevice in Frameworks */ = {isa = PBXBuildFile; productRef = DB0A000000000003 /* MWDATMockDevice */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -53,6 +54,7 @@
 			files = (
 				DB01000000000009 /* MWDATCore in Frameworks */,
 				DB0100000000000A /* MWDATDisplay in Frameworks */,
+				DB0100000000000B /* MWDATMockDevice in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -136,6 +138,7 @@
 			packageProductDependencies = (
 				DB0A000000000001 /* MWDATCore */,
 				DB0A000000000002 /* MWDATDisplay */,
+				DB0A000000000003 /* MWDATMockDevice */,
 			);
 			productName = DisplayAccess;
 			productReference = DB02000000000001 /* DisplayAccess.app */;
@@ -212,12 +215,10 @@
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = DisplayAccess/DisplayAccess.entitlements;
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = "";
-				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = V9WTTPBFK9;
 				ENABLE_PREVIEWS = YES;
 				FRAMEWORK_SEARCH_PATHS = "";
 				INFOPLIST_FILE = DisplayAccess/Info.plist;
@@ -229,9 +230,7 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.meta.wearables.external.DisplaySample;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "Facebook Generic";
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -243,12 +242,10 @@
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = DisplayAccess/DisplayAccess.entitlements;
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = "";
-				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = V9WTTPBFK9;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = DisplayAccess/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.2;
@@ -259,9 +256,7 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.meta.wearables.external.DisplaySample;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "Facebook Generic";
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
@@ -411,7 +406,7 @@
 			repositoryURL = "https://github.com/facebook/meta-wearables-dat-ios";
 			requirement = {
 				kind = exactVersion;
-				version = 0.9.0;
+				version = 1.0.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
@@ -426,6 +421,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = DB09000000000001 /* XCRemoteSwiftPackageReference "meta-wearables-dat-ios" */;
 			productName = MWDATDisplay;
+		};
+		DB0A000000000003 /* MWDATMockDevice */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DB09000000000001 /* XCRemoteSwiftPackageReference "meta-wearables-dat-ios" */;
+			productName = MWDATMockDevice;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

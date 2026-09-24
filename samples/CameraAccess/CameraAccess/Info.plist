@@ -73,7 +73,7 @@
 	<key>NSCameraUsageDescription</key>
 	<string>This app needs camera access to stream from your phone's camera as a mock device feed.</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>This app needs microphone access to record audio together with video from your glasses.</string>
+	<string>This app needs microphone access to record sound from your glasses' microphone alongside video.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

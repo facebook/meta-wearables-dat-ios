@@ -1,0 +1,8 @@
+---
+description: Recognize speech and handle partial and final transcriptions on iOS
+globs: **/*Speech*, **/*Transcript*, **/*Caption*
+---
+
+# Speech (iOS)
+
+Request microphone permission only after a user action. Attach Speech after the session starts, retain state/locale/error/transcription listeners before `speech.start()`, handle partial and final results including unavailable confidence, and remove the capability during cleanup. Speech is experimental.

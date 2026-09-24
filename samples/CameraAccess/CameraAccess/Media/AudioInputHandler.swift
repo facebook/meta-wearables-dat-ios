@@ -10,8 +10,10 @@ import AVFoundation
 import UIKit
 import os
 
-/// Drives the phone microphone: engine setup, Bluetooth routing, interruption and
-/// app-lifecycle handling. Thread-safe via `OSAllocatedUnfairLock`.
+/// Drives the glasses microphone over Bluetooth HFP: engine setup, forcing the glasses HFP
+/// route as the input, interruption and app-lifecycle handling. Audio is captured only when
+/// the glasses HFP mic is the active input — the phone mic is never used, even as a fallback.
+/// Thread-safe via `OSAllocatedUnfairLock`.
 ///
 /// Locking discipline: the lock guards state only. Every `AVAudioEngine` /
 /// `AVAudioSession` call runs *outside* the lock — they can invoke the tap callback
@@ -34,6 +36,8 @@ final class AudioInputHandler: Sendable {
     var isBluetoothConnected: Bool = false
     var onAudioBuffer: (@Sendable ([Float], Int, AudioStreamBasicDescription) -> Void)?
     var onInterruptionResume: (() -> Void)?
+    // Fired when a configure pass finds no glasses HFP mic, so the app can reflect mic-off.
+    var onGlassesAudioUnavailable: (@Sendable () -> Void)?
   }
 
   private let state = OSAllocatedUnfairLock(uncheckedState: State())
@@ -47,11 +51,13 @@ final class AudioInputHandler: Sendable {
 
   func setCallbacks(
     onAudioBuffer: @escaping @Sendable ([Float], Int, AudioStreamBasicDescription) -> Void,
-    onInterruptionResume: @escaping () -> Void
+    onInterruptionResume: @escaping () -> Void,
+    onGlassesAudioUnavailable: @escaping @Sendable () -> Void
   ) {
     state.withLockUnchecked { state in
       state.onAudioBuffer = onAudioBuffer
       state.onInterruptionResume = onInterruptionResume
+      state.onGlassesAudioUnavailable = onGlassesAudioUnavailable
     }
   }
 
@@ -205,7 +211,19 @@ final class AudioInputHandler: Sendable {
 
   private func handleRouteChange(reason: AVAudioSession.RouteChangeReason) {
     switch reason {
-    case .newDeviceAvailable, .oldDeviceUnavailable, .categoryChange, .override, .wakeFromSleep, .routeConfigurationChange:
+    case .newDeviceAvailable, .oldDeviceUnavailable:
+      // The glasses connected or dropped. While capturing, re-run the full configure path so
+      // we re-select the glasses HFP mic — or fall back to video-only — but never the phone
+      // mic. `attemptAudioReset()` reconfigures and re-gates the tap; `configureBluetooth()`
+      // then reports availability. These reasons come from hardware, not our own config
+      // calls, so there's no reconfigure loop.
+      let isListening = state.withLockUnchecked { $0.isListening }
+      if isListening {
+        attemptAudioReset()
+      } else {
+        updateBluetoothStatus()
+      }
+    case .categoryChange, .override, .wakeFromSleep, .routeConfigurationChange:
       updateBluetoothStatus()
     case .unknown, .noSuitableRouteForCategory:
       break
@@ -273,29 +291,46 @@ final class AudioInputHandler: Sendable {
     state.withLockUnchecked { $0.isBluetoothConnected = inputPort != nil }
   }
 
+  private func notifyGlassesAudioUnavailable() {
+    let callback = state.withLockUnchecked { $0.onGlassesAudioUnavailable }
+    callback?()
+  }
+
   private func configureBluetooth() {
     let audioSession = AVAudioSession.sharedInstance()
     do {
       try audioSession.setCategory(.playAndRecord, mode: .videoRecording, options: [.allowBluetoothHFP, .mixWithOthers])
       try audioSession.setActive(true)
+      // Force the glasses' Bluetooth HFP mic as the input so recorded audio comes from the
+      // glasses, never the phone. `.allowBluetoothHFP` is what surfaces the HFP input here.
+      if let glassesInput = audioSession.availableInputs?.first(where: { $0.portType == .bluetoothHFP }) {
+        try audioSession.setPreferredInput(glassesInput)
+      }
     } catch {
       Self.logger.error("Failed to configure audio session: \(error.localizedDescription)")
       state.withLockUnchecked { $0.isBluetoothConnected = false }
+      notifyGlassesAudioUnavailable()
       return
     }
 
-    let inputPort = audioSession.currentRoute.inputs.first(where: { $0.portType == .bluetoothHFP })
+    // Capture only when the glasses HFP mic is the active input. If it isn't, install no tap
+    // and record video-only — the phone mic is never used, even as a fallback.
+    let glassesActive = audioSession.currentRoute.inputs.contains { $0.portType == .bluetoothHFP }
 
     // Snapshot under the lock, then install the tap outside it — installTap can fire
     // the callback synchronously, re-entering the lock and deadlocking.
     let inputNode = state.withLockUnchecked { state -> AVAudioInputNode in
-      state.isBluetoothConnected = inputPort != nil
+      state.isBluetoothConnected = glassesActive
       return state.audioEngine.inputNode
     }
     let callback = state.withLockUnchecked { $0.onAudioBuffer }
 
-    if let callback {
+    if glassesActive, let callback {
       setupAudioEngineTap(inputNode: inputNode, onAudioBuffer: callback)
+    }
+    if !glassesActive {
+      // No glasses HFP mic → recording video-only; tell the app so it can reflect mic-off.
+      notifyGlassesAudioUnavailable()
     }
   }
 

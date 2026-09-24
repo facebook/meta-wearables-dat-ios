@@ -45,7 +45,7 @@ struct HomeScreenView: View {
           TipRow(
             resource: .tapIcon,
             title: "Capture",
-            text: "Take photos and record video with audio."
+            text: "Take photos and record video with audio from your glasses' microphone."
           )
         }
 

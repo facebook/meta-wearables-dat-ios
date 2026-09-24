@@ -1,0 +1,704 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		09342490301697A300DE442B /* MWDATCore in Frameworks */ = {isa = PBXBuildFile; productRef = 7A20000230C0000000DE442B /* MWDATCore */; };
+		09342491301697A300DE442B /* MWDATCamera in Frameworks */ = {isa = PBXBuildFile; productRef = 7A20000330C0000000DE442B /* MWDATCamera */; };
+		09342492301697A300DE442B /* MWDATInputs in Frameworks */ = {isa = PBXBuildFile; productRef = 7A20000430C0000000DE442B /* MWDATInputs */; };
+		09342493301697A300DE442B /* MWDATMotion in Frameworks */ = {isa = PBXBuildFile; productRef = 7A20000530C0000000DE442B /* MWDATMotion */; };
+		09342494301697A300DE442B /* MWDATDisplay in Frameworks */ = {isa = PBXBuildFile; productRef = 7A20000630C0000000DE442B /* MWDATDisplay */; };
+		09342495301697A300DE442B /* MWDATSpeech in Frameworks */ = {isa = PBXBuildFile; productRef = 7A20000730C0000000DE442B /* MWDATSpeech */; };
+		09342496301697A300DE442B /* MWDATMockDevice in Frameworks */ = {isa = PBXBuildFile; productRef = 7A20000830C0000000DE442B /* MWDATMockDevice */; };
+		5EED0002300BAED100DE442B /* SeedData in Resources */ = {isa = PBXBuildFile; fileRef = 5EED0001300BAED100DE442B /* SeedData */; };
+		7A10000330C0000000DE442B /* GRDB in Frameworks */ = {isa = PBXBuildFile; productRef = 7A10000230C0000000DE442B /* GRDB */; };
+		7A10000530C0000000DE442B /* GRDB in Frameworks */ = {isa = PBXBuildFile; productRef = 7A10000430C0000000DE442B /* GRDB */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		09340767300BAED300DE442B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 09340751300BAED100DE442B /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 09340758300BAED100DE442B;
+			remoteInfo = birdspotter;
+		};
+		09340771300BAED300DE442B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 09340751300BAED100DE442B /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 09340758300BAED100DE442B;
+			remoteInfo = birdspotter;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		09340759300BAED100DE442B /* birdspotter.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = birdspotter.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		09340766300BAED300DE442B /* birdspotterTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = birdspotterTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		09340770300BAED300DE442B /* birdspotterUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = birdspotterUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		5EED0001300BAED100DE442B /* SeedData */ = {isa = PBXFileReference; lastKnownFileType = folder; path = SeedData; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		0934075B300BAED100DE442B /* BirdSpotter */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = BirdSpotter;
+			sourceTree = "<group>";
+		};
+		09340769300BAED300DE442B /* birdspotterTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = BirdSpotterTests;
+			sourceTree = "<group>";
+		};
+		09340773300BAED300DE442B /* birdspotterUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = BirdSpotterUITests;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		09340756300BAED100DE442B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				09342491301697A300DE442B /* MWDATCamera in Frameworks */,
+				09342492301697A300DE442B /* MWDATInputs in Frameworks */,
+				09342493301697A300DE442B /* MWDATMotion in Frameworks */,
+				09342494301697A300DE442B /* MWDATDisplay in Frameworks */,
+				09342495301697A300DE442B /* MWDATSpeech in Frameworks */,
+				09342496301697A300DE442B /* MWDATMockDevice in Frameworks */,
+				09342490301697A300DE442B /* MWDATCore in Frameworks */,
+				7A10000330C0000000DE442B /* GRDB in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		09340763300BAED300DE442B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7A10000530C0000000DE442B /* GRDB in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		0934076D300BAED300DE442B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		09340750300BAED100DE442B = {
+			isa = PBXGroup;
+			children = (
+				0934075B300BAED100DE442B /* BirdSpotter */,
+				5EED0001300BAED100DE442B /* SeedData */,
+				09340769300BAED300DE442B /* birdspotterTests */,
+				09340773300BAED300DE442B /* birdspotterUITests */,
+				0934075A300BAED100DE442B /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		0934075A300BAED100DE442B /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				09340759300BAED100DE442B /* birdspotter.app */,
+				09340766300BAED300DE442B /* birdspotterTests.xctest */,
+				09340770300BAED300DE442B /* birdspotterUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		09340758300BAED100DE442B /* birdspotter */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 0934077A300BAED300DE442B /* Build configuration list for PBXNativeTarget "birdspotter" */;
+			buildPhases = (
+				09340755300BAED100DE442B /* Sources */,
+				09340756300BAED100DE442B /* Frameworks */,
+				09340757300BAED100DE442B /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				0934075B300BAED100DE442B /* BirdSpotter */,
+			);
+			name = birdspotter;
+			packageProductDependencies = (
+				7A10000230C0000000DE442B /* GRDB */,
+				7A20000230C0000000DE442B /* MWDATCore */,
+				7A20000330C0000000DE442B /* MWDATCamera */,
+				7A20000430C0000000DE442B /* MWDATInputs */,
+				7A20000530C0000000DE442B /* MWDATMotion */,
+				7A20000630C0000000DE442B /* MWDATDisplay */,
+				7A20000730C0000000DE442B /* MWDATSpeech */,
+				7A20000830C0000000DE442B /* MWDATMockDevice */,
+			);
+			productName = birdspotter;
+			productReference = 09340759300BAED100DE442B /* birdspotter.app */;
+			productType = "com.apple.product-type.application";
+		};
+		09340765300BAED300DE442B /* birdspotterTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 0934077D300BAED300DE442B /* Build configuration list for PBXNativeTarget "birdspotterTests" */;
+			buildPhases = (
+				09340762300BAED300DE442B /* Sources */,
+				09340763300BAED300DE442B /* Frameworks */,
+				09340764300BAED300DE442B /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				09340768300BAED300DE442B /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				09340769300BAED300DE442B /* birdspotterTests */,
+			);
+			name = birdspotterTests;
+			packageProductDependencies = (
+				7A10000430C0000000DE442B /* GRDB */,
+			);
+			productName = birdspotterTests;
+			productReference = 09340766300BAED300DE442B /* birdspotterTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		0934076F300BAED300DE442B /* birdspotterUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 09340780300BAED300DE442B /* Build configuration list for PBXNativeTarget "birdspotterUITests" */;
+			buildPhases = (
+				0934076C300BAED300DE442B /* Sources */,
+				0934076D300BAED300DE442B /* Frameworks */,
+				0934076E300BAED300DE442B /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				09340772300BAED300DE442B /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				09340773300BAED300DE442B /* birdspotterUITests */,
+			);
+			name = birdspotterUITests;
+			packageProductDependencies = (
+			);
+			productName = birdspotterUITests;
+			productReference = 09340770300BAED300DE442B /* birdspotterUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		09340751300BAED100DE442B /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2660;
+				LastUpgradeCheck = 2660;
+				TargetAttributes = {
+					09340758300BAED100DE442B = {
+						CreatedOnToolsVersion = 26.6;
+					};
+					09340765300BAED300DE442B = {
+						CreatedOnToolsVersion = 26.6;
+						TestTargetID = 09340758300BAED100DE442B;
+					};
+					0934076F300BAED300DE442B = {
+						CreatedOnToolsVersion = 26.6;
+						TestTargetID = 09340758300BAED100DE442B;
+					};
+				};
+			};
+			buildConfigurationList = 09340754300BAED100DE442B /* Build configuration list for PBXProject "birdspotter" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 09340750300BAED100DE442B;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				7A10000130C0000000DE442B /* XCRemoteSwiftPackageReference "GRDB" */,
+				7A20000130C0000000DE442B /* XCRemoteSwiftPackageReference "meta-wearables-dat-ios" */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 0934075A300BAED100DE442B /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				09340758300BAED100DE442B /* birdspotter */,
+				09340765300BAED300DE442B /* birdspotterTests */,
+				0934076F300BAED300DE442B /* birdspotterUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		09340757300BAED100DE442B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5EED0002300BAED100DE442B /* SeedData in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		09340764300BAED300DE442B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		0934076E300BAED300DE442B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		09340755300BAED100DE442B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		09340762300BAED300DE442B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		0934076C300BAED300DE442B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		09340768300BAED300DE442B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 09340758300BAED100DE442B /* birdspotter */;
+			targetProxy = 09340767300BAED300DE442B /* PBXContainerItemProxy */;
+		};
+		09340772300BAED300DE442B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 09340758300BAED100DE442B /* birdspotter */;
+			targetProxy = 09340771300BAED300DE442B /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		09340778300BAED300DE442B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		09340779300BAED300DE442B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = "";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		0934077B300BAED300DE442B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "BirdSpotter-Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Bird Spotter";
+				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "BirdSpotter links with your Meta AI glasses over Bluetooth, so a session can spot through their camera.";
+				INFOPLIST_KEY_NSCameraUsageDescription = "BirdSpotter uses the camera for real-time identification — point it at a bird to put a name to it.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "BirdSpotter stamps each sighting with where you saw the bird, so your journal remembers the spot.";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "BirdSpotter listens through the microphone to identify a bird by its call.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.meta.pixelandtexel.birdspotter;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		0934077C300BAED300DE442B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "BirdSpotter-Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Bird Spotter";
+				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "BirdSpotter links with your Meta AI glasses over Bluetooth, so a session can spot through their camera.";
+				INFOPLIST_KEY_NSCameraUsageDescription = "BirdSpotter uses the camera for real-time identification — point it at a bird to put a name to it.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "BirdSpotter stamps each sighting with where you saw the bird, so your journal remembers the spot.";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "BirdSpotter listens through the microphone to identify a bird by its call.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.meta.pixelandtexel.birdspotter;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		0934077E300BAED300DE442B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.meta.pixelandtexel.birdspotterTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/birdspotter.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/birdspotter";
+			};
+			name = Debug;
+		};
+		0934077F300BAED300DE442B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.meta.pixelandtexel.birdspotterTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/birdspotter.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/birdspotter";
+			};
+			name = Release;
+		};
+		09340781300BAED300DE442B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.meta.pixelandtexel.birdspotterUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = birdspotter;
+			};
+			name = Debug;
+		};
+		09340782300BAED300DE442B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.meta.pixelandtexel.birdspotterUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = birdspotter;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		09340754300BAED100DE442B /* Build configuration list for PBXProject "birdspotter" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				09340778300BAED300DE442B /* Debug */,
+				09340779300BAED300DE442B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		0934077A300BAED300DE442B /* Build configuration list for PBXNativeTarget "birdspotter" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0934077B300BAED300DE442B /* Debug */,
+				0934077C300BAED300DE442B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		0934077D300BAED300DE442B /* Build configuration list for PBXNativeTarget "birdspotterTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0934077E300BAED300DE442B /* Debug */,
+				0934077F300BAED300DE442B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		09340780300BAED300DE442B /* Build configuration list for PBXNativeTarget "birdspotterUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				09340781300BAED300DE442B /* Debug */,
+				09340782300BAED300DE442B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		7A10000130C0000000DE442B /* XCRemoteSwiftPackageReference "GRDB" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/groue/GRDB.swift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 7.11.1;
+			};
+		};
+		7A20000130C0000000DE442B /* XCRemoteSwiftPackageReference "meta-wearables-dat-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/facebook/meta-wearables-dat-ios";
+			requirement = {
+				kind = exactVersion;
+				version = "1.0.0";
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		7A10000230C0000000DE442B /* GRDB */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7A10000130C0000000DE442B /* XCRemoteSwiftPackageReference "GRDB" */;
+			productName = GRDB;
+		};
+		7A10000430C0000000DE442B /* GRDB */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7A10000130C0000000DE442B /* XCRemoteSwiftPackageReference "GRDB" */;
+			productName = GRDB;
+		};
+		7A20000230C0000000DE442B /* MWDATCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7A20000130C0000000DE442B /* XCRemoteSwiftPackageReference "meta-wearables-dat-ios" */;
+			productName = MWDATCore;
+		};
+		7A20000330C0000000DE442B /* MWDATCamera */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7A20000130C0000000DE442B /* XCRemoteSwiftPackageReference "meta-wearables-dat-ios" */;
+			productName = MWDATCamera;
+		};
+		7A20000430C0000000DE442B /* MWDATInputs */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7A20000130C0000000DE442B /* XCRemoteSwiftPackageReference "meta-wearables-dat-ios" */;
+			productName = MWDATInputs;
+		};
+		7A20000530C0000000DE442B /* MWDATMotion */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7A20000130C0000000DE442B /* XCRemoteSwiftPackageReference "meta-wearables-dat-ios" */;
+			productName = MWDATMotion;
+		};
+		7A20000630C0000000DE442B /* MWDATDisplay */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7A20000130C0000000DE442B /* XCRemoteSwiftPackageReference "meta-wearables-dat-ios" */;
+			productName = MWDATDisplay;
+		};
+		7A20000730C0000000DE442B /* MWDATSpeech */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7A20000130C0000000DE442B /* XCRemoteSwiftPackageReference "meta-wearables-dat-ios" */;
+			productName = MWDATSpeech;
+		};
+		7A20000830C0000000DE442B /* MWDATMockDevice */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7A20000130C0000000DE442B /* XCRemoteSwiftPackageReference "meta-wearables-dat-ios" */;
+			productName = MWDATMockDevice;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 09340751300BAED100DE442B /* Project object */;
+}

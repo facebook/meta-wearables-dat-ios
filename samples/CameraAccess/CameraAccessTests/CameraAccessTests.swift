@@ -35,9 +35,9 @@ final class ViewModelIntegrationTests: XCTestCase {
     mockDevice = pairedMockDevice
     cameraKit = pairedMockDevice.services.camera
 
-    // Power on and unfold the device to make it available
+    // Power on and don the device to make it available for session start.
     pairedMockDevice.powerOn()
-    pairedMockDevice.unfold()
+    pairedMockDevice.don()
 
     // Wait for device to be available in Wearables
     try await Task.sleep(nanoseconds: 1_000_000_000)
@@ -46,7 +46,7 @@ final class ViewModelIntegrationTests: XCTestCase {
   override func tearDown() async throws {
     viewModel?.endSession()
     viewModel = nil
-    MockDeviceKit.shared.disable()
+    await MockDeviceKit.shared.disable()
     mockDevice = nil
     cameraKit = nil
     try await super.tearDown()
@@ -208,7 +208,7 @@ final class ViewModelIntegrationTests: XCTestCase {
       viewModel.isStreaming && viewModel.hasReceivedFirstFrame && viewModel.currentVideoFrame != nil
     }
 
-    // Single tap on the touchpad → stream pauses (matches the T275267876 repro).
+    // Single tap on the touchpad pauses the stream.
     device.services.captouch.tap()
     await observeUntil(timeout: 5) { viewModel.streamState == .paused }
 
@@ -256,7 +256,7 @@ final class ViewModelIntegrationTests: XCTestCase {
 
     await observeUntil(timeout: 5) { !viewModel.hasSession }
     XCTAssertFalse(viewModel.hasSession)
-    XCTAssertEqual(viewModel.sessionState, .idle)
+    XCTAssertEqual(viewModel.sessionState, .stopped)
     XCTAssertEqual(viewModel.streamState, .stopped)
     XCTAssertFalse(viewModel.showError)
   }

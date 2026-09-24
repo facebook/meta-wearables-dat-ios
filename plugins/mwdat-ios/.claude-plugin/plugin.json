@@ -1,6 +1,6 @@
 {
   "name": "mwdat-ios",
-  "version": "0.9.0",
+  "version": "1.0.0",
   "description": "Git-native DAT SDK guidance for ios development, covering setup, camera streaming, display access, MockDeviceKit, session lifecycle, permissions, debugging, and sample app patterns.",
   "author": {
     "name": "Meta Wearables"
@@ -15,5 +15,6 @@
   ],
   "skills": [
     "./skills/"
-  ]
+  ],
+  "mcpServers": "./mcp/dat_docs.json"
 }

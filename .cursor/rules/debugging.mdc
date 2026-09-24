@@ -76,8 +76,10 @@ Ensure compatible versions of SDK, Meta AI app, and glasses firmware. See [versi
 | Issue | Workaround |
 |-------|-----------|
 | No internet → registration fails | Internet required for registration |
-| Streams started with glasses doffed pause when donned | Unpause by tapping side of glasses |
-| [iOS] Meta Ray-Ban Display: no audio feedback on pause/resume | Will be fixed in future release |
+| Streams started with glasses doffed pause when donned | Unpause by tapping the side of the glasses |
+| A single touchpad tap pauses an active stream | Tap again to resume; keep the last frame on screen while `StreamState` is `.paused` |
+
+See the public [known issues](https://wearables.developer.meta.com/docs/knownissues) page for the current list.
 
 ## Adding debug logging
 
@@ -98,8 +100,11 @@ logger.error("Stream error: \(error)")
 - [ ] Glasses firmware updated to compatible version
 - [ ] Internet connection available for registration
 - [ ] Bluetooth enabled on phone
-- [ ] Correct URL scheme configured in Info.plist
-- [ ] Background modes enabled (bluetooth-peripheral, external-accessory)
+- [ ] Correct URL scheme configured in Info.plist, and `MWDAT` > `AppLinkURLScheme` matches it
+- [ ] URL callback handler forwards `metaWearablesAction` links to `Wearables.shared.handleUrl(_:)`
+- [ ] Background modes enabled (`processing`, `bluetooth-central`, `bluetooth-peripheral`, `external-accessory`)
+- [ ] `UISupportedExternalAccessoryProtocols` contains `com.meta.ar.wearable`
+- [ ] `NSBluetoothAlwaysUsageDescription`, `NSLocalNetworkUsageDescription`, and `NSBonjourServices` present
 
 ## Links
 

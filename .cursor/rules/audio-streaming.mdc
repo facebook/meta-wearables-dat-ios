@@ -1,0 +1,8 @@
+---
+description: Configure and receive PCM audio with Camera Stream on iOS
+globs: **/*Audio*, **/*Stream*, **/*Camera*
+---
+
+# Audio Streaming (iOS)
+
+Audio is an experimental Camera Stream extension. Require camera and microphone permission, set a non-nil PCM `audioCodec`, register `audioFramePublisher` before starting Stream, and use frame timestamps. Cancel the listener before stopping Camera. MockDeviceKit does not promise deterministic PCM delivery.

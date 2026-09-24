@@ -10,7 +10,7 @@ import AVFoundation
 import UIKit
 import os
 
-/// Writes the phone-mic audio track for a recording: owns the audio
+/// Writes the glasses-mic (Bluetooth HFP) audio track for a recording: owns the audio
 /// `AVAssetWriterInput` and `AudioInputHandler`, encodes AAC, and gap-fills silence
 /// across interruptions to keep the track aligned with the timeline.
 /// Thread-safe via `OSAllocatedUnfairLock`, which guards the non-Sendable state.
@@ -38,6 +38,9 @@ final class AudioCaptureHandler: Sendable {
   }
 
   private let recordingStartTime: Date
+  /// Fired once at capture start (and on a mid-recording glasses drop) when the glasses HFP mic
+  /// isn't available, so the app can reflect that the recording is video-only.
+  private let onGlassesAudioUnavailable: @Sendable () -> Void
 
   private struct State {
     var audioInput: AVAssetWriterInput
@@ -57,8 +60,13 @@ final class AudioCaptureHandler: Sendable {
     return Date().timeIntervalSince(lastWrite) < Self.streamingStalenessSeconds
   }
 
-  init(writer: AVAssetWriter, recordingStartTime: Date) {
+  init(
+    writer: AVAssetWriter,
+    recordingStartTime: Date,
+    onGlassesAudioUnavailable: @escaping @Sendable () -> Void
+  ) {
     self.recordingStartTime = recordingStartTime
+    self.onGlassesAudioUnavailable = onGlassesAudioUnavailable
 
     let audioInput = Self.createAudioWriterInput()
     self.state = OSAllocatedUnfairLock(
@@ -87,7 +95,8 @@ final class AudioCaptureHandler: Sendable {
         Task {
           await self.fillSilenceForInterruption()
         }
-      }
+      },
+      onGlassesAudioUnavailable: onGlassesAudioUnavailable
     )
     handler.setup()
     handler.setupInput()

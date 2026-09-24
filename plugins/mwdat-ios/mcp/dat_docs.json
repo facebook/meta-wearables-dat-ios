@@ -1,0 +1,9 @@
+{
+  "description": "Wearables Device Access Toolkit documentation search.",
+  "mcpServers": {
+    "wearables": {
+      "type": "http",
+      "url": "https://mcp.developer.meta.com/wearables"
+    }
+  }
+}

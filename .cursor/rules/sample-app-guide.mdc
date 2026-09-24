@@ -51,6 +51,12 @@ struct MyDATApp: App {
         WindowGroup {
             MainAppView()
                 .onOpenURL { url in
+                    guard
+                        let components = URLComponents(url: url, resolvingAgainstBaseURL: false),
+                        components.queryItems?.contains(where: { $0.name == "metaWearablesAction" }) == true
+                    else {
+                        return
+                    }
                     Task {
                         _ = try? await Wearables.shared.handleUrl(url)
                     }
@@ -62,25 +68,33 @@ struct MyDATApp: App {
 
 ## Wearables ViewModel
 
+`devicesStream()` yields `[DeviceIdentifier]` (a `[String]`), not device objects.
+Resolve each identifier with `wearables.deviceForIdentifier(_:)` when you need
+`nameOrId()`, `deviceType()`, `linkState`, or `compatibility()`.
+
 ```swift
 import MWDATCore
 
 @MainActor
 class WearablesViewModel: ObservableObject {
-    @Published var registrationState: String = "Unknown"
+    @Published var registrationState: RegistrationState
     @Published var devices: [DeviceIdentifier] = []
 
     private let wearables = Wearables.shared
 
+    init() {
+        registrationState = Wearables.shared.registrationState
+    }
+
     func observeState() {
         Task {
             for await state in wearables.registrationStateStream() {
-                self.registrationState = "\(state)"
+                self.registrationState = state
             }
         }
         Task {
-            for await devices in wearables.devicesStream() {
-                self.devices = devices.map { $0.identifier }
+            for await deviceIds in wearables.devicesStream() {
+                self.devices = deviceIds
             }
         }
     }
@@ -128,10 +142,9 @@ class StreamViewModel: ObservableObject {
                 if state == .started { break }
             }
             guard let camera = try deviceSession.addCamera(config: config) else { return }
-            let stream = camera.stream
             self.deviceSession = deviceSession
             self.camera = camera
-            self.stream = stream
+            self.stream = camera.stream
         } catch {
             return
         }
@@ -161,6 +174,7 @@ class StreamViewModel: ObservableObject {
     }
 
     func stopStream() {
+        // Stopping the camera cascades to its stream child
         camera?.stop()
         deviceSession?.stop()
         stream = nil
@@ -174,6 +188,14 @@ class StreamViewModel: ObservableObject {
 }
 ```
 
+## Behaviors the CameraAccess sample also covers
+
+- **Two explicit steps.** "Start Session" creates and starts the `DeviceSession`; "Preview" adds the `Camera` and starts the stream. Stopping the preview leaves the session connected so the user can start it again without re-creating the session.
+- **Bind the UI to the SDK's own states.** Mirror `DeviceSessionState` and `StreamState` instead of maintaining a parallel state machine, and show a busy indicator while `starting`, `waitingForDevice`, or `stopping`.
+- **Background handling.** On `UIApplication.didEnterBackgroundNotification`, end the session. Suppress the teardown errors that the SDK emits during that intentional stop so the user does not see a false failure on return.
+- **Update prompts.** Watch `device.compatibility()` with `device.addCompatibilityListener`; on `.deviceUpdateRequired`, offer `Wearables.shared.openFirmwareUpdate()`. When session start reports `DeviceSessionError.datAppOnTheGlassesUpdateRequired`, offer `Wearables.shared.openDATGlassesAppUpdate()`.
+- **Single error surface.** Present `error.localizedDescription` from `session.errorPublisher` and `stream.errorPublisher` in one alert rather than an app-maintained error map.
+
 ## Testing with MockDeviceKit
 
 Add mock device support to develop without glasses:
@@ -186,9 +208,11 @@ func setupMockDevice() async {
     mockDeviceKit.enable()
 
     guard let device = try? mockDeviceKit.pairGlasses(model: .rayBanMeta) else { return }
+    device.powerOn()
+    device.unfold()
     device.don()
 
-    if let videoURL = Bundle.main.url(forResource: "test_video", withExtension: "mov") {
+    if let videoURL = Bundle.main.url(forResource: "test_video", withExtension: "mp4") {
         let camera = device.services.camera
         camera.setCameraFeed(fileURL: videoURL)
     }
@@ -205,6 +229,7 @@ Your DAT app should only depend on:
 - `MWDATCore` — always required
 - `MWDATCamera` — for camera streaming
 - `MWDATMockDevice` — for testing (can be test-only dependency)
+- `MWDATDisplay` — for Display experiences
 
 ## Links
 

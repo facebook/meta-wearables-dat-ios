@@ -1,0 +1,8 @@
+---
+description: Capture standalone high-quality photos from connected glasses on iOS
+globs: **/*Photo*, **/*Capture*, **/*Camera*
+---
+
+# Camera Capture (iOS)
+
+Use `camera.photo` for standalone high-quality capture, not `stream.capturePhoto`. Stop Stream first, register Photo publishers, call `photo.start()`, wait for `.started`, then capture. Observe data, progress, and errors; stop Photo before Camera. Requires camera permission and is experimental.

@@ -1,28 +1,9 @@
 {
   "name": "mwdat-ios",
-  "version": "0.9.0",
-  "description": "Git-native DAT SDK guidance for ios development, covering setup, camera streaming, display access, MockDeviceKit, session lifecycle, permissions, debugging, and sample app patterns.",
-  "homepage": "https://github.com/facebook/meta-wearables-dat-ios",
-  "repository": "https://github.com/facebook/meta-wearables-dat-ios",
-  "keywords": [
-    "wearables",
-    "dat",
-    "ios",
-    "sdk",
-    "codex"
-  ],
-  "skills": "./skills/",
-  "interface": {
-    "displayName": "Meta Wearables DAT iOS",
-    "shortDescription": "Git-native DAT SDK guidance for ios development, covering setup, camera streaming, display access, MockDeviceKit, session lifecycle, permissions, debugging, and sample app patterns.",
-    "longDescription": "Git-hosted Codex plugin for Meta Wearables DAT iOS. It packages the same public DAT SDK guidance shipped to Claude, including setup, camera streaming, display access, MockDeviceKit, session lifecycle, permissions, debugging, and sample app guidance.",
-    "developerName": "Meta Wearables",
-    "category": "Developer Tools",
-    "capabilities": [
-      "Interactive",
-      "Write"
-    ],
-    "websiteURL": "https://github.com/facebook/meta-wearables-dat-ios",
-    "brandColor": "#1B74E4"
-  }
+  "version": "1.0.0",
+  "description": "Git-native DAT SDK guidance for iOS development.",
+  "author": {
+    "name": "Meta Wearables"
+  },
+  "mcpServers": "./mcp/dat_docs.json"
 }

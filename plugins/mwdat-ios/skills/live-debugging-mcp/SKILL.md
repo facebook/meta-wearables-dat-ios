@@ -60,7 +60,7 @@ use this skill for observed app/device behavior.
 - Session: `DeviceSession` creation/start, `deviceSession.state`,
   `session.state`, and session errors
 - Stream: stream start, `stream.state`, frame counters, and stream errors
-- DAM/DWA-visible transport: `sdk.usesDam` and DAM/DWA error values
+- DAM/DWA-visible transport: DAM/DWA error values
 
 ## Diagnosis patterns
 

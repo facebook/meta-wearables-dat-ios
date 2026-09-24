@@ -8,6 +8,7 @@
 # Install DAT SDK AI development config into your project.
 # Usage:
 #   ./install-skills.sh              # Interactive menu (when run with a tty)
+#   ./install-skills.sh muse         # Muse Code plugin
 #   ./install-skills.sh claude       # Claude Code plugin
 #   ./install-skills.sh codex        # Codex plugin
 #   ./install-skills.sh copilot      # GitHub Copilot only
@@ -22,7 +23,8 @@ REPO="facebook/meta-wearables-dat-ios"
 BRANCH="main"
 ARCHIVE_URL="https://github.com/${REPO}/archive/refs/heads/${BRANCH}.tar.gz"
 EXTRACT_DIR="meta-wearables-dat-ios-${BRANCH}"
-PLUGIN_DIR="${EXTRACT_DIR}/plugins/mwdat-ios"
+PLUGIN="mwdat-ios"
+MARKETPLACE="mwdat-ios-marketplace"
 
 safe_cleanup() {
   if [ -z "${EXTRACT_DIR:-}" ]; then
@@ -52,30 +54,30 @@ require_command() {
   fi
 }
 
+install_muse() {
+  echo "Installing Muse Code plugin for iOS..."
+  require_command muse
+  muse plugins marketplace add "${MARKETPLACE}" "https://github.com/${REPO}" || return 1
+  muse plugins install "${PLUGIN}@${MARKETPLACE}" || return 1
+  # Muse Code holds third-party MCP servers for review; approving activates MockDevice.
+  muse plugins approve "${PLUGIN}" || return 1
+  echo "Installed Muse Code plugin ${PLUGIN}."
+}
+
 install_claude() {
   echo "Installing Claude Code plugin for iOS..."
   require_command claude
-  download_archive
-  if [ -d "${PLUGIN_DIR}" ]; then
-    claude plugin install "${PLUGIN_DIR}" || return 1
-    echo "Installed Claude plugin from ${PLUGIN_DIR}."
-  else
-    echo "Error: Failed to download Claude plugin payload." >&2
-    return 1
-  fi
+  claude plugin marketplace add "${REPO}" || return 1
+  claude plugin install "${PLUGIN}@${MARKETPLACE}" || return 1
+  echo "Installed Claude Code plugin ${PLUGIN}."
 }
 
 install_codex() {
   echo "Installing Codex plugin for iOS..."
   require_command codex
-  download_archive
-  if [ -d "${PLUGIN_DIR}" ]; then
-    codex plugin install "${PLUGIN_DIR}" || return 1
-    echo "Installed Codex plugin from ${PLUGIN_DIR}."
-  else
-    echo "Error: Failed to download Codex plugin payload." >&2
-    return 1
-  fi
+  codex plugin marketplace add "${REPO}" || return 1
+  codex plugin add "${PLUGIN}@${MARKETPLACE}" || return 1
+  echo "Installed Codex plugin ${PLUGIN}."
 }
 
 install_copilot() {
@@ -118,6 +120,11 @@ install_agents() {
 
 install_all() {
   local failed=0
+  if command -v muse >/dev/null 2>&1; then
+    install_muse || failed=1
+  else
+    echo "Skipping Muse Code plugin install because 'muse' is not on PATH."
+  fi
   if command -v claude >/dev/null 2>&1; then
     install_claude || failed=1
   else
@@ -143,23 +150,25 @@ show_menu() {
   echo ""
   echo "Which tool do you want to install config for?"
   echo ""
-  echo "  1) Claude Code plugin"
-  echo "  2) Codex plugin"
-  echo "  3) GitHub Copilot (.github/)"
-  echo "  4) Cursor         (.cursor/)"
-  echo "  5) AGENTS.md      (universal fallback)"
-  echo "  6) All supported tools"
-  echo "  7) Cancel"
+  echo "  1) Muse Code plugin"
+  echo "  2) Claude Code plugin"
+  echo "  3) Codex plugin"
+  echo "  4) GitHub Copilot (.github/)"
+  echo "  5) Cursor         (.cursor/)"
+  echo "  6) AGENTS.md      (universal fallback)"
+  echo "  7) All supported tools"
+  echo "  8) Cancel"
   echo ""
-  read -rp "Enter choice [1-7]: " choice
+  read -rp "Enter choice [1-8]: " choice
   case "$choice" in
-    1) install_claude ;;
-    2) install_codex ;;
-    3) install_copilot ;;
-    4) install_cursor ;;
-    5) install_agents ;;
-    6) install_all ;;
-    7) echo "Cancelled." ; exit 0 ;;
+    1) install_muse ;;
+    2) install_claude ;;
+    3) install_codex ;;
+    4) install_copilot ;;
+    5) install_cursor ;;
+    6) install_agents ;;
+    7) install_all ;;
+    8) echo "Cancelled." ; exit 0 ;;
     *) echo "Invalid choice." >&2 ; exit 1 ;;
   esac
 }
@@ -169,13 +178,14 @@ TOOL="${1:-}"
 
 if [ -n "$TOOL" ]; then
   case "$TOOL" in
+    muse)    install_muse ;;
     claude)  install_claude ;;
     codex)   install_codex ;;
     copilot) install_copilot ;;
     cursor)  install_cursor ;;
     agents)  install_agents ;;
     all)     install_all ;;
-    *)       echo "Unknown tool: $TOOL. Use: claude, codex, copilot, cursor, agents, or all." >&2 ; exit 1 ;;
+    *)       echo "Unknown tool: $TOOL. Use: muse, claude, codex, copilot, cursor, agents, or all." >&2 ; exit 1 ;;
   esac
 elif [ -t 0 ]; then
   show_menu

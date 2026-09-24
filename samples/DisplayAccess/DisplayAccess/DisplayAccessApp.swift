@@ -45,7 +45,16 @@ struct DisplayAccessApp: App {
     WindowGroup {
       TabView(selection: $selectedTab) {
         NavigationStack {
-          SampleAppsView(displayViewModel: displayViewModel)
+          SampleAppsView(
+            displayViewModel: displayViewModel,
+            developerPreviewMode: wearablesViewModel.developerPreviewMode,
+            isDeveloperPreviewChanging: wearablesViewModel.isDeveloperPreviewChanging,
+            phonePreviewDisplay: wearablesViewModel.phonePreviewDisplay,
+            phonePreviewDeviceIdentifier: wearablesViewModel.phonePreviewDeviceIdentifier,
+            chromePreviewURL: wearablesViewModel.chromePreviewURL,
+            developerPreviewErrorMessage: wearablesViewModel.developerPreviewErrorMessage,
+            setDeveloperPreviewMode: setDeveloperPreviewMode
+          )
         }
         .tabItem {
           Label("Samples", systemImage: "eyeglasses")
@@ -83,12 +92,6 @@ struct DisplayAccessApp: App {
         }
         .tag(AppTab.settings)
       }
-      .onChange(of: displayViewModel.didFailToStartSession) { _, didFailToStartSession in
-        if didFailToStartSession {
-          selectedTab = .settings
-          displayViewModel.clearSessionStartFailure()
-        }
-      }
       .alert("Error", isPresented: $wearablesViewModel.showError) {
         Button("OK") { wearablesViewModel.dismissError() }
       } message: {
@@ -97,5 +100,12 @@ struct DisplayAccessApp: App {
 
       RegistrationView(viewModel: wearablesViewModel)
     }
+  }
+
+  private func setDeveloperPreviewMode(_ mode: DeveloperPreviewMode?) async -> Bool {
+    await wearablesViewModel.setDeveloperPreviewMode(
+      mode,
+      stopDisplaySession: displayViewModel.stopSession
+    )
   }
 }

@@ -1,0 +1,43 @@
+BirdSpotter
+Copyright (c) Meta Platforms, Inc. and affiliates.
+
+This product is provided under the terms in the LICENSE file.
+
+This product includes third-party components and content that are distributed
+under their own licenses. The notices below satisfy the attribution required by
+those licenses; the linked files carry the full, binding terms and the complete
+per-item credits.
+
+-------------------------------------------------------------------------------
+Bird facts, photography, and audio
+-------------------------------------------------------------------------------
+
+Taxonomy and facts derive from Wikidata (CC0 1.0). Bundled photographs and audio
+recordings originate from Wikimedia Commons and Xeno-canto and are individually
+licensed under Creative Commons CC BY / CC BY-SA (various versions) or are in the
+public domain. Each bundled photo, call, song, and sonogram is credited to its
+author with its license and source link in:
+
+    licenses/ATTRIBUTION.md
+
+-------------------------------------------------------------------------------
+Fonts
+-------------------------------------------------------------------------------
+
+Libre Caslon Display, Libre Caslon Text, Public Sans, and Cinzel are bundled in
+the app binaries under the SIL Open Font License 1.1. Copyright and upstream for
+each family, and the full license text, are in:
+
+    licenses/fonts/
+
+-------------------------------------------------------------------------------
+Icons
+-------------------------------------------------------------------------------
+
+Nineteen drawings are adapted from Phosphor Icons (@phosphor-icons/core 2.1.1),
+Copyright (c) 2023 Phosphor Icons, under the MIT License. The Identify and shutter
+glyphs, the markRings / markBird badge layers, and the four size anchors on the
+identify wizard's size scale are original to this sample. Credits and the
+full license text are in:
+
+    licenses/icons/

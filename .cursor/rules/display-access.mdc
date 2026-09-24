@@ -7,7 +7,7 @@ globs: **/*Display*, **/*DisplayAccess*, **/*Flex*, **/*Video*
 
 Use `MWDATDisplay` to render content on Meta Ray-Ban Display glasses.
 
-Use this rule with getting-started and permissions-registration when creating a full app. A Display app still needs `Wearables.configure()` at launch, Info.plist URL scheme configuration, URL callbacks through `Wearables.shared.handleUrl(_:)`, and completed Meta AI registration before it can create a session.
+Use this skill with `getting-started` and `permissions-registration` when creating a full app. A Display app still needs `Wearables.configure()` at launch, Info.plist URL scheme configuration, URL callbacks through `Wearables.shared.handleUrl(_:)`, and completed Meta AI registration before it can create a session.
 
 ## Add the Display module
 
@@ -18,14 +18,35 @@ import MWDATCore
 import MWDATDisplay
 ```
 
+For a phone preview, add `MWDATMockDevice` alongside `MWDATDisplay`, enable
+`MockDeviceKit`, and pair a display-capable model:
+
+```swift
+import MWDATMockDevice
+
+MockDeviceKit.shared.enable()
+let mockDevice = try MockDeviceKit.shared.pairGlasses(model: .metaRayBanDisplay)
+mockDevice.powerOn()
+mockDevice.don()
+
+// Render what the glasses would show, inside your app
+let previewView = mockDevice.services.display.createPreviewView()
+```
+
+`MockDisplayKit` also exposes `sendClick(identifier:)` so tests can simulate taps.
+
+Use the normal `DeviceSession.addDisplay()` API for both physical and mock
+devices. Wait until `deviceForIdentifier(_:)` reports `linkState == .connected`
+and `compatibility() == .compatible` before creating the session.
+
 ## Display-specific app configuration
 
 Use the getting-started Info.plist setup, then mirror the DisplayAccess sample for Display sessions:
 
 - Keep the `CFBundleURLTypes` URL scheme and route callbacks to `Wearables.shared.handleUrl(_:)`.
-- Under `MWDAT`, set `AppLinkURLScheme`, `MetaAppID`, `ClientToken`, and `TeamID`. `MetaAppID = 0` is for Developer Mode; production apps should use Wearables Developer Center values for `MetaAppID` and `ClientToken`, plus the Apple Developer Team ID.
-- Include `UISupportedExternalAccessoryProtocols` with `com.meta.ar.wearable`, `UIBackgroundModes` entries for `external-accessory` and `bluetooth-central`, and `NSBluetoothAlwaysUsageDescription`. The DisplayAccess sample also includes `bluetooth-peripheral` and `processing`.
-- For high-bandwidth Display/video fallback, include a non-empty `NSLocalNetworkUsageDescription` and `NSBonjourServices`. Display acquires link leases: core device discovery/session setup uses medium then low links, while Display uses medium then high links when available.
+- Under `MWDAT`, set `AppLinkURLScheme`, `MetaAppID`, `ClientToken`, and `TeamID`. An empty, `0`, or unexpanded `$(META_APP_ID)` value keeps the SDK in Developer Mode; production apps should use Wearables Developer Center values for `MetaAppID` and `ClientToken`, plus the Apple Developer Team ID.
+- Set `UIBackgroundModes` to `processing`, `bluetooth-central`, `bluetooth-peripheral`, and `external-accessory`; add `UISupportedExternalAccessoryProtocols` with `com.meta.ar.wearable`; and add `NSBluetoothAlwaysUsageDescription`. The DisplayAccess sample declares the first three background modes; keep the `external-accessory` mode and the accessory protocol so the Bluetooth Classic link stays available.
+- For high-bandwidth Display/video, include a non-empty `NSLocalNetworkUsageDescription` and `NSBonjourServices` with `_bonjour._tcp`. Display acquires link leases: core device discovery/session setup uses medium then low links, while Display uses medium then high links when available.
 
 ## Select a display-capable device
 
@@ -156,9 +177,26 @@ func showStatusCard() {
 }
 ```
 
+## Group buttons and control layout
+
+Wrap multiple buttons in a `ButtonGroup` rather than adding them directly to a `FlexBox`. Mark the default action with `.actionRole(.primary)`. `FlexBox`, `Text`, `Button`, `ButtonGroup`, `Image`, and `Icon` all support `.flexGrow(_:)`, `.flexShrink(_:)`, and `.alignSelf(_:)`; `FlexBox` also supports `.padding(_:)`, `.background(_:)`, and `.onTap(_:)`.
+
+```swift
+FlexBox(direction: .row, spacing: 8, alignment: .center, crossAlignment: .center) {
+  ButtonGroup {
+    Button(label: "Previous", style: .primary, iconName: .triangleLeftVerticalLine, onClick: onPrevious)
+    Button(label: "Next", style: .primary, iconName: .triangleRightVerticalLine, onClick: onNext)
+      .actionRole(.primary)
+    Button(label: "Watch video", style: .secondary, iconName: .videoCamera, onClick: onWatchVideo)
+  }
+}
+```
+
+`FlexBox` also accepts `wrap: true` and `padding: EdgeInsets(...)` in its initializer, and its `@ComponentBuilder` content supports `for` loops and `if` conditions.
+
 ## Use images and built-in icons
 
-Use HTTPS image URLs for image content, and use the `IconName` enum for built-in icons. Do not invent raw icon strings.
+Use HTTPS image URLs for remote images, or `Image(image:)` for a bundled `UIImage`. Use the `IconName` enum for built-in icons; do not invent raw icon strings. `ButtonStyle` is `.primary`, `.secondary`, or `.outline`; `IconStyle` is `.filled` or `.outline`.
 
 ```swift
 try await display.send(
@@ -168,6 +206,7 @@ try await display.send(
       sizePreset: .fill,
       cornerRadius: .medium
     )
+    Image(image: UIImage(resource: .oil), sizePreset: .fill, cornerRadius: .medium)
     Icon(name: .gear, style: .filled)
     Text("Device settings", style: .body)
   }
@@ -214,7 +253,8 @@ try await display.send(
 - Use the getting-started setup for Info.plist URL schemes and route app-open URLs to `Wearables.shared.handleUrl(_:)`.
 - Use `nameOrId()`, `deviceType()`, `linkState`, and `compatibility()` for device rows; keep link/compatibility listener tokens until the row is gone.
 - Use `FlexBox.onTap` and `Button(label:onClick:)` for interactions. The callbacks belong to the most recent sent view.
-- Use only public Display DSL names: `FlexBox`, `Text`, `Button`, `Image`, `Icon`, `VideoPlayer`, `IconName`, `TextStyle`, `TextColor`, `ButtonStyle`, `ImageSize`, `CornerRadius`, `Direction`, `Alignment`, `Background`, `Edge`, and `EdgeInsets`.
+- Use only public Display DSL names: `FlexBox`, `Text`, `Button`, `ButtonGroup`, `Image`, `Icon`, `VideoPlayer`, `IconName`, `IconStyle`, `TextStyle`, `TextColor`, `ButtonStyle`, `ButtonGroupAlignment`, `ActionRole`, `ImageSize`, `CornerRadius`, `Direction`, `Alignment`, `Background`, `Edge`, and `EdgeInsets`.
+- Call `display.clearDisplay()` when you want to remove content without stopping Display.
 - Clear `display.onPlaybackEvent` when the video flow is finished if you no longer need playback callbacks.
 - Stop Display before stopping the parent `DeviceSession` when the display experience ends.
 

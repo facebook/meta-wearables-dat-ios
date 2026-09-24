@@ -20,7 +20,7 @@ enum RecordingStopResult {
 
 /// Records the glasses camera stream to a `.mov` in the temporary directory. Owns
 /// the `AVAssetWriter` and delegates compressed video to `VideoCaptureHandler` and
-/// (when enabled) phone-mic audio to `AudioCaptureHandler` on the same writer.
+/// (when enabled) glasses-mic (Bluetooth HFP) audio to `AudioCaptureHandler` on the same writer.
 /// Thread-safe via `OSAllocatedUnfairLock`, which guards the non-Sendable AVFoundation state.
 final class VideoRecorder: Sendable {
   private struct State {
@@ -32,8 +32,10 @@ final class VideoRecorder: Sendable {
     var isRecording: Bool = false
     // Recording is gated by the shutter: frames are written only while this is true.
     var shouldAcceptNewFrames: Bool = false
-    // Whether to record phone-microphone audio alongside video.
+    // Whether to record glasses-microphone (Bluetooth HFP) audio alongside video.
     var includeAudio: Bool = true
+    // Forwarded to the audio handler; fires when the glasses mic isn't available at capture.
+    var onGlassesAudioUnavailable: (@Sendable () -> Void)?
   }
 
   private let state = OSAllocatedUnfairLock(uncheckedState: State())
@@ -68,12 +70,17 @@ final class VideoRecorder: Sendable {
     state.withLockUnchecked { $0.shouldAcceptNewFrames = false }
   }
 
-  /// Allows the next frame to auto-start a new recording, recording phone-mic
-  /// audio alongside video when `includeAudio` is true.
-  func prepareToStart(includeAudio: Bool) {
+  /// Allows the next frame to auto-start a new recording, recording glasses-mic (Bluetooth
+  /// HFP) audio alongside video when `includeAudio` is true. `onGlassesAudioUnavailable` fires
+  /// if the glasses mic isn't available at capture, so the caller can reflect mic-off.
+  func prepareToStart(
+    includeAudio: Bool,
+    onGlassesAudioUnavailable: @escaping @Sendable () -> Void
+  ) {
     state.withLockUnchecked {
       $0.shouldAcceptNewFrames = true
       $0.includeAudio = includeAudio
+      $0.onGlassesAudioUnavailable = onGlassesAudioUnavailable
     }
   }
 
@@ -108,7 +115,14 @@ final class VideoRecorder: Sendable {
 
       var audioHandler: AudioCaptureHandler?
       if includeAudio {
-        audioHandler = AudioCaptureHandler(writer: writer, recordingStartTime: startTime)
+        let noopUnavailable: @Sendable () -> Void = {}
+        let onGlassesAudioUnavailable =
+          state.withLockUnchecked { $0.onGlassesAudioUnavailable } ?? noopUnavailable
+        audioHandler = AudioCaptureHandler(
+          writer: writer,
+          recordingStartTime: startTime,
+          onGlassesAudioUnavailable: onGlassesAudioUnavailable
+        )
       }
 
       if writer.startWriting() {

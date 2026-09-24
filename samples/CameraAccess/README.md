@@ -8,7 +8,7 @@ A sample iOS application demonstrating integration with Meta Wearables Device Ac
 - Explicit camera lifecycle: start/end a device session and start/stop the live preview
 - Stream the camera feed from the device
 - Capture photos
-- Record video, with optional sound-in-video
+- Record video, with optional sound-in-video captured from the glasses' microphone
 - Backgrounding the app ends the active preview session and returns the sample to a clean idle state
 - Preview and share captured photos and recorded videos
 - Open the firmware update flow when required
@@ -22,6 +22,8 @@ A sample iOS application demonstrating integration with Meta Wearables Device Ac
 - A Meta AI glasses device for testing (optional for development)
 
 ## Building the app
+
+- Before running on a device, select your Apple development team and use your own bundle identifier. Developer Mode needs no credentials; for other release channels, set `META_APP_ID` and `CLIENT_TOKEN` using credentials from Wearables Developer Center.
 
 ### Using Xcode
 
@@ -39,7 +41,7 @@ A sample iOS application demonstrating integration with Meta Wearables Device Ac
 1. Tap "Start Session" to connect to your glasses, then "Preview" to begin the live camera feed.
 1. Use the on-screen controls to:
    - Capture photos
-   - Record video, toggling the microphone for sound-in-video
+   - Record video, toggling the glasses' microphone for sound-in-video
    - Preview and share captured photos and recorded videos
    - Stop the preview, end the session, or disconnect from the device
 1. If the app backgrounds while previewing or recording, CameraAccess ends the active session; when you return, start again from "Start Session".

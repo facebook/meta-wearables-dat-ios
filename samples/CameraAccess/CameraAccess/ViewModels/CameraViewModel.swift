@@ -81,10 +81,11 @@ final class CameraViewModel {
   /// recorder. Drives the isolated `RecordingTimerLabel`'s `TimelineView`, so the timer
   /// counts continuously — including through a stream pause. `nil` when not recording.
   var recordingStartDate: Date?
-  /// Whether to record phone-microphone audio into videos (sound-in-video).
-  /// Toggled from the mic button shown while streaming.
+  /// Whether to record the glasses-microphone (Bluetooth HFP) audio into videos
+  /// (sound-in-video). Toggled from the mic button shown while streaming.
   var includeAudioInStream: Bool = true
   /// Mic denied — iOS won't re-prompt. Drives the toggle's disabled look + tap-to-Settings.
+  /// Still required for glasses audio: iOS gates HFP capture behind mic permission too.
   var micDenied: Bool { AVAudioApplication.shared.recordPermission == .denied }
 
   // MARK: - Errors
@@ -277,8 +278,8 @@ final class CameraViewModel {
   private func beginStream(on session: DeviceSession) {
     guard camera == nil else { return }
     // hvc1 (compressed HEVC) so frames can be written to file in passthrough mode.
-    // Phone-mic audio for sound-in-video is captured app-side by AudioCaptureHandler,
-    // so the SDK stream needs only the public video config (no audio codec).
+    // Glasses-mic (Bluetooth HFP) audio for sound-in-video is captured app-side by
+    // AudioCaptureHandler, so the SDK stream needs only the public video config (no audio codec).
     let config = StreamConfiguration(
       videoCodec: VideoCodec.hvc1,
       resolution: StreamingResolution.low,
@@ -344,7 +345,12 @@ final class CameraViewModel {
     // Flip the intent flag synchronously so the toggle and UI don't lag the
     // frame-driven recorder; the file starts on the next frame.
     isRecording = true
-    videoRecorder.prepareToStart(includeAudio: includeAudioInStream)
+    // If the glasses mic isn't available, flip the mic off so the button reflects that this
+    // recording is video-only (the phone mic is never used). Left off afterward — the user can
+    // re-tap the mic to turn it back on.
+    videoRecorder.prepareToStart(includeAudio: includeAudioInStream) { [weak self] in
+      Task { @MainActor in self?.includeAudioInStream = false }
+    }
   }
 
   func stopVideoRecording() async {

@@ -9,6 +9,8 @@ A sample iOS application demonstrating integration with Meta Wearables Device Ac
 - Navigate step-by-step tutorials on the wearable display
 - Manage device registration and connection states
 - Open firmware and glasses app update flows when required
+- Preview the display experience and interactions on the phone
+- Preview an iOS Simulator display session in the Chrome Web App Simulator
 
 ## Prerequisites
 
@@ -18,7 +20,24 @@ A sample iOS application demonstrating integration with Meta Wearables Device Ac
 - Meta Wearables Device Access Toolkit (included as a dependency)
 - A Meta Ray-Ban Display glasses device for testing
 
+The local-XCFramework project also supports developer testing with a simulated
+display. On the Samples tab, open **Developer preview**, choose **In app**, and
+tap **Preview in app**. The same Display session and click handlers render in
+the app without physical glasses. Interact with the preview to advance the
+sample.
+
+To preview Display content on the phone, add `MWDATDisplay` and
+`MWDATMockDevice`, then enable `MockDeviceKit`. Create the display with
+`DeviceSession.addDisplay()`, just as you would for physical glasses.
+
+For desktop developer testing, run the app in an iOS Simulator, open
+**Developer preview**, choose **Chrome**, and tap **Start preview server**. Open
+the displayed URL in Chrome and enable Meta Ray-Ban Display Simulator. Chrome preview
+is not available on a physical iPhone.
+
 ## Building the app
+
+- Before running on a device, select your Apple development team and use your own bundle identifier. Developer Mode needs no credentials; for other release channels, set `META_APP_ID` and `CLIENT_TOKEN` using credentials from Wearables Developer Center.
 
 ### Using Xcode
 
