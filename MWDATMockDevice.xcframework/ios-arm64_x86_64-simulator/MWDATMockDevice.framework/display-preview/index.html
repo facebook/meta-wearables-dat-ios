@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=600" />
+    <meta name="simulator-source" content="DAT" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src data: https:; media-src data: https:; connect-src 'none'; font-src 'self' data:; object-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'"
+    />
+    <title>Device Access Toolkit Preview</title>
+    <link rel="stylesheet" href="preview.css" />
+    <style>
+      :root {
+        color-scheme: light dark;
+      }
+
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        background: transparent;
+        overflow: hidden;
+      }
+
+      body {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      #extension-guidance {
+        --color-text-primary: light-dark(#0a1317, #dfe2e5);
+        --color-text-secondary: light-dark(#4e606f, #aaafb5);
+        --color-background-body: light-dark(#f1f4f7, #111112);
+        --color-background-card: light-dark(#ffffff, #1f1f22);
+        --color-border: light-dark(#05365919, #f2f4f619);
+        --color-accent: light-dark(#0064e0, #2694fe);
+        --color-on-accent: #ffffff;
+        --color-overlay-hover: light-dark(#0536590c, #ffffff0c);
+        --color-overlay-pressed: light-dark(#05365919, #ffffff19);
+        --spacing-1: 4px;
+        --spacing-2: 8px;
+        --spacing-3: 12px;
+        --spacing-4: 16px;
+        --spacing-5: 20px;
+        --spacing-6: 24px;
+        --spacing-8: 32px;
+        --spacing-9: 36px;
+        --spacing-10: 40px;
+        --spacing-11: 44px;
+        --spacing-12: 48px;
+        --size-element-md: 32px;
+        --size-element-lg: 36px;
+        --border-width: 1px;
+        --focus-outline-width: 2px;
+        --focus-outline-style: solid;
+        --focus-outline-offset: 3px;
+        --radius-element: 8px;
+        --radius-container: 12px;
+        --duration-fast: 175ms;
+        --ease-standard: cubic-bezier(0.24, 1, 0.4, 1);
+        --font-family-body: -apple-system, BlinkMacSystemFont, "Segoe UI",
+          Roboto, Helvetica, Arial, sans-serif;
+        --font-size-sm: 0.75rem;
+        --font-size-base: 0.875rem;
+        --font-size-lg: 1.0625rem;
+        --font-weight-normal: 400;
+        --font-weight-medium: 500;
+        --font-weight-semibold: 600;
+        --text-body-size: var(--font-size-base);
+        --text-body-weight: var(--font-weight-normal);
+        --text-body-leading: 1.4286;
+        --text-label-size: var(--font-size-base);
+        --text-label-weight: var(--font-weight-medium);
+        --text-label-leading: 1.4286;
+        --text-large-size: var(--font-size-lg);
+        --text-large-weight: var(--font-weight-semibold);
+        --text-large-leading: 1.4118;
+        --text-supporting-size: var(--font-size-sm);
+        --text-supporting-weight: var(--font-weight-normal);
+        --text-supporting-leading: 1.6667;
+        display: none;
+        width: 100%;
+        height: 100%;
+        padding: var(--spacing-6);
+        box-sizing: border-box;
+        align-items: center;
+        justify-content: center;
+        overflow-y: auto;
+        background: var(--color-background-body);
+        color: var(--color-text-primary);
+        font-family: var(--font-family-body);
+      }
+
+      html[data-dat-preview-ready='true']:not(.mdcs-active)
+        #extension-guidance {
+        display: flex;
+      }
+
+      html[data-dat-preview-ready='true']:not(.mdcs-active) #app {
+        display: none;
+      }
+
+      .extension-guidance-card {
+        width: min(100%, 480px);
+        box-sizing: border-box;
+        overflow: clip;
+        border: var(--border-width) solid var(--color-border);
+        border-radius: var(--radius-container);
+        background: var(--color-background-card);
+      }
+
+      .extension-guidance-state {
+        display: flex;
+        padding: calc(var(--spacing-12) - var(--border-width))
+          calc(var(--spacing-10) - var(--border-width));
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: var(--spacing-4);
+        text-align: center;
+      }
+
+      .extension-guidance-mark {
+        display: block;
+        width: calc(var(--spacing-8) * 2);
+        height: calc(var(--spacing-8) * 2);
+      }
+
+      .extension-guidance-copy {
+        display: flex;
+        max-width: 360px;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .extension-guidance-state h1 {
+        margin: 0;
+        color: var(--color-text-primary);
+        font-size: var(--text-large-size);
+        font-weight: var(--text-large-weight);
+        line-height: var(--text-large-leading);
+      }
+
+      .extension-guidance-description {
+        margin: 0;
+        color: var(--color-text-secondary);
+        font-size: var(--text-body-size);
+        font-weight: var(--text-body-weight);
+        line-height: var(--text-body-leading);
+      }
+
+      .extension-guidance-action {
+        display: inline-flex;
+        height: var(--size-element-lg);
+        margin-top: var(--spacing-1);
+        padding: var(--spacing-2) var(--spacing-3);
+        box-sizing: border-box;
+        align-items: center;
+        justify-content: center;
+        gap: var(--spacing-2);
+        border-radius: var(--radius-element);
+        background-color: var(--color-accent);
+        color: var(--color-on-accent);
+        font-size: var(--text-label-size);
+        font-weight: var(--text-label-weight);
+        line-height: var(--text-label-leading);
+        text-decoration: none;
+        white-space: nowrap;
+        transition-duration: var(--duration-fast);
+        transition-property:
+          background-image, background-color, color, opacity, transform;
+        transition-timing-function: var(--ease-standard);
+      }
+
+      .extension-guidance-action svg {
+        width: var(--spacing-5);
+        height: var(--spacing-5);
+      }
+
+      .visually-hidden {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border-width: 0;
+      }
+
+      @media (hover: hover) {
+        .extension-guidance-action:hover {
+          background-image: linear-gradient(
+            var(--color-overlay-hover),
+            var(--color-overlay-hover)
+          );
+        }
+      }
+
+      .extension-guidance-action:active {
+        background-image: linear-gradient(
+          var(--color-overlay-pressed),
+          var(--color-overlay-pressed)
+        );
+        transform: scale(0.98);
+      }
+
+      .extension-guidance-action:focus-visible {
+        outline-color: var(--color-accent);
+        outline-offset: var(--focus-outline-offset);
+        outline-style: var(--focus-outline-style);
+        outline-width: var(--focus-outline-width);
+      }
+
+      @media (pointer: coarse) {
+        .extension-guidance-action {
+          min-height: var(--spacing-11);
+        }
+      }
+
+      .extension-guidance-enable {
+        display: flex;
+        width: 100%;
+        max-width: 360px;
+        padding-top: var(--spacing-4);
+        flex-direction: column;
+        align-items: center;
+        gap: var(--spacing-1);
+        border-top: var(--border-width) solid var(--color-border);
+      }
+
+      .extension-guidance-enable h2 {
+        margin: 0;
+        color: var(--color-text-primary);
+        font-size: var(--text-body-size);
+        font-weight: var(--font-weight-semibold);
+        line-height: var(--text-body-leading);
+      }
+
+      .extension-guidance-enable p {
+        margin: 0;
+        color: var(--color-text-secondary);
+        font-size: var(--text-body-size);
+        font-weight: var(--text-body-weight);
+        line-height: var(--text-body-leading);
+      }
+
+      @media (max-width: 420px), (max-height: 420px) {
+        #extension-guidance {
+          padding: var(--spacing-4);
+        }
+
+        .extension-guidance-state {
+          padding: calc(var(--spacing-8) - var(--border-width));
+          gap: var(--spacing-2);
+        }
+
+        .extension-guidance-mark {
+          width: var(--spacing-12);
+          height: var(--spacing-12);
+        }
+
+        .extension-guidance-state h1 {
+          font-size: var(--text-label-size);
+          line-height: var(--text-label-leading);
+        }
+
+        .extension-guidance-description,
+        .extension-guidance-enable p {
+          font-size: var(--text-supporting-size);
+          font-weight: var(--text-supporting-weight);
+          line-height: var(--text-supporting-leading);
+        }
+
+        .extension-guidance-action {
+          height: var(--size-element-md);
+        }
+
+        .extension-guidance-action svg {
+          width: var(--spacing-4);
+          height: var(--spacing-4);
+        }
+
+        .extension-guidance-enable {
+          padding-top: var(--spacing-3);
+        }
+      }
+
+      @media (max-height: 320px) {
+        #extension-guidance {
+          align-items: flex-start;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .extension-guidance-action {
+          transition-duration: 0s;
+        }
+      }
+
+      #app {
+        position: relative;
+        display: flex;
+        width: 600px;
+        height: 600px;
+        flex: 0 0 auto;
+        flex-direction: column;
+        box-sizing: border-box;
+        overflow-x: hidden;
+        overflow-y: auto;
+        background: transparent;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      #app > [data-app-root] {
+        min-height: 100%;
+        box-sizing: border-box;
+      }
+    </style>
+  </head>
+  <body>
+    <main id="extension-guidance" aria-labelledby="extension-guidance-title">
+      <section
+        class="extension-guidance-card extension-guidance-state"
+        role="status"
+      >
+        <img
+          class="extension-guidance-mark"
+          src="data:image/png;base64,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"
+          width="64"
+          height="64"
+          alt=""
+        />
+        <header class="extension-guidance-copy">
+          <h1 id="extension-guidance-title">Preview this display in Chrome</h1>
+          <p class="extension-guidance-description">
+            Install Meta Ray-Ban Display Simulator to view and interact with
+            this display experience.
+          </p>
+        </header>
+        <a
+          class="extension-guidance-action"
+          href="https://chromewebstore.google.com/detail/meta-ray-ban-display-web/jpjlmmodokemlepklkdbimceggpbjcll"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Install from Chrome Web Store
+          <span class="visually-hidden"> (opens in a new tab)</span>
+          <svg
+            viewBox="0 0 20 20"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.75"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M7 5h8v8" />
+            <path d="m15 5-9 9" />
+          </svg>
+        </a>
+        <section
+          class="extension-guidance-enable"
+          aria-labelledby="extension-guidance-enable-title"
+        >
+          <h2 id="extension-guidance-enable-title">Already installed?</h2>
+          <p>
+            The preview opens automatically after enabled.
+          </p>
+        </section>
+      </section>
+    </main>
+    <div id="app"></div>
+    <script type="module" src="preview.js"></script>
+    <!-- dat-preview-host-entry -->
+  </body>
+</html>

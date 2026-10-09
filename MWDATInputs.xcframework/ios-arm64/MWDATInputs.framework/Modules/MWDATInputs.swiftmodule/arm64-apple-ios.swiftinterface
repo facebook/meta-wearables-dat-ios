@@ -1,0 +1,334 @@
+// swift-interface-format-version: 1.0
+// swift-compiler-version: Apple Swift version 6.3.3 (swiftlang-6.3.3.1.3 clang-2100.1.1.101)
+// swift-module-flags: -target arm64-apple-ios17.2 -enable-objc-interop -enable-library-evolution -swift-version 6 -Osize -module-name MWDATInputs -package-name MetaWearablesDAT
+// swift-module-flags-ignorable: -no-verify-emitted-module-interface -formal-cxx-interoperability-mode=off -interface-compiler-version 6.3.3
+import Foundation
+import MWDATCore
+import Swift
+import _Concurrency
+import _StringProcessing
+import _SwiftConcurrencyShims
+extension MWDATCore.DeviceSession {
+  final public func addInputs(configuration: MWDATInputs.InputsConfiguration = InputsConfiguration()) throws(MWDATCore.DeviceSessionError) -> MWDATInputs.Inputs?
+  final public func removeInputs() throws(MWDATCore.DeviceSessionError)
+}
+public enum InputEvent : Swift.Sendable, Swift.Equatable {
+  case nav(direction: MWDATInputs.NavDirection, source: MWDATInputs.InputSource, timestampMs: Swift.Int64)
+  case select(source: MWDATInputs.InputSource, timestampMs: Swift.Int64)
+  case back(source: MWDATInputs.InputSource, timestampMs: Swift.Int64)
+  case button(_: MWDATInputs.ButtonType, source: MWDATInputs.InputSource, timestampMs: Swift.Int64)
+  case capture(_: MWDATInputs.CapturePressType, source: MWDATInputs.InputSource, timestampMs: Swift.Int64)
+  case drag(action: MWDATInputs.DragAction, x: Swift.Float, y: Swift.Float, dx: Swift.Float, dy: Swift.Float, source: MWDATInputs.InputSource, timestampMs: Swift.Int64)
+  public var source: MWDATInputs.InputSource {
+    get
+  }
+  public var timestampMs: Swift.Int64 {
+    get
+  }
+  public static func == (a: MWDATInputs.InputEvent, b: MWDATInputs.InputEvent) -> Swift.Bool
+}
+@_hasMissingDesignatedInitializers final public class Inputs : Swift.Sendable {
+  final public var statePublisher: any MWDATCore.Announcer<MWDATInputs.InputsState> {
+    get
+  }
+  final public var errorPublisher: any MWDATCore.Announcer<MWDATInputs.InputsError> {
+    get
+  }
+  final public let events: _Concurrency.AsyncStream<MWDATInputs.InputEvent>
+  final public var state: MWDATInputs.InputsState {
+    get
+  }
+  final public let configuration: MWDATInputs.InputsConfiguration
+  @objc deinit
+}
+public struct InputsConfiguration : Swift.Sendable, Swift.Equatable {
+  public let sources: Swift.Set<MWDATInputs.InputSource>
+  public let consumeBack: Swift.Bool
+  public init(sources: Swift.Set<MWDATInputs.InputSource> = [
+      .captouch,
+      .neuralBand,
+      .captureButton,
+      .actionButton,
+      .neuralBandDrag,
+    ], consumeBack: Swift.Bool = true)
+  public static func == (a: MWDATInputs.InputsConfiguration, b: MWDATInputs.InputsConfiguration) -> Swift.Bool
+}
+public enum InputsError : MWDATCore.DatError, Swift.Equatable {
+  case permissionDenied
+  case connectionClosed
+  case activationTimeout
+  case activationFailed
+  case capabilityUnavailable
+  case deviceDisconnected
+  case communicationError
+  public var description: Swift.String {
+    get
+  }
+  public var errorDescription: Swift.String? {
+    get
+  }
+  public static func == (a: MWDATInputs.InputsError, b: MWDATInputs.InputsError) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+public enum InputsState : Swift.Sendable, Swift.Equatable, Swift.CustomStringConvertible {
+  case inactive
+  case activating
+  case active
+  case deactivating
+  public var description: Swift.String {
+    get
+  }
+  public static func == (a: MWDATInputs.InputsState, b: MWDATInputs.InputsState) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+@frozen public enum InputSource : Swift.Sendable, Swift.Equatable {
+  case captouch
+  case neuralBand
+  case captureButton
+  case actionButton
+  case neuralBandDrag
+  case unknown
+  public static func == (a: MWDATInputs.InputSource, b: MWDATInputs.InputSource) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+@frozen public enum NavDirection : Swift.Sendable, Swift.Equatable {
+  case up
+  case down
+  case left
+  case right
+  public static func == (a: MWDATInputs.NavDirection, b: MWDATInputs.NavDirection) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+@frozen public enum ButtonType : Swift.Sendable, Swift.Equatable {
+  case action
+  public static func == (a: MWDATInputs.ButtonType, b: MWDATInputs.ButtonType) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+@frozen public enum CapturePressType : Swift.Sendable, Swift.Equatable {
+  case shortPress
+  case hold
+  case doublePress
+  public static func == (a: MWDATInputs.CapturePressType, b: MWDATInputs.CapturePressType) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+@frozen public enum DragAction : Swift.Sendable, Swift.Equatable {
+  case down
+  case move
+  case up
+  public static func == (a: MWDATInputs.DragAction, b: MWDATInputs.DragAction) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+extension MWDATCore.ObjC_DeviceSession {
+  @objc(addInputsWithConfiguration:error:) final public func addInputs(configuration: MWDATInputs.ObjC_InputsConfiguration, error outError: Foundation.NSErrorPointer) -> MWDATInputs.ObjC_Inputs?
+  @objc(removeInputsAndReturnError:) final public func removeInputsAndReturnError(_ outError: Foundation.NSErrorPointer) -> Swift.Bool
+}
+@_hasMissingDesignatedInitializers @objc(MWDATInputsListenerToken) final public class ObjC_InputsListenerToken : ObjectiveC.NSObject, Swift.Sendable {
+  @objc final public func cancel()
+  @objc deinit
+}
+@_hasMissingDesignatedInitializers @objc(MWDATInputs) final public class ObjC_Inputs : ObjectiveC.NSObject, Swift.Sendable {
+  public typealias StateHandler = @Sendable @convention(block) (MWDATInputs.ObjC_InputsState) -> Swift.Void
+  public typealias EventHandler = @Sendable @convention(block) (MWDATInputs.ObjC_InputEvent) -> Swift.Void
+  public typealias ErrorHandler = @Sendable @convention(block) (MWDATInputs.ObjC_InputsError) -> Swift.Void
+  @objc deinit
+  @objc final public var state: MWDATInputs.ObjC_InputsState {
+    @objc get
+  }
+  @objc final public var onStateChanged: MWDATInputs.ObjC_Inputs.StateHandler? {
+    @objc get
+    @objc set
+  }
+  @objc final public var onEvent: MWDATInputs.ObjC_Inputs.EventHandler? {
+    @objc get
+    @objc set
+  }
+  @objc final public var onError: MWDATInputs.ObjC_Inputs.ErrorHandler? {
+    @objc get
+    @objc set
+  }
+  @objc final public func addStateListener(_ listener: @escaping @Sendable (MWDATInputs.ObjC_InputsState) -> Swift.Void) -> MWDATInputs.ObjC_InputsListenerToken
+  @objc final public func addErrorListener(_ listener: @escaping @Sendable (MWDATInputs.ObjC_InputsError) -> Swift.Void) -> MWDATInputs.ObjC_InputsListenerToken
+}
+@objc(MWDATNavDirection) @frozen public enum ObjC_NavDirection : Swift.Int, Swift.Sendable {
+  case up
+  case down
+  case left
+  case right
+  case unknown
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+@objc(MWDATInputsState) @frozen public enum ObjC_InputsState : Swift.Int, Swift.Sendable {
+  case inactive
+  case activating
+  case active
+  case deactivating
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+@objc(MWDATInputsError) public enum ObjC_InputsError : Swift.Int, Swift.Sendable {
+  case permissionDenied
+  case connectionClosed
+  case activationTimeout
+  case deviceDisconnected
+  case communicationError
+  case activationFailed
+  case capabilityUnavailable
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+@objc(MWDATInputEventType) @frozen public enum ObjC_InputEventType : Swift.Int, Swift.Sendable {
+  case nav
+  case select
+  case back
+  case button
+  case capture
+  case drag
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+@_inheritsConvenienceInitializers @objc(MWDATInputsConfiguration) final public class ObjC_InputsConfiguration : ObjectiveC.NSObject, Swift.Sendable {
+  @objc final public let sources: [Foundation.NSNumber]
+  @objc final public let consumeBack: Swift.Bool
+  @objc public init(sources: [Foundation.NSNumber], consumeBack: Swift.Bool)
+  @objc override convenience dynamic public init()
+  @objc deinit
+}
+@_hasMissingDesignatedInitializers @objc(MWDATInputEvent) final public class ObjC_InputEvent : ObjectiveC.NSObject, Swift.Sendable {
+  @objc final public let type: MWDATInputs.ObjC_InputEventType
+  @objc final public let source: MWDATInputs.ObjC_InputSource
+  @objc final public let timestampMs: Swift.Int64
+  @objc final public let navDirection: MWDATInputs.ObjC_NavDirection
+  @objc final public let button: MWDATInputs.ObjC_ButtonType
+  @objc final public let capturePressType: MWDATInputs.ObjC_CapturePressType
+  @objc final public let dragAction: MWDATInputs.ObjC_DragAction
+  @objc final public let x: Swift.Float
+  @objc final public let y: Swift.Float
+  @objc final public let dx: Swift.Float
+  @objc final public let dy: Swift.Float
+  @objc deinit
+}
+@objc(MWDATInputSource) @frozen public enum ObjC_InputSource : Swift.Int, Swift.Sendable, Swift.CaseIterable {
+  case captouch = 0
+  case neuralBand = 1
+  case captureButton = 2
+  case actionButton = 3
+  case neuralBandDrag = 4
+  case unknown = 5
+  public init?(rawValue: Swift.Int)
+  public typealias AllCases = [MWDATInputs.ObjC_InputSource]
+  public typealias RawValue = Swift.Int
+  nonisolated public static var allCases: [MWDATInputs.ObjC_InputSource] {
+    get
+  }
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+@objc(MWDATButtonType) @frozen public enum ObjC_ButtonType : Swift.Int, Swift.Sendable {
+  case action
+  case unknown
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+@objc(MWDATCapturePressType) @frozen public enum ObjC_CapturePressType : Swift.Int, Swift.Sendable {
+  case shortPress
+  case hold
+  case doublePress
+  case unknown
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+@objc(MWDATDragAction) @frozen public enum ObjC_DragAction : Swift.Int, Swift.Sendable {
+  case down
+  case move
+  case up
+  case unknown
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+extension MWDATInputs.InputsError : Swift.Hashable {}
+extension MWDATInputs.InputsState : Swift.Hashable {}
+extension MWDATInputs.InputSource : Swift.Hashable {}
+extension MWDATInputs.InputSource : Swift.BitwiseCopyable {}
+extension MWDATInputs.NavDirection : Swift.Hashable {}
+extension MWDATInputs.NavDirection : Swift.BitwiseCopyable {}
+extension MWDATInputs.ButtonType : Swift.Hashable {}
+extension MWDATInputs.ButtonType : Swift.BitwiseCopyable {}
+extension MWDATInputs.CapturePressType : Swift.Hashable {}
+extension MWDATInputs.CapturePressType : Swift.BitwiseCopyable {}
+extension MWDATInputs.DragAction : Swift.Hashable {}
+extension MWDATInputs.DragAction : Swift.BitwiseCopyable {}
+extension MWDATInputs.ObjC_NavDirection : Swift.Equatable {}
+extension MWDATInputs.ObjC_NavDirection : Swift.Hashable {}
+extension MWDATInputs.ObjC_NavDirection : Swift.RawRepresentable {}
+extension MWDATInputs.ObjC_NavDirection : Swift.BitwiseCopyable {}
+extension MWDATInputs.ObjC_InputsState : Swift.Equatable {}
+extension MWDATInputs.ObjC_InputsState : Swift.Hashable {}
+extension MWDATInputs.ObjC_InputsState : Swift.RawRepresentable {}
+extension MWDATInputs.ObjC_InputsState : Swift.BitwiseCopyable {}
+extension MWDATInputs.ObjC_InputsError : Swift.Equatable {}
+extension MWDATInputs.ObjC_InputsError : Swift.Hashable {}
+extension MWDATInputs.ObjC_InputsError : Swift.RawRepresentable {}
+extension MWDATInputs.ObjC_InputEventType : Swift.Equatable {}
+extension MWDATInputs.ObjC_InputEventType : Swift.Hashable {}
+extension MWDATInputs.ObjC_InputEventType : Swift.RawRepresentable {}
+extension MWDATInputs.ObjC_InputEventType : Swift.BitwiseCopyable {}
+extension MWDATInputs.ObjC_InputSource : Swift.Equatable {}
+extension MWDATInputs.ObjC_InputSource : Swift.Hashable {}
+extension MWDATInputs.ObjC_InputSource : Swift.RawRepresentable {}
+extension MWDATInputs.ObjC_InputSource : Swift.BitwiseCopyable {}
+extension MWDATInputs.ObjC_ButtonType : Swift.Equatable {}
+extension MWDATInputs.ObjC_ButtonType : Swift.Hashable {}
+extension MWDATInputs.ObjC_ButtonType : Swift.RawRepresentable {}
+extension MWDATInputs.ObjC_ButtonType : Swift.BitwiseCopyable {}
+extension MWDATInputs.ObjC_CapturePressType : Swift.Equatable {}
+extension MWDATInputs.ObjC_CapturePressType : Swift.Hashable {}
+extension MWDATInputs.ObjC_CapturePressType : Swift.RawRepresentable {}
+extension MWDATInputs.ObjC_CapturePressType : Swift.BitwiseCopyable {}
+extension MWDATInputs.ObjC_DragAction : Swift.Equatable {}
+extension MWDATInputs.ObjC_DragAction : Swift.Hashable {}
+extension MWDATInputs.ObjC_DragAction : Swift.RawRepresentable {}
+extension MWDATInputs.ObjC_DragAction : Swift.BitwiseCopyable {}

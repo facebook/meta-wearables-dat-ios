@@ -1,0 +1,199 @@
+// swift-interface-format-version: 1.0
+// swift-compiler-version: Apple Swift version 6.3.3 (swiftlang-6.3.3.1.3 clang-2100.1.1.101)
+// swift-module-flags: -target arm64-apple-ios17.2 -enable-objc-interop -enable-library-evolution -swift-version 6 -Osize -module-name MWDATMockDeviceTestClient -package-name MetaWearablesDAT
+// swift-module-flags-ignorable: -no-verify-emitted-module-interface -formal-cxx-interoperability-mode=off -interface-compiler-version 6.3.3
+import Foundation
+import MWDATCore
+import Swift
+import _Concurrency
+import _StringProcessing
+import _SwiftConcurrencyShims
+@_hasMissingDesignatedInitializers final public class MockDeviceTestClient : Swift.Sendable {
+  public init(port: Swift.UInt16)
+  public init()
+  public init(portFilePath: Swift.String)
+  @discardableResult
+  final public func pairDevice(deviceType: MWDATCore.DeviceType = .rayBanMeta) async -> Swift.String?
+  @discardableResult
+  final public func unpairDevice(deviceId: Swift.String) async -> Swift.Bool
+  @discardableResult
+  final public func powerOn(deviceId: Swift.String) async -> Swift.Bool
+  @discardableResult
+  final public func powerOff(deviceId: Swift.String) async -> Swift.Bool
+  @discardableResult
+  final public func don(deviceId: Swift.String) async -> Swift.Bool
+  @discardableResult
+  final public func doff(deviceId: Swift.String) async -> Swift.Bool
+  @discardableResult
+  final public func fold(deviceId: Swift.String) async -> Swift.Bool
+  @discardableResult
+  final public func unfold(deviceId: Swift.String) async -> Swift.Bool
+  @discardableResult
+  final public func captouchTap(deviceId: Swift.String) async -> Swift.Bool
+  @discardableResult
+  final public func captouchTapAndHold(deviceId: Swift.String) async -> Swift.Bool
+  @discardableResult
+  final public func setCameraFeed(deviceId: Swift.String, resourceName: Swift.String, ext: Swift.String) async -> Swift.Bool
+  @discardableResult
+  final public func setCapturedImage(deviceId: Swift.String, resourceName: Swift.String, ext: Swift.String) async -> Swift.Bool
+  @discardableResult
+  final public func setCameraFacing(deviceId: Swift.String, facing: MWDATMockDeviceTestClient.TestCameraFacing) async -> Swift.Bool
+  @discardableResult
+  final public func setCapturedPhoto(deviceId: Swift.String, resourceName: Swift.String, ext: Swift.String) async -> Swift.Bool
+  @discardableResult
+  final public func simulateCaptureFailure(deviceId: Swift.String) async -> Swift.Bool
+  @discardableResult
+  final public func inputNav(deviceId: Swift.String, direction: MWDATMockDeviceTestClient.TestNavDirection, source: MWDATMockDeviceTestClient.TestInputSource = .captouch) async -> Swift.Bool
+  @discardableResult
+  final public func inputSelect(deviceId: Swift.String, source: MWDATMockDeviceTestClient.TestInputSource = .captouch) async -> Swift.Bool
+  @discardableResult
+  final public func inputBack(deviceId: Swift.String, source: MWDATMockDeviceTestClient.TestInputSource = .captouch) async -> Swift.Bool
+  @discardableResult
+  final public func inputCapture(deviceId: Swift.String, pressType: MWDATMockDeviceTestClient.TestCapturePressType = .shortPress) async -> Swift.Bool
+  @discardableResult
+  final public func inputAction(deviceId: Swift.String) async -> Swift.Bool
+  @discardableResult
+  final public func inputDrag(deviceId: Swift.String, action: MWDATMockDeviceTestClient.TestDragAction, x: Swift.Float, y: Swift.Float, dx: Swift.Float, dy: Swift.Float) async -> Swift.Bool
+  @discardableResult
+  final public func setMotionFeed(deviceId: Swift.String, resourceName: Swift.String, ext: Swift.String) async -> Swift.Bool
+  @discardableResult
+  final public func simulateTranscription(deviceId: Swift.String, text: Swift.String, isFinal: Swift.Bool = true, confidence: Swift.Float = 0.95) async -> Swift.Bool
+  @discardableResult
+  final public func simulateSpeechError(deviceId: Swift.String, errorCode: Swift.Int32, message: Swift.String) async -> Swift.Bool
+  @discardableResult
+  final public func simulateSpeechCompletion(deviceId: Swift.String) async -> Swift.Bool
+  @discardableResult
+  final public func setSpeechLocale(deviceId: Swift.String, locale: Swift.String) async -> Swift.Bool
+  @discardableResult
+  final public func setPermission(_ permission: MWDATMockDeviceTestClient.TestPermission, status: MWDATMockDeviceTestClient.TestPermissionStatus) async -> Swift.Bool
+  @discardableResult
+  final public func setPermissionRequestResult(_ permission: MWDATMockDeviceTestClient.TestPermission, result: MWDATMockDeviceTestClient.TestPermissionStatus) async -> Swift.Bool
+  @discardableResult
+  final public func sendLaunchAppAction(deviceId: Swift.String) async -> Swift.String?
+  @discardableResult
+  final public func sendIncompleteAction(deviceId: Swift.String) async -> Swift.String?
+  final public func getDeviceState() async -> [Swift.String : Any]?
+  final public func healthCheck() async -> Swift.Bool
+  final public func waitForServer(timeout: Foundation.TimeInterval = 10) async -> Swift.Bool
+  @objc deinit
+}
+public enum TestInputSource : Swift.String, Swift.Sendable, Swift.CaseIterable {
+  case captouch
+  case neuralBand
+  case captureButton
+  case actionButton
+  case neuralBandDrag
+  case unknown
+  public init?(rawValue: Swift.String)
+  public typealias AllCases = [MWDATMockDeviceTestClient.TestInputSource]
+  public typealias RawValue = Swift.String
+  nonisolated public static var allCases: [MWDATMockDeviceTestClient.TestInputSource] {
+    get
+  }
+  public var rawValue: Swift.String {
+    get
+  }
+}
+public enum TestNavDirection : Swift.String, Swift.Sendable, Swift.CaseIterable {
+  case up
+  case down
+  case left
+  case right
+  public init?(rawValue: Swift.String)
+  public typealias AllCases = [MWDATMockDeviceTestClient.TestNavDirection]
+  public typealias RawValue = Swift.String
+  nonisolated public static var allCases: [MWDATMockDeviceTestClient.TestNavDirection] {
+    get
+  }
+  public var rawValue: Swift.String {
+    get
+  }
+}
+public enum TestCapturePressType : Swift.String, Swift.Sendable, Swift.CaseIterable {
+  case shortPress
+  case hold
+  case doublePress
+  public init?(rawValue: Swift.String)
+  public typealias AllCases = [MWDATMockDeviceTestClient.TestCapturePressType]
+  public typealias RawValue = Swift.String
+  nonisolated public static var allCases: [MWDATMockDeviceTestClient.TestCapturePressType] {
+    get
+  }
+  public var rawValue: Swift.String {
+    get
+  }
+}
+public enum TestDragAction : Swift.String, Swift.Sendable, Swift.CaseIterable {
+  case down
+  case move
+  case up
+  public init?(rawValue: Swift.String)
+  public typealias AllCases = [MWDATMockDeviceTestClient.TestDragAction]
+  public typealias RawValue = Swift.String
+  nonisolated public static var allCases: [MWDATMockDeviceTestClient.TestDragAction] {
+    get
+  }
+  public var rawValue: Swift.String {
+    get
+  }
+}
+public enum TestCameraFacing : Swift.String, Swift.Sendable, Swift.CaseIterable {
+  case front
+  case back
+  public init?(rawValue: Swift.String)
+  public typealias AllCases = [MWDATMockDeviceTestClient.TestCameraFacing]
+  public typealias RawValue = Swift.String
+  nonisolated public static var allCases: [MWDATMockDeviceTestClient.TestCameraFacing] {
+    get
+  }
+  public var rawValue: Swift.String {
+    get
+  }
+}
+public enum TestPermission : Swift.String, Swift.Sendable, Swift.CaseIterable {
+  case camera
+  case microphone
+  public init?(rawValue: Swift.String)
+  public typealias AllCases = [MWDATMockDeviceTestClient.TestPermission]
+  public typealias RawValue = Swift.String
+  nonisolated public static var allCases: [MWDATMockDeviceTestClient.TestPermission] {
+    get
+  }
+  public var rawValue: Swift.String {
+    get
+  }
+}
+public enum TestPermissionStatus : Swift.String, Swift.Sendable, Swift.CaseIterable {
+  case granted
+  case denied
+  public init?(rawValue: Swift.String)
+  public typealias AllCases = [MWDATMockDeviceTestClient.TestPermissionStatus]
+  public typealias RawValue = Swift.String
+  nonisolated public static var allCases: [MWDATMockDeviceTestClient.TestPermissionStatus] {
+    get
+  }
+  public var rawValue: Swift.String {
+    get
+  }
+}
+extension MWDATMockDeviceTestClient.TestInputSource : Swift.Equatable {}
+extension MWDATMockDeviceTestClient.TestInputSource : Swift.Hashable {}
+extension MWDATMockDeviceTestClient.TestInputSource : Swift.RawRepresentable {}
+extension MWDATMockDeviceTestClient.TestNavDirection : Swift.Equatable {}
+extension MWDATMockDeviceTestClient.TestNavDirection : Swift.Hashable {}
+extension MWDATMockDeviceTestClient.TestNavDirection : Swift.RawRepresentable {}
+extension MWDATMockDeviceTestClient.TestCapturePressType : Swift.Equatable {}
+extension MWDATMockDeviceTestClient.TestCapturePressType : Swift.Hashable {}
+extension MWDATMockDeviceTestClient.TestCapturePressType : Swift.RawRepresentable {}
+extension MWDATMockDeviceTestClient.TestDragAction : Swift.Equatable {}
+extension MWDATMockDeviceTestClient.TestDragAction : Swift.Hashable {}
+extension MWDATMockDeviceTestClient.TestDragAction : Swift.RawRepresentable {}
+extension MWDATMockDeviceTestClient.TestCameraFacing : Swift.Equatable {}
+extension MWDATMockDeviceTestClient.TestCameraFacing : Swift.Hashable {}
+extension MWDATMockDeviceTestClient.TestCameraFacing : Swift.RawRepresentable {}
+extension MWDATMockDeviceTestClient.TestPermission : Swift.Equatable {}
+extension MWDATMockDeviceTestClient.TestPermission : Swift.Hashable {}
+extension MWDATMockDeviceTestClient.TestPermission : Swift.RawRepresentable {}
+extension MWDATMockDeviceTestClient.TestPermissionStatus : Swift.Equatable {}
+extension MWDATMockDeviceTestClient.TestPermissionStatus : Swift.Hashable {}
+extension MWDATMockDeviceTestClient.TestPermissionStatus : Swift.RawRepresentable {}

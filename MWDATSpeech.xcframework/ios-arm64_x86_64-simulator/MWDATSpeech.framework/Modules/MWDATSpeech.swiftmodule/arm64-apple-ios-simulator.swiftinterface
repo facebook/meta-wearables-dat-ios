@@ -1,0 +1,154 @@
+// swift-interface-format-version: 1.0
+// swift-compiler-version: Apple Swift version 6.3.3 (swiftlang-6.3.3.1.3 clang-2100.1.1.101)
+// swift-module-flags: -target arm64-apple-ios17.2-simulator -enable-objc-interop -enable-library-evolution -swift-version 6 -Osize -module-name MWDATSpeech -package-name MetaWearablesDAT
+// swift-module-flags-ignorable: -no-verify-emitted-module-interface -formal-cxx-interoperability-mode=off -interface-compiler-version 6.3.3
+import Foundation
+import MWDATCore
+import Swift
+import _Concurrency
+import _StringProcessing
+import _SwiftConcurrencyShims
+extension MWDATCore.DeviceSession {
+  final public func addSpeech() throws(MWDATCore.DeviceSessionError) -> MWDATSpeech.Speech?
+  final public func removeSpeech() throws(MWDATCore.DeviceSessionError)
+}
+extension MWDATCore.ObjC_DeviceSession {
+  @objc(addSpeechAndReturnError:) final public func addSpeechAndReturnError(_ outError: Foundation.NSErrorPointer) -> MWDATSpeech.ObjC_Speech?
+}
+@_hasMissingDesignatedInitializers @objc(MWDATSpeechListenerToken) final public class ObjC_SpeechListenerToken : ObjectiveC.NSObject, Swift.Sendable {
+  @objc final public func cancel()
+  @objc deinit
+}
+@_hasMissingDesignatedInitializers @objc(MWDATSpeech) final public class ObjC_Speech : ObjectiveC.NSObject, Swift.Sendable {
+  public typealias StateHandler = @Sendable @convention(block) (MWDATSpeech.ObjC_SpeechState) -> Swift.Void
+  public typealias TranscriptionHandler = @Sendable @convention(block) (MWDATSpeech.ObjC_TranscriptionResult) -> Swift.Void
+  public typealias ErrorHandler = @Sendable @convention(block) (MWDATSpeech.ObjC_SpeechError) -> Swift.Void
+  @objc deinit
+  @objc final public var state: MWDATSpeech.ObjC_SpeechState {
+    @objc get
+  }
+  @objc final public var locale: Swift.String? {
+    @objc get
+  }
+  @objc final public var onStateChanged: MWDATSpeech.ObjC_Speech.StateHandler? {
+    @objc get
+    @objc set
+  }
+  @objc final public var onTranscription: MWDATSpeech.ObjC_Speech.TranscriptionHandler? {
+    @objc get
+    @objc set
+  }
+  @objc final public var onError: MWDATSpeech.ObjC_Speech.ErrorHandler? {
+    @objc get
+    @objc set
+  }
+  @objc final public func start()
+  @objc final public func stop()
+  @objc final public func addStateListener(_ listener: @escaping @Sendable (MWDATSpeech.ObjC_SpeechState) -> Swift.Void) -> MWDATSpeech.ObjC_SpeechListenerToken
+  @objc final public func addTranscriptionListener(_ listener: @escaping @Sendable (MWDATSpeech.ObjC_TranscriptionResult) -> Swift.Void) -> MWDATSpeech.ObjC_SpeechListenerToken
+  @objc final public func addErrorListener(_ listener: @escaping @Sendable (MWDATSpeech.ObjC_SpeechError) -> Swift.Void) -> MWDATSpeech.ObjC_SpeechListenerToken
+}
+@objc(MWDATSpeechState) @frozen public enum ObjC_SpeechState : Swift.Int, Swift.Sendable {
+  case starting
+  case started
+  case stopping
+  case stopped
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+@objc(MWDATSpeechError) public enum ObjC_SpeechError : Swift.Int, Swift.Sendable {
+  case deviceDisconnected
+  case invalidState
+  case unavailable
+  case alreadyListening
+  case startFailed
+  case unexpectedError
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+@_hasMissingDesignatedInitializers @objc(MWDATTranscriptionResult) final public class ObjC_TranscriptionResult : ObjectiveC.NSObject, Swift.Sendable {
+  @objc final public let text: Swift.String
+  @objc final public let isFinal: Swift.Bool
+  @objc final public let confidence: Swift.Float
+  @objc public init(text: Swift.String, isFinal: Swift.Bool, confidence: Swift.Float)
+  @objc deinit
+}
+@frozen public enum SpeechState : Swift.Sendable, Swift.Equatable, Swift.CustomStringConvertible {
+  case starting
+  case started
+  case stopping
+  case stopped
+  public var description: Swift.String {
+    get
+  }
+  public static func == (a: MWDATSpeech.SpeechState, b: MWDATSpeech.SpeechState) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+public enum SpeechError : MWDATCore.DatError, Swift.Equatable {
+  case deviceDisconnected
+  case invalidState
+  case unavailable
+  case alreadyListening
+  case startFailed
+  case unexpectedError
+  public var description: Swift.String {
+    get
+  }
+  public var errorDescription: Swift.String? {
+    get
+  }
+  public static func == (a: MWDATSpeech.SpeechError, b: MWDATSpeech.SpeechError) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+@_hasMissingDesignatedInitializers final public class Speech : Swift.Sendable {
+  final public var statePublisher: any MWDATCore.Announcer<MWDATSpeech.SpeechState> {
+    get
+  }
+  final public var transcriptionPublisher: any MWDATCore.Announcer<MWDATSpeech.TranscriptionResult> {
+    get
+  }
+  final public var errorPublisher: any MWDATCore.Announcer<MWDATSpeech.SpeechError> {
+    get
+  }
+  final public var localePublisher: any MWDATCore.Announcer<Swift.String> {
+    get
+  }
+  final public var state: MWDATSpeech.SpeechState {
+    get
+  }
+  final public var locale: Swift.String? {
+    get
+  }
+  final public func start()
+  final public func stop()
+  @objc deinit
+}
+public struct TranscriptionResult : Swift.Sendable, Swift.Equatable {
+  public let text: Swift.String
+  public let isFinal: Swift.Bool
+  public let confidence: Swift.Float
+  public init(text: Swift.String, isFinal: Swift.Bool, confidence: Swift.Float)
+  public static func == (a: MWDATSpeech.TranscriptionResult, b: MWDATSpeech.TranscriptionResult) -> Swift.Bool
+}
+extension MWDATSpeech.ObjC_SpeechState : Swift.Equatable {}
+extension MWDATSpeech.ObjC_SpeechState : Swift.Hashable {}
+extension MWDATSpeech.ObjC_SpeechState : Swift.RawRepresentable {}
+extension MWDATSpeech.ObjC_SpeechState : Swift.BitwiseCopyable {}
+extension MWDATSpeech.ObjC_SpeechError : Swift.Equatable {}
+extension MWDATSpeech.ObjC_SpeechError : Swift.Hashable {}
+extension MWDATSpeech.ObjC_SpeechError : Swift.RawRepresentable {}
+extension MWDATSpeech.SpeechState : Swift.Hashable {}
+extension MWDATSpeech.SpeechState : Swift.BitwiseCopyable {}
+extension MWDATSpeech.SpeechError : Swift.Hashable {}

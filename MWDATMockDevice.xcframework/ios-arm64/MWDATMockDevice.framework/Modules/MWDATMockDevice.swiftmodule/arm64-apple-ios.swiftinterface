@@ -1,0 +1,476 @@
+// swift-interface-format-version: 1.0
+// swift-compiler-version: Apple Swift version 6.3.3 (swiftlang-6.3.3.1.3 clang-2100.1.1.101)
+// swift-module-flags: -target arm64-apple-ios17.2 -enable-objc-interop -enable-library-evolution -swift-version 6 -Osize -module-name MWDATMockDevice -package-name MetaWearablesDAT
+// swift-module-flags-ignorable: -no-verify-emitted-module-interface -formal-cxx-interoperability-mode=off -interface-compiler-version 6.3.3
+import AVFoundation
+import CoreMedia
+import Foundation
+import ImageIO
+import MWDATCore
+@preconcurrency import Network
+import Speech
+import Swift
+import UIKit
+import _Concurrency
+import _StringProcessing
+import _SwiftConcurrencyShims
+import simd
+public enum CameraFacing : Swift.Sendable {
+  case front
+  case back
+  public static func == (a: MWDATMockDevice.CameraFacing, b: MWDATMockDevice.CameraFacing) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+public enum GlassesModel : Swift.String, Swift.CaseIterable, Swift.Sendable {
+  case rayBanMeta
+  case oakleyMetaHSTN
+  case oakleyMetaVanguard
+  case rayBanMetaOptics
+  case metaGlasses
+  case metaRayBanDisplay
+  public init?(rawValue: Swift.String)
+  public typealias AllCases = [MWDATMockDevice.GlassesModel]
+  public typealias RawValue = Swift.String
+  nonisolated public static var allCases: [MWDATMockDevice.GlassesModel] {
+    get
+  }
+  public var rawValue: Swift.String {
+    get
+  }
+}
+public protocol MockCameraCaptureKit : Swift.Sendable {
+  func setCapturedPhoto(fileURL: Foundation.URL)
+  func simulateCaptureFailure()
+}
+public protocol MockCameraKit : Swift.Sendable {
+  func setCameraFeed(fileURL: Foundation.URL)
+  func setCameraFeed(cameraFacing: MWDATMockDevice.CameraFacing)
+  func setCapturedImage(fileURL: Foundation.URL)
+}
+public protocol MockCaptouchKit : Swift.Sendable {
+  func tap()
+  func tapAndHold()
+}
+public protocol MockDevice : Swift.Sendable {
+  var deviceIdentifier: MWDATCore.DeviceIdentifier { get }
+  func powerOn()
+  func powerOff()
+  func don()
+  func doff()
+  func setBatteryLevel(_ level: Swift.Int?)
+  func setChargingState(_ state: MWDATCore.ChargingState)
+  func setThermalLevel(_ level: MWDATCore.ThermalLevel)
+}
+public enum MockDeviceKitError : MWDATCore.DatError, Swift.Equatable {
+  case notEnabled
+  case testServerUnavailable
+  public var description: Swift.String {
+    get
+  }
+  public static func == (a: MWDATMockDevice.MockDeviceKitError, b: MWDATMockDevice.MockDeviceKitError) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+public protocol MockDeviceKitInterface : Swift.Sendable {
+  var isEnabled: Swift.Bool { get }
+  func enable(config: MWDATMockDevice.MockDeviceKitConfig)
+  func disable()
+  func disable() async
+  func pairGlasses(model: MWDATMockDevice.GlassesModel) throws(MWDATMockDevice.MockDeviceKitError) -> any MWDATMockDevice.MockGlasses
+  func unpairDevice(_ device: any MWDATMockDevice.MockDevice)
+  func unpairDevice(_ device: any MWDATMockDevice.MockDevice) async
+  var pairedDevices: [any MWDATMockDevice.MockDevice] { get }
+  var permissions: any MWDATMockDevice.MockPermissions { get }
+  func startTestServer(portFilePath: Swift.String?) async throws -> Swift.UInt16
+  func startTestServer(port: Swift.UInt16, portFilePath: Swift.String?) async throws -> Swift.UInt16
+  func stopTestServer() async
+}
+extension MWDATMockDevice.MockDeviceKitInterface {
+  public func enable()
+  public func startTestServer(port: Swift.UInt16, portFilePath: Swift.String?) async throws -> Swift.UInt16
+  public func startTestServer(port: Swift.UInt16 = 0) async throws -> Swift.UInt16
+}
+public enum MockDeviceKit : Swift.Sendable {
+  public static let shared: any MWDATMockDevice.MockDeviceKitInterface
+}
+@frozen public struct MockDeviceKitConfig : Swift.Sendable {
+  public let initiallyRegistered: Swift.Bool
+  public let initialPermissionsGranted: Swift.Bool
+  public init(initiallyRegistered: Swift.Bool = true, initialPermissionsGranted: Swift.Bool = true)
+}
+public protocol MockDisplayKit : Swift.Sendable {
+  @discardableResult
+  func sendClick(identifier: Swift.String) -> Swift.Bool
+  @_Concurrency.MainActor func createPreviewView() -> UIKit.UIView
+}
+public protocol MockGlasses : MWDATMockDevice.MockDevice {
+  func fold()
+  func unfold()
+  var services: any MWDATMockDevice.MockGlassesServices { get }
+}
+public protocol MockGlassesServices : Swift.Sendable {
+  var camera: any MWDATMockDevice.MockCameraKit { get }
+  var captouch: any MWDATMockDevice.MockCaptouchKit { get }
+  var cameraCapture: any MWDATMockDevice.MockCameraCaptureKit { get }
+  var speech: any MWDATMockDevice.MockSpeechKit { get }
+  var motion: any MWDATMockDevice.MockMotionKit { get }
+  var input: any MWDATMockDevice.MockInputKit { get }
+  var display: any MWDATMockDevice.MockDisplayKit { get }
+  var voiceInvocation: any MWDATMockDevice.MockVoiceInvocationKit { get }
+}
+public protocol MockInputKit : Swift.Sendable {
+  func navUp(source: MWDATMockDevice.InputSource)
+  func navDown(source: MWDATMockDevice.InputSource)
+  func navLeft(source: MWDATMockDevice.InputSource)
+  func navRight(source: MWDATMockDevice.InputSource)
+  func select(source: MWDATMockDevice.InputSource)
+  func back(source: MWDATMockDevice.InputSource)
+  func capture(pressType: MWDATMockDevice.CapturePressType)
+  func button(type: MWDATMockDevice.ButtonType)
+  func drag(action: MWDATMockDevice.DragAction, x: Swift.Float, y: Swift.Float, dx: Swift.Float, dy: Swift.Float)
+}
+extension MWDATMockDevice.MockInputKit {
+  public func navUp()
+  public func navDown()
+  public func navLeft()
+  public func navRight()
+  public func select()
+  public func back()
+  public func button()
+}
+public protocol MockMotionKit : Swift.Sendable {
+  var isStreaming: Swift.Bool { get }
+  func setMotionFeed(fileURL: Foundation.URL)
+  func setMotionFeed(_ samples: [MWDATMockDevice.MotionSample])
+}
+public let mockMotionGravityMetersPerSecondSquared: Swift.Float
+public protocol MockPermissions : Swift.Sendable {
+  func set(_ permission: MWDATCore.Permission, _ status: MWDATCore.PermissionStatus)
+  func setRequestResult(_ permission: MWDATCore.Permission, result: MWDATCore.PermissionStatus)
+}
+public protocol MockSpeechKit : Swift.Sendable {
+  var isListening: Swift.Bool { get }
+  func setTranscriptionSource(_ source: MWDATMockDevice.MockSpeechSource)
+  func simulateTranscription(text: Swift.String, isFinal: Swift.Bool, confidence: Swift.Float)
+  func simulateError(errorCode: Swift.Int32, message: Swift.String)
+  func simulateCompletion()
+  func setLocale(_ locale: Swift.String)
+  var liveSourceDiagnostic: Swift.String? { get }
+  var liveSourceDiagnosticPublisher: any MWDATCore.Announcer<Swift.String?> { get }
+}
+extension MWDATMockDevice.MockSpeechKit {
+  public func simulateTranscription(_ result: MWDATMockDevice.TranscriptionResult)
+  public func setTranscriptionSource(_ source: MWDATMockDevice.MockSpeechSource)
+  public var liveSourceDiagnostic: Swift.String? {
+    get
+  }
+  public var liveSourceDiagnosticPublisher: any MWDATCore.Announcer<Swift.String?> {
+    get
+  }
+}
+public enum MockSpeechSource : Swift.Sendable {
+  case injected
+  case liveDeviceAsr
+  public static func == (a: MWDATMockDevice.MockSpeechSource, b: MWDATMockDevice.MockSpeechSource) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+public protocol MockVoiceInvocationKit : Swift.Sendable {
+  func sendLaunchAppAction() -> Swift.String?
+  func sendIncompleteAction() -> Swift.String?
+  var hasConnectedClients: Swift.Bool { get }
+}
+@_hasMissingDesignatedInitializers @objc(MockCameraCaptureKit) final public class ObjC_MockCameraCaptureKit : ObjectiveC.NSObject, Swift.Sendable {
+  @objc final public func setCapturedPhoto(fileURL: Foundation.URL)
+  @objc final public func simulateCaptureFailure()
+  @objc deinit
+}
+@_hasMissingDesignatedInitializers @objc(MockCameraKit) final public class ObjC_MockCameraKit : ObjectiveC.NSObject, Swift.Sendable {
+  @objc final public func setCameraFeed(fileURL: Foundation.URL)
+  @objc final public func setCameraFeed(cameraFacing: Swift.Int)
+  @objc final public func setCapturedImage(fileURL: Foundation.URL)
+  @objc deinit
+}
+@_hasMissingDesignatedInitializers @objc(MockCaptouchKit) final public class ObjC_MockCaptouchKit : ObjectiveC.NSObject, Swift.Sendable {
+  @objc final public func tap()
+  @objc final public func tapAndHold()
+  @objc deinit
+}
+@objc(MockDevice) public protocol ObjC_MockDevice : Swift.Sendable {
+  @objc var deviceIdentifier: Swift.String { get }
+  @objc func powerOn()
+  @objc func powerOff()
+  @objc func don()
+  @objc func doff()
+}
+@_hasMissingDesignatedInitializers @objc(MWDATMockDeviceKit) final public class ObjC_MockDeviceKit : ObjectiveC.NSObject, Swift.Sendable {
+  @objc public static let sharedInstance: MWDATMockDevice.ObjC_MockDeviceKit
+  @objc final public var isEnabled: Swift.Bool {
+    @objc get
+  }
+  @objc final public func enable()
+  @objc final public func enable(initiallyRegistered: Swift.Bool)
+  @objc final public func disable()
+  @objc final public var pairedDevices: [any MWDATMockDevice.ObjC_MockDevice] {
+    @objc get
+  }
+  @objc final public func pairGlasses(modelRawValue: Swift.String) -> (any MWDATMockDevice.ObjC_MockGlasses)?
+  @objc final public func unpairDevice(_ device: any MWDATMockDevice.ObjC_MockDevice)
+  @objc deinit
+}
+@_hasMissingDesignatedInitializers @objc(MockDisplayKit) final public class ObjC_MockDisplayKit : ObjectiveC.NSObject, Swift.Sendable {
+  @objc final public func sendClick(identifier: Swift.String) -> Swift.Bool
+  @_Concurrency.MainActor @objc final public func createPreviewView() -> UIKit.UIView
+  @objc deinit
+}
+@objc(MockGlasses) public protocol ObjC_MockGlasses : MWDATMockDevice.ObjC_MockDevice {
+  @objc func fold()
+  @objc func unfold()
+  @objc var services: MWDATMockDevice.ObjC_MockGlassesServices { get }
+}
+@_hasMissingDesignatedInitializers @objc(MockGlassesServices) final public class ObjC_MockGlassesServices : ObjectiveC.NSObject, Swift.Sendable {
+  @objc final public let camera: MWDATMockDevice.ObjC_MockCameraKit
+  @objc final public let captouch: MWDATMockDevice.ObjC_MockCaptouchKit
+  @objc final public let cameraCapture: MWDATMockDevice.ObjC_MockCameraCaptureKit
+  @objc final public let speech: MWDATMockDevice.ObjC_MockSpeechKit
+  @objc final public let motion: MWDATMockDevice.ObjC_MockMotionKit
+  @objc final public let input: MWDATMockDevice.ObjC_MockInputKit
+  @objc final public let display: MWDATMockDevice.ObjC_MockDisplayKit
+  @objc final public let voiceInvocation: MWDATMockDevice.ObjC_MockVoiceInvocationKit
+  @objc deinit
+}
+@_hasMissingDesignatedInitializers @objc(MockInputKit) final public class ObjC_MockInputKit : ObjectiveC.NSObject, Swift.Sendable {
+  @objc final public func navUp(source: MWDATMockDevice.ObjC_InputSource)
+  @objc final public func navDown(source: MWDATMockDevice.ObjC_InputSource)
+  @objc final public func navLeft(source: MWDATMockDevice.ObjC_InputSource)
+  @objc final public func navRight(source: MWDATMockDevice.ObjC_InputSource)
+  @objc final public func select(source: MWDATMockDevice.ObjC_InputSource)
+  @objc final public func back(source: MWDATMockDevice.ObjC_InputSource)
+  @objc final public func capture(pressType: MWDATMockDevice.ObjC_CapturePressType)
+  @objc final public func button(type: MWDATMockDevice.ObjC_ButtonType)
+  @objc final public func drag(action: MWDATMockDevice.ObjC_DragAction, x: Swift.Float, y: Swift.Float, dx: Swift.Float, dy: Swift.Float)
+  @objc deinit
+}
+@_hasMissingDesignatedInitializers @objc(MockMotionKit) final public class ObjC_MockMotionKit : ObjectiveC.NSObject, Swift.Sendable {
+  @objc final public var isStreaming: Swift.Bool {
+    @objc get
+  }
+  @objc final public func setMotionFeed(fileURL: Foundation.URL)
+  @objc deinit
+}
+@_hasMissingDesignatedInitializers @objc(MockSpeechKit) final public class ObjC_MockSpeechKit : ObjectiveC.NSObject, Swift.Sendable {
+  @objc final public var isListening: Swift.Bool {
+    @objc get
+  }
+  @objc final public func setLiveDeviceAsrEnabled(_ enabled: Swift.Bool)
+  @objc final public func simulateTranscription(text: Swift.String, isFinal: Swift.Bool, confidence: Swift.Float)
+  @objc final public func simulateError(errorCode: Swift.Int32, message: Swift.String)
+  @objc final public func simulateCompletion()
+  @objc final public func setLocale(_ locale: Swift.String)
+  @objc final public var liveSourceDiagnostic: Swift.String? {
+    @objc get
+  }
+  @objc deinit
+}
+@_hasMissingDesignatedInitializers @objc(MockVoiceInvocationKit) final public class ObjC_MockVoiceInvocationKit : ObjectiveC.NSObject, Swift.Sendable {
+  @objc final public func sendLaunchAppAction() -> Swift.String?
+  @objc final public func sendIncompleteAction() -> Swift.String?
+  @objc final public var hasConnectedClients: Swift.Bool {
+    @objc get
+  }
+  @objc deinit
+}
+@frozen public enum InputSource : Swift.Sendable, Swift.Equatable {
+  case captouch
+  case neuralBand
+  case captureButton
+  case actionButton
+  case neuralBandDrag
+  case unknown
+  public static func == (a: MWDATMockDevice.InputSource, b: MWDATMockDevice.InputSource) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+@frozen public enum NavDirection : Swift.Sendable, Swift.Equatable {
+  case up
+  case down
+  case left
+  case right
+  public static func == (a: MWDATMockDevice.NavDirection, b: MWDATMockDevice.NavDirection) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+@frozen public enum ButtonType : Swift.Sendable, Swift.Equatable {
+  case action
+  public static func == (a: MWDATMockDevice.ButtonType, b: MWDATMockDevice.ButtonType) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+@frozen public enum CapturePressType : Swift.Sendable, Swift.Equatable {
+  case shortPress
+  case hold
+  case doublePress
+  public static func == (a: MWDATMockDevice.CapturePressType, b: MWDATMockDevice.CapturePressType) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+@frozen public enum DragAction : Swift.Sendable, Swift.Equatable {
+  case down
+  case move
+  case up
+  public static func == (a: MWDATMockDevice.DragAction, b: MWDATMockDevice.DragAction) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+@objc(MWDATInputSource) @frozen public enum ObjC_InputSource : Swift.Int, Swift.Sendable, Swift.CaseIterable {
+  case captouch = 0
+  case neuralBand = 1
+  case captureButton = 2
+  case actionButton = 3
+  case neuralBandDrag = 4
+  case unknown = 5
+  public init?(rawValue: Swift.Int)
+  public typealias AllCases = [MWDATMockDevice.ObjC_InputSource]
+  public typealias RawValue = Swift.Int
+  nonisolated public static var allCases: [MWDATMockDevice.ObjC_InputSource] {
+    get
+  }
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+@objc(MWDATButtonType) @frozen public enum ObjC_ButtonType : Swift.Int, Swift.Sendable {
+  case action
+  case unknown
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+@objc(MWDATCapturePressType) @frozen public enum ObjC_CapturePressType : Swift.Int, Swift.Sendable {
+  case shortPress
+  case hold
+  case doublePress
+  case unknown
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+@objc(MWDATDragAction) @frozen public enum ObjC_DragAction : Swift.Int, Swift.Sendable {
+  case down
+  case move
+  case up
+  case unknown
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+public struct Vector3 : Swift.Sendable, Swift.Equatable {
+  public let x: Swift.Float
+  public let y: Swift.Float
+  public let z: Swift.Float
+  public init(x: Swift.Float, y: Swift.Float, z: Swift.Float)
+  public init(_ simd: Swift.SIMD3<Swift.Float>)
+  public var simd: Swift.SIMD3<Swift.Float> {
+    get
+  }
+  public static func == (a: MWDATMockDevice.Vector3, b: MWDATMockDevice.Vector3) -> Swift.Bool
+}
+public struct Quaternion : Swift.Sendable, Swift.Equatable {
+  public let x: Swift.Float
+  public let y: Swift.Float
+  public let z: Swift.Float
+  public let w: Swift.Float
+  public init(x: Swift.Float, y: Swift.Float, z: Swift.Float, w: Swift.Float)
+  public init(_ simd: simd.simd_quatf)
+  public var simd: simd.simd_quatf {
+    get
+  }
+  public static func == (a: MWDATMockDevice.Quaternion, b: MWDATMockDevice.Quaternion) -> Swift.Bool
+}
+@frozen public enum MotionSource : Swift.Sendable, Swift.Equatable {
+  case glasses
+  case neuralBand
+  case unknown
+  public static func == (a: MWDATMockDevice.MotionSource, b: MWDATMockDevice.MotionSource) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+public struct MotionSample : Swift.Sendable, Swift.Equatable {
+  public let timestampNs: Swift.Int64
+  public let accelerometer: MWDATMockDevice.Vector3?
+  public let gyroscope: MWDATMockDevice.Vector3?
+  public let magnetometer: MWDATMockDevice.Vector3?
+  public let orientation: MWDATMockDevice.Quaternion?
+  public let source: MWDATMockDevice.MotionSource
+  public init(timestampNs: Swift.Int64, accelerometer: MWDATMockDevice.Vector3? = nil, gyroscope: MWDATMockDevice.Vector3? = nil, magnetometer: MWDATMockDevice.Vector3? = nil, orientation: MWDATMockDevice.Quaternion? = nil, source: MWDATMockDevice.MotionSource = .unknown)
+  public static func == (a: MWDATMockDevice.MotionSample, b: MWDATMockDevice.MotionSample) -> Swift.Bool
+}
+public struct TranscriptionResult : Swift.Sendable, Swift.Equatable {
+  public let text: Swift.String
+  public let isFinal: Swift.Bool
+  public let confidence: Swift.Float
+  public init(text: Swift.String, isFinal: Swift.Bool, confidence: Swift.Float)
+  public static func == (a: MWDATMockDevice.TranscriptionResult, b: MWDATMockDevice.TranscriptionResult) -> Swift.Bool
+}
+extension MWDATMockDevice.CameraFacing : Swift.Equatable {}
+extension MWDATMockDevice.CameraFacing : Swift.Hashable {}
+extension MWDATMockDevice.GlassesModel : Swift.Equatable {}
+extension MWDATMockDevice.GlassesModel : Swift.Hashable {}
+extension MWDATMockDevice.GlassesModel : Swift.RawRepresentable {}
+extension MWDATMockDevice.MockDeviceKitError : Swift.Hashable {}
+extension MWDATMockDevice.MockDeviceKitConfig : Swift.BitwiseCopyable {}
+extension MWDATMockDevice.MockSpeechSource : Swift.Equatable {}
+extension MWDATMockDevice.MockSpeechSource : Swift.Hashable {}
+extension MWDATMockDevice.InputSource : Swift.Hashable {}
+extension MWDATMockDevice.InputSource : Swift.BitwiseCopyable {}
+extension MWDATMockDevice.NavDirection : Swift.Hashable {}
+extension MWDATMockDevice.NavDirection : Swift.BitwiseCopyable {}
+extension MWDATMockDevice.ButtonType : Swift.Hashable {}
+extension MWDATMockDevice.ButtonType : Swift.BitwiseCopyable {}
+extension MWDATMockDevice.CapturePressType : Swift.Hashable {}
+extension MWDATMockDevice.CapturePressType : Swift.BitwiseCopyable {}
+extension MWDATMockDevice.DragAction : Swift.Hashable {}
+extension MWDATMockDevice.DragAction : Swift.BitwiseCopyable {}
+extension MWDATMockDevice.ObjC_InputSource : Swift.Equatable {}
+extension MWDATMockDevice.ObjC_InputSource : Swift.Hashable {}
+extension MWDATMockDevice.ObjC_InputSource : Swift.RawRepresentable {}
+extension MWDATMockDevice.ObjC_InputSource : Swift.BitwiseCopyable {}
+extension MWDATMockDevice.ObjC_ButtonType : Swift.Equatable {}
+extension MWDATMockDevice.ObjC_ButtonType : Swift.Hashable {}
+extension MWDATMockDevice.ObjC_ButtonType : Swift.RawRepresentable {}
+extension MWDATMockDevice.ObjC_ButtonType : Swift.BitwiseCopyable {}
+extension MWDATMockDevice.ObjC_CapturePressType : Swift.Equatable {}
+extension MWDATMockDevice.ObjC_CapturePressType : Swift.Hashable {}
+extension MWDATMockDevice.ObjC_CapturePressType : Swift.RawRepresentable {}
+extension MWDATMockDevice.ObjC_CapturePressType : Swift.BitwiseCopyable {}
+extension MWDATMockDevice.ObjC_DragAction : Swift.Equatable {}
+extension MWDATMockDevice.ObjC_DragAction : Swift.Hashable {}
+extension MWDATMockDevice.ObjC_DragAction : Swift.RawRepresentable {}
+extension MWDATMockDevice.ObjC_DragAction : Swift.BitwiseCopyable {}
+extension MWDATMockDevice.MotionSource : Swift.Hashable {}
+extension MWDATMockDevice.MotionSource : Swift.BitwiseCopyable {}

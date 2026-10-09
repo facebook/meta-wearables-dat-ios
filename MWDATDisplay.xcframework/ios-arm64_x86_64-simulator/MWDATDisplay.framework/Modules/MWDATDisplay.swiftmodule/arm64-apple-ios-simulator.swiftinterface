@@ -1,0 +1,892 @@
+// swift-interface-format-version: 1.0
+// swift-compiler-version: Apple Swift version 6.3.3 (swiftlang-6.3.3.1.3 clang-2100.1.1.101)
+// swift-module-flags: -target arm64-apple-ios17.2-simulator -enable-objc-interop -enable-library-evolution -swift-version 6 -Osize -module-name MWDATDisplay -package-name MetaWearablesDAT
+// swift-module-flags-ignorable: -no-verify-emitted-module-interface -formal-cxx-interoperability-mode=off -interface-compiler-version 6.3.3
+import Foundation
+import MWDATCore
+import Swift
+import UIKit
+import _Concurrency
+import _StringProcessing
+import _SwiftConcurrencyShims
+extension MWDATCore.DeviceSession {
+  final public func addDisplay() throws(MWDATCore.DeviceSessionError) -> MWDATDisplay.Display
+}
+@frozen public enum DisplayState {
+  case starting
+  case started
+  case stopping
+  case stopped
+  public static func == (a: MWDATDisplay.DisplayState, b: MWDATDisplay.DisplayState) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+@_hasMissingDesignatedInitializers final public class Display : Swift.Sendable {
+  final public var statePublisher: any MWDATCore.Announcer<MWDATDisplay.DisplayState> {
+    get
+  }
+  final public var state: MWDATDisplay.DisplayState {
+    get
+  }
+  final public var onPlaybackEvent: (@Sendable (MWDATDisplay.VideoPlaybackEvent) -> Swift.Void)? {
+    get
+    set
+  }
+  @objc deinit
+  final public func start()
+  final public func stop()
+  final public func send(_ view: some DisplayableView) async throws
+  final public func clearDisplay() async throws
+  final public func sendVideoStop() async
+}
+public enum DisplayError : MWDATCore.DatError, Swift.Equatable {
+  case deviceDisconnected
+  case invalidVideoURL
+  case displayError(Swift.String)
+  public var description: Swift.String {
+    get
+  }
+  public var errorDescription: Swift.String? {
+    get
+  }
+  public static func == (a: MWDATDisplay.DisplayError, b: MWDATDisplay.DisplayError) -> Swift.Bool
+}
+public enum VideoPlaybackEventType : Swift.Int, Swift.Sendable {
+  case unknown
+  case started
+  case ended
+  case stopped
+  case error
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+public enum VideoErrorType : Swift.Int, Swift.Sendable {
+  case unknown
+  case urlInvalid
+  case alreadyPlaying
+  case playbackFailed
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+public struct VideoPlaybackEvent : Swift.Sendable {
+  public let type: MWDATDisplay.VideoPlaybackEventType
+  public let errorType: MWDATDisplay.VideoErrorType
+  public init(type: MWDATDisplay.VideoPlaybackEventType, errorType: MWDATDisplay.VideoErrorType = .unknown)
+}
+public enum VideoCodec : Swift.Int, Swift.Sendable {
+  case unknown
+  case mp4
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+extension MWDATCore.ObjC_DeviceSession {
+  @objc final public func addDisplayAndReturnError(_ outError: Foundation.NSErrorPointer) -> MWDATDisplay.ObjC_Display?
+}
+@_hasMissingDesignatedInitializers @objc(MWDATDisplayListenerToken) final public class ObjC_DisplayListenerToken : ObjectiveC.NSObject, Swift.Sendable {
+  @objc final public func cancel()
+  @objc deinit
+}
+@_hasMissingDesignatedInitializers @objc(MWDATDisplay) final public class ObjC_Display : ObjectiveC.NSObject, Swift.Sendable {
+  @objc final public var state: MWDATDisplay.ObjC_DisplayState {
+    @objc get
+  }
+  @objc deinit
+  @objc final public func start()
+  @objc final public func stop()
+  @objc final public func sendView(_ view: MWDATDisplay.ObjC_FlexBox, completion: @escaping @Sendable (Foundation.NSError?) -> Swift.Void)
+  @objc(clearDisplayWithCompletion:) final public func clearDisplay(completion: @escaping @Sendable (Foundation.NSError?) -> Swift.Void)
+  @objc final public func sendVideoWithURL(_ url: Swift.String, completion: @escaping @Sendable (Foundation.NSError?) -> Swift.Void)
+  @objc final public func sendVideoStop()
+  @objc final public func addStateListener(_ listener: @escaping @Sendable (MWDATDisplay.ObjC_DisplayState) -> Swift.Void) -> MWDATDisplay.ObjC_DisplayListenerToken
+  @objc final public var onPlaybackEvent: (@Sendable (MWDATDisplay.ObjC_VideoPlaybackEvent) -> Swift.Void)? {
+    @objc get
+    @objc set
+  }
+}
+@objc extension Foundation.NSNotification {
+  @objc public static let displayStateChanged: Foundation.Notification.Name
+}
+@objc(MWDATDisplayState) @frozen public enum ObjC_DisplayState : Swift.Int, Swift.Sendable {
+  case starting
+  case started
+  case stopping
+  case stopped
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+@objc(MWDATDisplayError) public enum ObjC_DisplayError : Swift.Int, Swift.Sendable {
+  case deviceDisconnected = 2
+  case invalidVideoURL = 10
+  case displayError = 11
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+@objc(MWDATDisplayVideoCodec) @frozen public enum ObjC_DisplayVideoCodec : Swift.Int, Swift.Sendable {
+  case unknown
+  case mp4
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+@objc(MWDATVideoPlaybackEventType) @frozen public enum ObjC_VideoPlaybackEventType : Swift.Int, Swift.Sendable {
+  case unknown
+  case started
+  case ended
+  case stopped
+  case error
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+@objc(MWDATVideoErrorType) @frozen public enum ObjC_VideoErrorType : Swift.Int, Swift.Sendable {
+  case unknown
+  case urlInvalid
+  case alreadyPlaying
+  case playbackFailed
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+@_hasMissingDesignatedInitializers @objc(MWDATVideoPlaybackEvent) final public class ObjC_VideoPlaybackEvent : ObjectiveC.NSObject, Swift.Sendable {
+  @objc final public var type: MWDATDisplay.ObjC_VideoPlaybackEventType {
+    @objc get
+  }
+  @objc final public var errorType: MWDATDisplay.ObjC_VideoErrorType {
+    @objc get
+  }
+  @objc deinit
+}
+@objc(MWDATDirection) @frozen public enum ObjC_DatDirection : Swift.Int, Swift.Sendable {
+  case column
+  case row
+  case columnReverse
+  case rowReverse
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+@objc(MWDATAlignment) @frozen public enum ObjC_DatAlignment : Swift.Int, Swift.Sendable {
+  case start
+  case center
+  case end
+  case stretch
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+@objc(MWDATTextStyle) @frozen public enum ObjC_DatTextStyle : Swift.Int, Swift.Sendable {
+  case heading
+  case body
+  case meta
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+@objc(MWDATTextColor) @frozen public enum ObjC_DatTextColor : Swift.Int, Swift.Sendable {
+  case primary
+  case secondary
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+@objc(MWDATButtonStyle) @frozen public enum ObjC_DatButtonStyle : Swift.Int, Swift.Sendable {
+  case primary
+  case secondary
+  case outline
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+@objc(MWDATActionRole) @frozen public enum ObjC_DatActionRole : Swift.Int, Swift.Sendable {
+  case primary
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+@objc(MWDATImageSize) @frozen public enum ObjC_DatImageSize : Swift.Int, Swift.Sendable {
+  case icon
+  case fill
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+@objc(MWDATCornerRadius) @frozen public enum ObjC_DatCornerRadius : Swift.Int, Swift.Sendable {
+  case none
+  case small
+  case medium
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+@objc(MWDATIconStyle) @frozen public enum ObjC_DatIconStyle : Swift.Int, Swift.Sendable {
+  case filled
+  case outline
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+@objc(MWDATBackground) @frozen public enum ObjC_DatBackground : Swift.Int, Swift.Sendable {
+  case none
+  case card
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+@objc(MWDATEdge) @frozen public enum ObjC_DatEdge : Swift.Int, Swift.Sendable {
+  case top
+  case bottom
+  case leading
+  case trailing
+  case horizontal
+  case vertical
+  case all
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+@objc(MWDATEdgeInsets) final public class ObjC_DatEdgeInsets : ObjectiveC.NSObject, Swift.Sendable {
+  @objc final public let top: CoreFoundation.CGFloat
+  @objc final public let bottom: CoreFoundation.CGFloat
+  @objc final public let leading: CoreFoundation.CGFloat
+  @objc final public let trailing: CoreFoundation.CGFloat
+  @objc public init(top: CoreFoundation.CGFloat, bottom: CoreFoundation.CGFloat, leading: CoreFoundation.CGFloat, trailing: CoreFoundation.CGFloat)
+  @objc convenience public init(all value: CoreFoundation.CGFloat)
+  @objc deinit
+}
+@_inheritsConvenienceInitializers @objc(MWDATViewComponent) public class ObjC_DatViewComponent : ObjectiveC.NSObject, @unchecked Swift.Sendable {
+  @objc override dynamic public init()
+  @objc deinit
+}
+@objc(MWDATText) final public class ObjC_Text : MWDATDisplay.ObjC_DatViewComponent, @unchecked Swift.Sendable {
+  @objc public init(content: Swift.String, style: MWDATDisplay.ObjC_DatTextStyle = .body, color: MWDATDisplay.ObjC_DatTextColor = .primary)
+  @objc deinit
+}
+@_hasMissingDesignatedInitializers @objc(MWDATButton) final public class ObjC_Button : MWDATDisplay.ObjC_DatViewComponent, @unchecked Swift.Sendable {
+  @objc public init(label: Swift.String, style: MWDATDisplay.ObjC_DatButtonStyle = .primary, iconName: Swift.String? = nil, onClick: (@Sendable () -> Swift.Void)? = nil)
+  @objc final public func actionRole(_ role: MWDATDisplay.ObjC_DatActionRole) -> MWDATDisplay.ObjC_Button
+  @objc deinit
+}
+@objc(MWDATImage) final public class ObjC_Image : MWDATDisplay.ObjC_DatViewComponent, @unchecked Swift.Sendable {
+  @objc public init(uri: Swift.String, sizePreset: MWDATDisplay.ObjC_DatImageSize = .icon, cornerRadius: MWDATDisplay.ObjC_DatCornerRadius = .none)
+  @objc public init(image: UIKit.UIImage, sizePreset: MWDATDisplay.ObjC_DatImageSize = .fill, cornerRadius: MWDATDisplay.ObjC_DatCornerRadius = .none)
+  @objc deinit
+}
+@objc(MWDATIcon) final public class ObjC_Icon : MWDATDisplay.ObjC_DatViewComponent, @unchecked Swift.Sendable {
+  @objc public init?(name: Swift.String, style: MWDATDisplay.ObjC_DatIconStyle = .filled)
+  @objc deinit
+}
+@_hasMissingDesignatedInitializers @objc(MWDATFlexBox) final public class ObjC_FlexBox : MWDATDisplay.ObjC_DatViewComponent, @unchecked Swift.Sendable {
+  @objc public init(direction: MWDATDisplay.ObjC_DatDirection = .column, children: [MWDATDisplay.ObjC_DatViewComponent], spacing: CoreFoundation.CGFloat = 0, alignment: MWDATDisplay.ObjC_DatAlignment = .start, crossAlignment: MWDATDisplay.ObjC_DatAlignment = .start, wrap: Swift.Bool = false, padding: MWDATDisplay.ObjC_DatEdgeInsets? = nil)
+  @objc final public func flexGrow(_ value: Swift.Float) -> MWDATDisplay.ObjC_FlexBox
+  @objc final public func flexShrink(_ value: Swift.Float) -> MWDATDisplay.ObjC_FlexBox
+  @objc final public func alignSelf(_ value: MWDATDisplay.ObjC_DatAlignment) -> MWDATDisplay.ObjC_FlexBox
+  @objc final public func padding(_ value: CoreFoundation.CGFloat) -> MWDATDisplay.ObjC_FlexBox
+  @objc final public func paddingWithInsets(_ insets: MWDATDisplay.ObjC_DatEdgeInsets) -> MWDATDisplay.ObjC_FlexBox
+  @objc final public func paddingForEdges(_ edges: MWDATDisplay.ObjC_DatEdge, value: CoreFoundation.CGFloat) -> MWDATDisplay.ObjC_FlexBox
+  @objc final public func background(_ value: MWDATDisplay.ObjC_DatBackground) -> MWDATDisplay.ObjC_FlexBox
+  @objc final public func onTap(_ handler: @escaping @Sendable () -> Swift.Void) -> MWDATDisplay.ObjC_FlexBox
+  @objc deinit
+}
+@objc(MWDATButtonGroupAlignment) @frozen public enum ObjC_DatButtonGroupAlignment : Swift.Int, Swift.Sendable {
+  case start
+  case center
+  case end
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+@objc(MWDATButtonGroup) final public class ObjC_ButtonGroup : MWDATDisplay.ObjC_DatViewComponent, @unchecked Swift.Sendable {
+  @objc public init(alignment: MWDATDisplay.ObjC_DatButtonGroupAlignment = .center, buttons: [MWDATDisplay.ObjC_Button])
+  @objc deinit
+}
+public enum VideoError : MWDATCore.DatError, Swift.Equatable {
+  case playbackFailed(MWDATDisplay.VideoErrorType)
+  public var description: Swift.String {
+    get
+  }
+  public var errorDescription: Swift.String? {
+    get
+  }
+  public static func == (a: MWDATDisplay.VideoError, b: MWDATDisplay.VideoError) -> Swift.Bool
+}
+public struct VideoPlayer : MWDATDisplay.DisplayableView, Swift.Sendable {
+  public enum Provider : Swift.Sendable {
+    case uri(Swift.String)
+  }
+  public let provider: MWDATDisplay.VideoPlayer.Provider
+  public let codec: MWDATDisplay.VideoCodec
+  public let onError: (@Sendable (MWDATDisplay.VideoError) -> Swift.Void)?
+  public init(provider: MWDATDisplay.VideoPlayer.Provider, codec: MWDATDisplay.VideoCodec = .mp4, onError: (@Sendable (MWDATDisplay.VideoError) -> Swift.Void)? = nil)
+}
+public enum ButtonStyle : Swift.Sendable {
+  case primary
+  case secondary
+  case outline
+  public static func == (a: MWDATDisplay.ButtonStyle, b: MWDATDisplay.ButtonStyle) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+public enum ActionRole : Swift.Sendable {
+  case primary
+  public static func == (a: MWDATDisplay.ActionRole, b: MWDATDisplay.ActionRole) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+public struct Button : Swift.Sendable {
+  public let label: Swift.String
+  public let style: MWDATDisplay.ButtonStyle
+  public let iconName: MWDATDisplay.IconName?
+  public let onClick: (@Sendable () -> Swift.Void)?
+  public var flexGrow: Swift.Float {
+    get
+  }
+  public var flexShrink: Swift.Float {
+    get
+  }
+  public var alignSelf: MWDATDisplay.Alignment? {
+    get
+  }
+  public init(label: Swift.String, style: MWDATDisplay.ButtonStyle = .primary, iconName: MWDATDisplay.IconName? = nil, onClick: (@Sendable () -> Swift.Void)? = nil)
+  public func flexGrow(_ value: Swift.Float) -> MWDATDisplay.Button
+  public func flexShrink(_ value: Swift.Float) -> MWDATDisplay.Button
+  public func alignSelf(_ value: MWDATDisplay.Alignment) -> MWDATDisplay.Button
+  public func actionRole(_ role: MWDATDisplay.ActionRole) -> MWDATDisplay.Button
+}
+public enum ButtonGroupAlignment : Swift.Sendable {
+  case start
+  case center
+  case end
+  public static func == (a: MWDATDisplay.ButtonGroupAlignment, b: MWDATDisplay.ButtonGroupAlignment) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+@_functionBuilder public struct ButtonGroupBuilder {
+  public static func buildBlock(_ components: [MWDATDisplay.Button]...) -> [MWDATDisplay.Button]
+  public static func buildArray(_ components: [[MWDATDisplay.Button]]) -> [MWDATDisplay.Button]
+  public static func buildOptional(_ component: [MWDATDisplay.Button]?) -> [MWDATDisplay.Button]
+  public static func buildEither(first component: [MWDATDisplay.Button]) -> [MWDATDisplay.Button]
+  public static func buildEither(second component: [MWDATDisplay.Button]) -> [MWDATDisplay.Button]
+  public static func buildExpression(_ expression: MWDATDisplay.Button) -> [MWDATDisplay.Button]
+}
+public struct ButtonGroup : Swift.Sendable {
+  public var buttons: [MWDATDisplay.Button] {
+    get
+  }
+  public var alignment: MWDATDisplay.ButtonGroupAlignment {
+    get
+  }
+  public var flexGrow: Swift.Float {
+    get
+  }
+  public var flexShrink: Swift.Float {
+    get
+  }
+  public var alignSelf: MWDATDisplay.Alignment? {
+    get
+  }
+  public init(alignment: MWDATDisplay.ButtonGroupAlignment = .center, @MWDATDisplay.ButtonGroupBuilder content: () -> [MWDATDisplay.Button])
+  public func flexGrow(_ value: Swift.Float) -> MWDATDisplay.ButtonGroup
+  public func flexShrink(_ value: Swift.Float) -> MWDATDisplay.ButtonGroup
+  public func alignSelf(_ value: MWDATDisplay.Alignment) -> MWDATDisplay.ButtonGroup
+}
+public struct FlexBox : Swift.Sendable {
+  public var direction: MWDATDisplay.Direction {
+    get
+  }
+  public var children: [any MWDATDisplay.ViewComponent] {
+    get
+  }
+  public var spacing: CoreFoundation.CGFloat {
+    get
+  }
+  public var alignment: MWDATDisplay.Alignment {
+    get
+  }
+  public var crossAlignment: MWDATDisplay.Alignment {
+    get
+  }
+  public var wrap: Swift.Bool {
+    get
+  }
+  public var padding: MWDATDisplay.EdgeInsets? {
+    get
+  }
+  public var background: MWDATDisplay.Background {
+    get
+  }
+  public var onClick: (@Sendable () -> Swift.Void)? {
+    get
+  }
+  public var flexGrow: Swift.Float {
+    get
+  }
+  public var flexShrink: Swift.Float {
+    get
+  }
+  public var alignSelf: MWDATDisplay.Alignment? {
+    get
+  }
+  public init(direction: MWDATDisplay.Direction = .column, spacing: CoreFoundation.CGFloat = 0, alignment: MWDATDisplay.Alignment = .start, crossAlignment: MWDATDisplay.Alignment = .start, wrap: Swift.Bool = false, padding: MWDATDisplay.EdgeInsets? = nil, @MWDATDisplay.ComponentBuilder content: () -> [any MWDATDisplay.ViewComponent])
+  public func flexGrow(_ value: Swift.Float) -> MWDATDisplay.FlexBox
+  public func flexShrink(_ value: Swift.Float) -> MWDATDisplay.FlexBox
+  public func alignSelf(_ value: MWDATDisplay.Alignment) -> MWDATDisplay.FlexBox
+  public func padding(_ value: CoreFoundation.CGFloat) -> MWDATDisplay.FlexBox
+  public func padding(_ insets: MWDATDisplay.EdgeInsets) -> MWDATDisplay.FlexBox
+  public func padding(_ edges: MWDATDisplay.Edge, _ value: CoreFoundation.CGFloat) -> MWDATDisplay.FlexBox
+  public func background(_ value: MWDATDisplay.Background) -> MWDATDisplay.FlexBox
+  public func onTap(_ handler: @escaping @Sendable () -> Swift.Void) -> MWDATDisplay.FlexBox
+}
+public enum IconStyle : Swift.Sendable {
+  case filled
+  case outline
+  public static func == (a: MWDATDisplay.IconStyle, b: MWDATDisplay.IconStyle) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+public enum IconName : Swift.String, Swift.Sendable {
+  case airplane
+  case arrowDownShallowU
+  case arrowLeft
+  case arrowRight
+  case arrowULeft
+  case arrowUpShallowU
+  case avatar
+  case avatarOff
+  case bedSide
+  case bell
+  case bellDiagonalRightDot
+  case bellOff
+  case bikeShare
+  case bug
+  case bullhorn
+  case bus
+  case calendar
+  case campfire
+  case caretDown
+  case caretLeft
+  case caretRight
+  case caretUp
+  case carFrontView
+  case cart
+  case checkmark
+  case checkmarkCircle
+  case circle8RaysLarge
+  case circleHandle
+  case clock
+  case cloud
+  case cloudCrescentMoon
+  case cloudDotFourRays
+  case cloudFiveDashes
+  case cloudHookSwirl
+  case cloudLightning
+  case cocktailGlass
+  case code
+  case coffeeCup
+  case compassNorthUpRed
+  case containerWithLid
+  case crossBriefcase
+  case dropper
+  case envelopeOpen
+  case exclamationCircle
+  case exclamationTriangle
+  case eye
+  case forkKnife
+  case fourArcsUpFilled
+  case fourArcsUpGrayscale
+  case fourCornerFrame
+  case gear
+  case globeWesternHemisphere
+  case graduationCap
+  case hashtag
+  case headphones
+  case heart
+  case house
+  case iCircle
+  case lightBulb
+  case magicWand
+  case metaAi
+  case mountainSquare
+  case mountainSquareStacked
+  case museumBuilding
+  case musicNote
+  case nineSquaresGrid
+  case padlockClosed
+  case padlockOpen
+  case palette
+  case paperAirplane
+  case pencil
+  case pencilSquare
+  case person
+  case personCircle
+  case phone
+  case phoneHandsetArrowDownLeft
+  case phoneHandsetArrowUpRight
+  case phoneSlash
+  case pizzaSlice
+  case plus
+  case plusCircle
+  case shoppingBag
+  case slidersHorizontal
+  case smartGlasses
+  case smileyCircle
+  case speakerOff
+  case speakerWithOneArc
+  case speakerWithThreeArcs
+  case speakerWithTwoArcs
+  case speechBubble
+  case speechBubbleOff
+  case stadium
+  case star
+  case starCircleTriangleAi
+  case taxi
+  case threeDotsHorizontal
+  case threeDotSpeechBubble
+  case threeHorizontalLines
+  case threeHorizontalLinesStackedDescending
+  case threePeopleOverlapping
+  case train
+  case tree
+  case triangleLeftVerticalLine
+  case triangleRight
+  case triangleRightCircle
+  case triangleRightVerticalLine
+  case twoArrowsClockwise
+  case twoLinesParallel
+  case twoSquaresStackedRightDown
+  case twoTrianglesLeft
+  case twoTrianglesRight
+  case videoCamera
+  case videoCameraOff
+  case wristband
+  case wristbandSlash
+  case x
+  public init?(rawValue: Swift.String)
+  public typealias RawValue = Swift.String
+  public var rawValue: Swift.String {
+    get
+  }
+}
+public struct Icon : Swift.Sendable {
+  public let name: MWDATDisplay.IconName
+  public let style: MWDATDisplay.IconStyle
+  public var flexGrow: Swift.Float {
+    get
+  }
+  public var flexShrink: Swift.Float {
+    get
+  }
+  public var alignSelf: MWDATDisplay.Alignment? {
+    get
+  }
+  public init(name: MWDATDisplay.IconName, style: MWDATDisplay.IconStyle = .filled)
+  public func flexGrow(_ value: Swift.Float) -> MWDATDisplay.Icon
+  public func flexShrink(_ value: Swift.Float) -> MWDATDisplay.Icon
+  public func alignSelf(_ value: MWDATDisplay.Alignment) -> MWDATDisplay.Icon
+}
+public enum ImageSize : Swift.Sendable {
+  case icon
+  case fill
+  public static func == (a: MWDATDisplay.ImageSize, b: MWDATDisplay.ImageSize) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+public enum CornerRadius : Swift.Sendable {
+  case none
+  case small
+  case medium
+  public static func == (a: MWDATDisplay.CornerRadius, b: MWDATDisplay.CornerRadius) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+public struct Image : Swift.Sendable {
+  public let uri: Swift.String
+  public let sizePreset: MWDATDisplay.ImageSize
+  public let cornerRadius: MWDATDisplay.CornerRadius
+  public var flexGrow: Swift.Float {
+    get
+  }
+  public var flexShrink: Swift.Float {
+    get
+  }
+  public var alignSelf: MWDATDisplay.Alignment? {
+    get
+  }
+  public init(uri: Swift.String, sizePreset: MWDATDisplay.ImageSize = .icon, cornerRadius: MWDATDisplay.CornerRadius = .none)
+  public init(image: UIKit.UIImage, sizePreset: MWDATDisplay.ImageSize = .fill, cornerRadius: MWDATDisplay.CornerRadius = .none)
+  public func flexGrow(_ value: Swift.Float) -> MWDATDisplay.Image
+  public func flexShrink(_ value: Swift.Float) -> MWDATDisplay.Image
+  public func alignSelf(_ value: MWDATDisplay.Alignment) -> MWDATDisplay.Image
+}
+public enum TextStyle : Swift.Sendable {
+  case heading
+  case body
+  case meta
+  public static func == (a: MWDATDisplay.TextStyle, b: MWDATDisplay.TextStyle) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+public enum TextColor : Swift.Sendable {
+  case primary
+  case secondary
+  public static func == (a: MWDATDisplay.TextColor, b: MWDATDisplay.TextColor) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+public struct Text : Swift.Sendable {
+  public let content: Swift.String
+  public let style: MWDATDisplay.TextStyle
+  public let color: MWDATDisplay.TextColor
+  public var flexGrow: Swift.Float {
+    get
+  }
+  public var flexShrink: Swift.Float {
+    get
+  }
+  public var alignSelf: MWDATDisplay.Alignment? {
+    get
+  }
+  public init(_ content: Swift.String, style: MWDATDisplay.TextStyle = .body, color: MWDATDisplay.TextColor = .primary)
+  public func flexGrow(_ value: Swift.Float) -> MWDATDisplay.Text
+  public func flexShrink(_ value: Swift.Float) -> MWDATDisplay.Text
+  public func alignSelf(_ value: MWDATDisplay.Alignment) -> MWDATDisplay.Text
+}
+public protocol DisplayableView : Swift.Sendable {
+}
+public protocol ViewComponent : Swift.Sendable {
+}
+@_functionBuilder public struct ComponentBuilder {
+  public static func buildBlock(_ components: [any MWDATDisplay.ViewComponent]...) -> [any MWDATDisplay.ViewComponent]
+  public static func buildArray(_ components: [[any MWDATDisplay.ViewComponent]]) -> [any MWDATDisplay.ViewComponent]
+  public static func buildOptional(_ component: [any MWDATDisplay.ViewComponent]?) -> [any MWDATDisplay.ViewComponent]
+  public static func buildEither(first component: [any MWDATDisplay.ViewComponent]) -> [any MWDATDisplay.ViewComponent]
+  public static func buildEither(second component: [any MWDATDisplay.ViewComponent]) -> [any MWDATDisplay.ViewComponent]
+  public static func buildExpression(_ expression: any MWDATDisplay.ViewComponent) -> [any MWDATDisplay.ViewComponent]
+}
+public enum Direction : Swift.Sendable {
+  case column
+  case row
+  case columnReverse
+  case rowReverse
+  public static func == (a: MWDATDisplay.Direction, b: MWDATDisplay.Direction) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+public enum Alignment : Swift.Sendable {
+  case start
+  case center
+  case end
+  case stretch
+  public static func == (a: MWDATDisplay.Alignment, b: MWDATDisplay.Alignment) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+public enum Background : Swift.Sendable {
+  case none
+  case card
+  public static func == (a: MWDATDisplay.Background, b: MWDATDisplay.Background) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+public struct Edge : Swift.OptionSet, Swift.Sendable {
+  public let rawValue: Swift.UInt8
+  public init(rawValue: Swift.UInt8)
+  public static let top: MWDATDisplay.Edge
+  public static let bottom: MWDATDisplay.Edge
+  public static let leading: MWDATDisplay.Edge
+  public static let trailing: MWDATDisplay.Edge
+  public static let horizontal: MWDATDisplay.Edge
+  public static let vertical: MWDATDisplay.Edge
+  public static let all: MWDATDisplay.Edge
+  public typealias ArrayLiteralElement = MWDATDisplay.Edge
+  public typealias Element = MWDATDisplay.Edge
+  public typealias RawValue = Swift.UInt8
+}
+public struct EdgeInsets : Swift.Sendable {
+  public let top: CoreFoundation.CGFloat
+  public let bottom: CoreFoundation.CGFloat
+  public let leading: CoreFoundation.CGFloat
+  public let trailing: CoreFoundation.CGFloat
+  public init(top: CoreFoundation.CGFloat = 0, bottom: CoreFoundation.CGFloat = 0, leading: CoreFoundation.CGFloat = 0, trailing: CoreFoundation.CGFloat = 0)
+  public init(all value: CoreFoundation.CGFloat)
+}
+extension MWDATDisplay.DisplayState : Swift.Equatable {}
+extension MWDATDisplay.DisplayState : Swift.Hashable {}
+extension MWDATDisplay.DisplayState : Swift.Sendable {}
+extension MWDATDisplay.DisplayState : Swift.BitwiseCopyable {}
+extension MWDATDisplay.VideoPlaybackEventType : Swift.Equatable {}
+extension MWDATDisplay.VideoPlaybackEventType : Swift.Hashable {}
+extension MWDATDisplay.VideoPlaybackEventType : Swift.RawRepresentable {}
+extension MWDATDisplay.VideoErrorType : Swift.Equatable {}
+extension MWDATDisplay.VideoErrorType : Swift.Hashable {}
+extension MWDATDisplay.VideoErrorType : Swift.RawRepresentable {}
+extension MWDATDisplay.VideoCodec : Swift.Equatable {}
+extension MWDATDisplay.VideoCodec : Swift.Hashable {}
+extension MWDATDisplay.VideoCodec : Swift.RawRepresentable {}
+extension MWDATDisplay.Direction : Swift.Equatable {}
+extension MWDATDisplay.Direction : Swift.Hashable {}
+extension MWDATDisplay.Alignment : Swift.Equatable {}
+extension MWDATDisplay.Alignment : Swift.Hashable {}
+extension MWDATDisplay.CornerRadius : Swift.Equatable {}
+extension MWDATDisplay.CornerRadius : Swift.Hashable {}
+extension MWDATDisplay.TextStyle : Swift.Equatable {}
+extension MWDATDisplay.TextStyle : Swift.Hashable {}
+extension MWDATDisplay.TextColor : Swift.Equatable {}
+extension MWDATDisplay.TextColor : Swift.Hashable {}
+extension MWDATDisplay.IconStyle : Swift.Equatable {}
+extension MWDATDisplay.IconStyle : Swift.Hashable {}
+extension MWDATDisplay.ButtonGroupAlignment : Swift.Equatable {}
+extension MWDATDisplay.ButtonGroupAlignment : Swift.Hashable {}
+extension MWDATDisplay.ObjC_DisplayState : Swift.Equatable {}
+extension MWDATDisplay.ObjC_DisplayState : Swift.Hashable {}
+extension MWDATDisplay.ObjC_DisplayState : Swift.RawRepresentable {}
+extension MWDATDisplay.ObjC_DisplayState : Swift.BitwiseCopyable {}
+extension MWDATDisplay.ObjC_DisplayError : Swift.Equatable {}
+extension MWDATDisplay.ObjC_DisplayError : Swift.Hashable {}
+extension MWDATDisplay.ObjC_DisplayError : Swift.RawRepresentable {}
+extension MWDATDisplay.ObjC_DisplayVideoCodec : Swift.Equatable {}
+extension MWDATDisplay.ObjC_DisplayVideoCodec : Swift.Hashable {}
+extension MWDATDisplay.ObjC_DisplayVideoCodec : Swift.RawRepresentable {}
+extension MWDATDisplay.ObjC_DisplayVideoCodec : Swift.BitwiseCopyable {}
+extension MWDATDisplay.ObjC_VideoPlaybackEventType : Swift.Equatable {}
+extension MWDATDisplay.ObjC_VideoPlaybackEventType : Swift.Hashable {}
+extension MWDATDisplay.ObjC_VideoPlaybackEventType : Swift.RawRepresentable {}
+extension MWDATDisplay.ObjC_VideoPlaybackEventType : Swift.BitwiseCopyable {}
+extension MWDATDisplay.ObjC_VideoErrorType : Swift.Equatable {}
+extension MWDATDisplay.ObjC_VideoErrorType : Swift.Hashable {}
+extension MWDATDisplay.ObjC_VideoErrorType : Swift.RawRepresentable {}
+extension MWDATDisplay.ObjC_VideoErrorType : Swift.BitwiseCopyable {}
+extension MWDATDisplay.ObjC_DatDirection : Swift.Equatable {}
+extension MWDATDisplay.ObjC_DatDirection : Swift.Hashable {}
+extension MWDATDisplay.ObjC_DatDirection : Swift.RawRepresentable {}
+extension MWDATDisplay.ObjC_DatDirection : Swift.BitwiseCopyable {}
+extension MWDATDisplay.ObjC_DatAlignment : Swift.Equatable {}
+extension MWDATDisplay.ObjC_DatAlignment : Swift.Hashable {}
+extension MWDATDisplay.ObjC_DatAlignment : Swift.RawRepresentable {}
+extension MWDATDisplay.ObjC_DatAlignment : Swift.BitwiseCopyable {}
+extension MWDATDisplay.ObjC_DatTextStyle : Swift.Equatable {}
+extension MWDATDisplay.ObjC_DatTextStyle : Swift.Hashable {}
+extension MWDATDisplay.ObjC_DatTextStyle : Swift.RawRepresentable {}
+extension MWDATDisplay.ObjC_DatTextStyle : Swift.BitwiseCopyable {}
+extension MWDATDisplay.ObjC_DatTextColor : Swift.Equatable {}
+extension MWDATDisplay.ObjC_DatTextColor : Swift.Hashable {}
+extension MWDATDisplay.ObjC_DatTextColor : Swift.RawRepresentable {}
+extension MWDATDisplay.ObjC_DatTextColor : Swift.BitwiseCopyable {}
+extension MWDATDisplay.ObjC_DatButtonStyle : Swift.Equatable {}
+extension MWDATDisplay.ObjC_DatButtonStyle : Swift.Hashable {}
+extension MWDATDisplay.ObjC_DatButtonStyle : Swift.RawRepresentable {}
+extension MWDATDisplay.ObjC_DatButtonStyle : Swift.BitwiseCopyable {}
+extension MWDATDisplay.ObjC_DatActionRole : Swift.Equatable {}
+extension MWDATDisplay.ObjC_DatActionRole : Swift.Hashable {}
+extension MWDATDisplay.ObjC_DatActionRole : Swift.RawRepresentable {}
+extension MWDATDisplay.ObjC_DatActionRole : Swift.BitwiseCopyable {}
+extension MWDATDisplay.ObjC_DatImageSize : Swift.Equatable {}
+extension MWDATDisplay.ObjC_DatImageSize : Swift.Hashable {}
+extension MWDATDisplay.ObjC_DatImageSize : Swift.RawRepresentable {}
+extension MWDATDisplay.ObjC_DatImageSize : Swift.BitwiseCopyable {}
+extension MWDATDisplay.ObjC_DatCornerRadius : Swift.Equatable {}
+extension MWDATDisplay.ObjC_DatCornerRadius : Swift.Hashable {}
+extension MWDATDisplay.ObjC_DatCornerRadius : Swift.RawRepresentable {}
+extension MWDATDisplay.ObjC_DatCornerRadius : Swift.BitwiseCopyable {}
+extension MWDATDisplay.ObjC_DatIconStyle : Swift.Equatable {}
+extension MWDATDisplay.ObjC_DatIconStyle : Swift.Hashable {}
+extension MWDATDisplay.ObjC_DatIconStyle : Swift.RawRepresentable {}
+extension MWDATDisplay.ObjC_DatIconStyle : Swift.BitwiseCopyable {}
+extension MWDATDisplay.ObjC_DatBackground : Swift.Equatable {}
+extension MWDATDisplay.ObjC_DatBackground : Swift.Hashable {}
+extension MWDATDisplay.ObjC_DatBackground : Swift.RawRepresentable {}
+extension MWDATDisplay.ObjC_DatBackground : Swift.BitwiseCopyable {}
+extension MWDATDisplay.ObjC_DatEdge : Swift.Equatable {}
+extension MWDATDisplay.ObjC_DatEdge : Swift.Hashable {}
+extension MWDATDisplay.ObjC_DatEdge : Swift.RawRepresentable {}
+extension MWDATDisplay.ObjC_DatEdge : Swift.BitwiseCopyable {}
+extension MWDATDisplay.ObjC_DatButtonGroupAlignment : Swift.Equatable {}
+extension MWDATDisplay.ObjC_DatButtonGroupAlignment : Swift.Hashable {}
+extension MWDATDisplay.ObjC_DatButtonGroupAlignment : Swift.RawRepresentable {}
+extension MWDATDisplay.ObjC_DatButtonGroupAlignment : Swift.BitwiseCopyable {}
+extension MWDATDisplay.ButtonStyle : Swift.Equatable {}
+extension MWDATDisplay.ButtonStyle : Swift.Hashable {}
+extension MWDATDisplay.ActionRole : Swift.Equatable {}
+extension MWDATDisplay.ActionRole : Swift.Hashable {}
+extension MWDATDisplay.Button : MWDATDisplay.ViewComponent {}
+extension MWDATDisplay.ButtonGroup : MWDATDisplay.ViewComponent {}
+extension MWDATDisplay.FlexBox : MWDATDisplay.ViewComponent {}
+extension MWDATDisplay.FlexBox : MWDATDisplay.DisplayableView {}
+extension MWDATDisplay.IconName : Swift.Equatable {}
+extension MWDATDisplay.IconName : Swift.Hashable {}
+extension MWDATDisplay.IconName : Swift.RawRepresentable {}
+extension MWDATDisplay.Icon : MWDATDisplay.ViewComponent {}
+extension MWDATDisplay.ImageSize : Swift.Equatable {}
+extension MWDATDisplay.ImageSize : Swift.Hashable {}
+extension MWDATDisplay.Image : MWDATDisplay.ViewComponent {}
+extension MWDATDisplay.Text : MWDATDisplay.ViewComponent {}
+extension MWDATDisplay.Background : Swift.Equatable {}
+extension MWDATDisplay.Background : Swift.Hashable {}

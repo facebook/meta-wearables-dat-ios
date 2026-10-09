@@ -1,0 +1,28 @@
+/* (c) Meta Platforms, Inc. and affiliates. Confidential and proprietary. */
+
+/* Localized error descriptions.
+   Keys match Android strings.xml for cross-platform parity. */
+
+"dat_error_photo_capture_failed" = "Photo capture failed";
+"dat_error_stream_battery_low" = "Device battery is too low for streaming";
+"dat_error_stream_critical_error" = "Critical error, the stream should end";
+"dat_error_stream_device_not_connected" = "Device is not connected";
+"dat_error_stream_device_not_found" = "Device not found";
+"dat_error_stream_error" = "Unspecified error, the stream can continue regardless";
+"dat_error_stream_hinge_closed" = "The hinges on the glasses were closed";
+"dat_error_stream_peak_power_limit" = "Device peak power limit reached";
+"dat_error_stream_permissions_denied" = "Permissions denied";
+"dat_error_stream_thermal_hot" = "Device thermal level is too high for streaming";
+"dat_error_stream_timeout" = "The operation timed out";
+
+/* Capture */
+"dat_error_capture_busy" = "Capture is busy";
+"dat_error_capture_device_disconnected" = "Device disconnected";
+"dat_error_capture_device_health_critical" = "Device health critical";
+"dat_error_capture_failure" = "Capture failed";
+"dat_error_capture_not_ready" = "Capture is not ready";
+"dat_error_capture_permission_denied" = "Capture permission denied";
+"dat_error_capture_service_unavailable" = "Capture service unavailable";
+"dat_error_capture_setup_failed" = "Capture setup failed";
+"dat_error_capture_timed_out" = "Capture timed out";
+"dat_error_capture_unknown" = "Unknown capture error";
