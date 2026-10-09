@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "name": "mwdat-ios",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "displayName": "Meta Wearables DAT iOS",
   "description": "Git-native DAT SDK guidance for iOS development, covering setup, camera streaming, display access, MockDeviceKit, session lifecycle, permissions, debugging, and sample app patterns.",
   "compat": {

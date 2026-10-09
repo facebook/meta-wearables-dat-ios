@@ -1,6 +1,6 @@
 # Meta Wearables Device Access Toolkit for iOS
 
-[![Swift Package](https://img.shields.io/badge/Swift_Package-1.0.0-brightgreen?logo=swift&logoColor=white)](https://github.com/facebook/meta-wearables-dat-ios/tags)
+[![Swift Package](https://img.shields.io/badge/Swift_Package-1.0.1-brightgreen?logo=swift&logoColor=white)](https://github.com/facebook/meta-wearables-dat-ios/tags)
 [![Docs](https://img.shields.io/badge/API_Reference-latest-blue?logo=meta)](https://wearables.developer.meta.com/docs/reference/ios_swift/dat/latest)
 
 The Meta Wearables Device Access Toolkit enables developers to utilize Meta's AI glasses to build hands-free wearable experiences into their mobile applications.
